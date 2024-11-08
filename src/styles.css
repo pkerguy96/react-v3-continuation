@@ -1,0 +1,62 @@
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+      transform: translateY(-100%);
+    }
+    80% {
+        transform: translateY(20px); /* Create a small bounce */
+      }
+    100% {
+        opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slideInX {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    80% {
+      transform: translateX(20px); /* Create a small bounce */
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  .ct{
+    text-align: center !important;
+  }
+  .animated-element {
+    animation: slideIn 0.3s ease-in-out; /* Apply the 'slideIn' animation */
+    @media (max-width: 768px) {
+        /* On screens with a width of 768px or less, apply 'slideInX' animation */
+        animation: slideInX 0.3s ease-in-out;
+      }
+  }
+
+  .MuiTableRow-hover {
+    cursor: pointer;
+}
+
+.fc-header-toolbar {
+  flex-direction: column;
+}
+.custom-date-color{
+  color: black;
+}
+.fc-header-toolbar button {
+  background-color: #1976d2 !important;
+  border-color: #1976d2 !important;
+}
+
+@media (min-width: 1024px) {
+  .fc-header-toolbar {
+    flex-direction: row;
+  } 
+}
+
+#Dicom .drawLayer {
+  position: absolute;
+  inset: 0;
+}
