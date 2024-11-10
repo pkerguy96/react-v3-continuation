@@ -8,6 +8,7 @@ import XrayDemand from "./XrayDemand";
 import DocumentPage from "./DocumentPage";
 import BloodTest from "./BloodTest";
 import OperationPayementStatus from "../../components/OperationPayementStatus";
+import VisiteValidation from "./VisiteValidation";
 
 const OperationParentPage = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -27,7 +28,13 @@ const OperationParentPage = () => {
           }}
         />
       )} */}
-      {activeStep === 0 && <OperationPayementStatus />}
+      {activeStep === 0 && (
+        <VisiteValidation
+          onNext={() => {
+            handleStepChange(2);
+          }}
+        />
+      )}
       {/*  {activeStep === 0 && (
         <AddOrdonance
           onNext={() => {
