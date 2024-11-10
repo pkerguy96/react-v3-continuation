@@ -16,9 +16,10 @@ import {
 } from "@mui/material";
 import { useEffect, useState, useMemo, Suspense, lazy } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
-import "../styles.css";
-import { Patient } from "./AddPatientForm";
-import LoadingSpinner from "../components/LoadingSpinner";
+
+import "../../styles.css";
+import { Patient } from "../AddPatientForm";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import { Controller, useForm } from "react-hook-form";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { AxiosError } from "axios";
@@ -28,20 +29,21 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { Bones, Younger, listOperationsArray } from "../constants";
+import { Bones, Younger, listOperationsArray } from "../../constants";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import getGlobal from "../hooks/getGlobal";
-import { CACHE_KEY_PATIENTS } from "../constants";
-import patientAPIClient, { OnlyPatientData } from "../services/PatientService";
+import getGlobal from "../../hooks/getGlobal";
+import { CACHE_KEY_PATIENTS } from "../../constants";
+import patientAPIClient, {
+  OnlyPatientData,
+} from "../../services/PatientService";
 import AddIcon from "@mui/icons-material/Add";
 import { Link } from "react-router-dom";
-import addGlobal from "../hooks/addGlobal";
-import operationApiClient, { Operation } from "../services/OperationService";
-import { useSnackbarStore } from "../zustand/useSnackbarStore";
-import useGlobalStore from "../zustand/useGlobalStore";
-import { useGlobalOperationPreference } from "../hooks/getOperationPrefs";
-import v6 from "../assets/v6.svg"; // adjust the path based on your folder structure
-
+import addGlobal from "../../hooks/addGlobal";
+import operationApiClient, { Operation } from "../../services/OperationService";
+import { useSnackbarStore } from "../../zustand/useSnackbarStore";
+import useGlobalStore from "../../zustand/useGlobalStore";
+import { useGlobalOperationPreference } from "../../hooks/getOperationPrefs";
+import v6 from "../../assets/v6.svg";
 const getColor = (colors) => {
   const randomColor = Math.floor(Math.random() * 16777215).toString(16);
   if (colors.includes(randomColor)) return getColor(colors);
@@ -49,16 +51,31 @@ const getColor = (colors) => {
 };
 
 const PatientOperation = ({ onNext }) => {
+  const [table, setTable] = useState([]);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-
-  // Access individual query params
   const patient_id = queryParams.get("id");
-
   const { showSnackbar } = useSnackbarStore();
   const setIds = useGlobalStore((state) => state.setIds);
   const resetIds = useGlobalStore((state) => state.resetIds);
   const addMutation = addGlobal({} as Operation, operationApiClient);
+
+  const validatePrix = useMemo(() => {
+    return (value: number) => {
+      const totalPrice = table.reduce((accumulator, currentValue) => {
+        return accumulator + currentValue.price;
+      }, 0);
+      if (totalPrice <= 0) {
+        return showSnackbar("le prix doit etre un nombre positive.", "error");
+      }
+      if (totalPrice < value) {
+        return "le montant payé ne doit pas dépasser le prix";
+      }
+
+      return true;
+    };
+  }, [table]);
+
   /*   const { data, isLoading } = getGlobal(
     {} as OnlyPatientData,
     [CACHE_KEY_PATIENTS[0]],
@@ -66,10 +83,11 @@ const PatientOperation = ({ onNext }) => {
     undefined
   ); */
   const isLoading = false;
-  const [table, setTable] = useState([]);
-  var { data: OperationList, isLoading: isloading2 } =
-    useGlobalOperationPreference();
-  OperationList = [
+
+  /*   var { data: OperationList, isLoading: isloading2 } =
+    useGlobalOperationPreference(); */
+  var isloading2 = false;
+  var OperationList = [
     {
       name: "operation 1",
       price: 100,
@@ -86,7 +104,6 @@ const PatientOperation = ({ onNext }) => {
       code: 3,
     },
   ];
-  isloading2 = false;
 
   const colors = [];
   const [bones, setBones] = useState([]);
@@ -102,20 +119,21 @@ const PatientOperation = ({ onNext }) => {
       patient_id: patient_id,
       is_paid: data?.fullyPaid,
       note: data?.note,
-      paidAmount: data?.paidAmount,
+      amount_paid: data?.paidAmount,
       operations: table,
     };
 
     const validatedData = [...table, cleanedData];
-    console.log(cleanedData);
+
     try {
       await addMutation.mutateAsync(cleanedData, {
         onSuccess: () => {
           console.log("ddaaaaaaaazt");
+          onNext();
         },
       });
     } catch (error) {
-      console.log("nod tkawad");
+      console.log("madaztch");
     }
   };
 
@@ -221,7 +239,7 @@ const PatientOperation = ({ onNext }) => {
                         >
                           {!isloading2 &&
                             OperationList.map((item) => (
-                              <MenuItem key={item.id} value={item.code}>
+                              <MenuItem key={item.code} value={item.code}>
                                 {item.name}
                               </MenuItem>
                             ))}
@@ -366,11 +384,9 @@ const PatientOperation = ({ onNext }) => {
                 <Controller
                   name="paidAmount"
                   control={control}
-                  rules={
-                    {
-                      // validate: validatePrix,
-                    }
-                  }
+                  rules={{
+                    validate: validatePrix,
+                  }}
                   defaultValue=""
                   render={({ field, fieldState }) => (
                     <Box className="flex-1">

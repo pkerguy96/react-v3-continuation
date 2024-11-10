@@ -28,7 +28,7 @@ import ChangePassword from "./pages/ChangePassword";
 import SettingsPage from "./pages/SettingsPage";
 import KpiSettings from "./components/Settings/KpiSettings";
 import OperationPayementStatus from "./components/OperationPayementStatus";
-import OperationParentPage from "./pages/OperationTimeline/OperationParentPage";
+import OperationParentPage from "./pages/OperationPages/OperationParentPage";
 import DebtPage from "./pages/DebtPage";
 import OperationsListSettings from "./components/Settings/OperationsListSettings";
 import PermissionsSettings from "./components/Settings/PermissionsSettings";

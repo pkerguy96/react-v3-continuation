@@ -8,46 +8,41 @@ import {
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment, { Moment } from "moment";
 import React, { useRef, useState } from "react";
-import { CACHE_KEY_PATIENTS } from "../constants";
-import getGlobalById from "../hooks/getGlobalById";
-import patientAPIClient, { OnlyPatientData } from "../services/PatientService";
-
-import addGlobal from "../hooks/addGlobal";
-import appointmentAPIClient from "../services/AppointmentService";
-
-import LoadingSpinner from "./LoadingSpinner";
-import { useSnackbarStore } from "../zustand/useSnackbarStore";
+import { CACHE_KEY_PATIENTS } from "../../constants";
+import getGlobalById from "../../hooks/getGlobalById";
+import patientAPIClient, {
+  OnlyPatientData,
+} from "../../services/PatientService";
+import addGlobal from "../../hooks/addGlobal";
+import appointmentAPIClient from "../../services/AppointmentService";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import { AxiosError } from "axios";
-import useGlobalStore from "../zustand/useGlobalStore";
-import {
-  finishtreatmentApiClient,
-  modifytreatmentApiClient,
-} from "../services/OperationService";
+import { useLocation } from "react-router";
+
 interface DataSend {
-  patient_id: number; // Ensure patient_id is defined as a number
-  title?: string; // Optional string property
+  patient_id: number;
+  title?: string;
   date: string;
   note?: string;
 }
 const AppointmentStepPage = ({ onNext }: any) => {
   const [selectedDateTime, setSelectedDateTime] = useState(moment());
-
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const patient_id = queryParams.get("id");
   const { showSnackbar } = useSnackbarStore();
-  const { id, operationId, ordonanceId } = useGlobalStore();
   const noteRef = useRef<HTMLInputElement>(null);
-  const titleRef = useRef<HTMLInputElement>(null);
   const dateTimePickerRef = useRef(null);
-  console.log(id, operationId, ordonanceId);
 
-  const { data, isLoading } = id
-    ? getGlobalById(
-        {} as OnlyPatientData,
-        [CACHE_KEY_PATIENTS[0], id],
-        patientAPIClient,
-        undefined,
-        parseInt(id)
-      )
-    : { data: {}, isLoading: false };
+  const { data, isLoading } = getGlobalById(
+    {} as OnlyPatientData,
+    [CACHE_KEY_PATIENTS[0], patient_id],
+    patientAPIClient,
+    undefined,
+    parseInt(patient_id)
+  );
+
   const Addmutation = addGlobal({} as DataSend, appointmentAPIClient);
   if (isLoading) return <LoadingSpinner />;
 
@@ -63,10 +58,6 @@ const AppointmentStepPage = ({ onNext }: any) => {
   };
   const onsubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!titleRef?.current?.value) {
-      showSnackbar("Veuillez saisir un titre.", "error");
-      return;
-    }
 
     // Frontend validation for the date field
     if (!selectedDateTime) {
@@ -74,12 +65,12 @@ const AppointmentStepPage = ({ onNext }: any) => {
       return;
     }
     const formData = {
-      patient_id: parseInt(id),
-      title: titleRef?.current?.value || "",
+      patient_id: parseInt(patient_id),
+
       date: selectedDateTime.format("YYYY-MM-DDTHH:mm:ss"),
       note: noteRef?.current?.value,
     };
-    await modifytreatmentApiClient.update(+operationId);
+
     await Addmutation.mutateAsync(formData, {
       onSuccess: () => {
         showSnackbar("Le rendez-vous a été créé", "success");
@@ -94,9 +85,7 @@ const AppointmentStepPage = ({ onNext }: any) => {
       },
     });
   };
-  const finishtreatment = async () => {
-    await finishtreatmentApiClient.update(+operationId);
-  };
+
   return (
     <div>
       <Paper className="!p-6 w-full flex flex-col gap-4">
@@ -113,7 +102,6 @@ const AppointmentStepPage = ({ onNext }: any) => {
             value={`${data.nom} ${data.prenom}`}
             disabled
           />
-          <TextField inputRef={titleRef} label="Titre" fullWidth id="title" />
 
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <DateTimePicker
@@ -137,7 +125,6 @@ const AppointmentStepPage = ({ onNext }: any) => {
             <Button
               variant="outlined"
               onClick={async () => {
-                await finishtreatment();
                 await onNext();
               }}
             >

@@ -19,9 +19,9 @@ import deleteItem from "../hooks/deleteItem";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 const OperationPayementStatus = () => {
   const { handleSubmit, control, setValue } = useForm<FormData>();
-  const { operationid } = useParams();
-  console.log(operationid);
+  /*   const { operationid } = useParams(); */
 
+  const operationid = 1;
   const [fetchedoperations, setFetchedOperations] = useState<any[]>([]);
   const [totalCost, setTotalCost] = useState<number>(0);
   const addMutation = updateItem<Operation>(

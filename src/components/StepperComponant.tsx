@@ -11,7 +11,14 @@ interface StepperComponentProps {
   activeStep: number; // Define the activeStep prop
 }
 
-const steps = ["Opération", "Rendez-vous", "Ordonance"];
+const steps = [
+  "Radiographie",
+  "Ordonance",
+  "Document",
+  "Bilan",
+  "Opération",
+  "Rendez-vous",
+];
 
 const StepperComponant: React.FC<StepperComponentProps> = ({ activeStep }) => {
   // Use React.FC and provide StepperComponentProps

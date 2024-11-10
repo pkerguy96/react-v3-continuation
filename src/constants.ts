@@ -167,9 +167,8 @@ export const XRayTypes = [
 ];
 
 export const ViewTypes = [
-  { title: "Antéro-Postérieur (AP)", value: "AP" },
-  { title: "Latéral", value: "Lateral" },
-  { title: "Oblique", value: "Oblique" },
+  { title: "Face", value: "Face" },
+  { title: "Profil", value: "Profil" },
 ];
 
 export const BodySides = [
@@ -177,7 +176,20 @@ export const BodySides = [
   { title: "Droite", value: "Droite" },
   { title: "Les deux", value: "Les_Deux" },
 ];
-
+export const BoneDoctorBloodTests = [
+  { title: "Calcium", value: "Calcium" },
+  { title: "Phosphore", value: "Phosphore" },
+  { title: "Vitamine D", value: "Vitamine_D" },
+  { title: "Protéine C-réactive (CRP)", value: "CRP" },
+  { title: "Vitesse de sédimentation (VS)", value: "VS" },
+  { title: "Facteur rhumatoïde", value: "Facteur_Rhumatoïde" },
+  { title: "Acide urique", value: "Acide_Urique" },
+  { title: "Phosphatase alcaline", value: "Phosphatase_Alcaline" },
+  { title: "Anticorps antinucléaires (ANA)", value: "ANA" },
+  { title: "Numération formule sanguine (NFS)", value: "NFS" },
+  { title: "Parathormone (PTH)", value: "Parathormone" },
+  { title: "Créatinine", value: "Créatinine" },
+];
 export const Bones = [
   {
     points:
