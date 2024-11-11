@@ -16,25 +16,35 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import AddIcon from "@mui/icons-material/Add";
 import getGlobalById from "../../hooks/getGlobalById";
-import { PatientXrayApiClient, XrayData } from "../../services/XrayService";
+import {
+  PatientXrayApiClient,
+  xrayApiClient,
+  XrayData,
+} from "../../services/XrayService";
 import { useLocation } from "react-router";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { CACHE_KEY_Xray } from "../../constants";
+import updateItem from "../../hooks/updateItem";
 interface RowData {
   id?: string | number;
   xray_type: string;
   price: number;
+  type?: string;
 }
 const VisiteValidation = ({ onNext }) => {
   const { handleSubmit, control, setValue } = useForm<{ rows: RowData[] }>();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const patient_id = queryParams.get("id");
-  const { data, isLoading } = getGlobalById(
+  const { data: globaldata, isLoading } = getGlobalById(
     {} as XrayData,
     [CACHE_KEY_Xray, patient_id.toString()],
     PatientXrayApiClient,
-    undefined,
+    {
+      staleTime: Infinity,
+      cacheTime: 1000 * 60 * 60,
+      refetchOnWindowFocus: false,
+    },
     parseInt(patient_id)
   );
   const [totalPrice, setTotalPrice] = useState(0);
@@ -42,20 +52,21 @@ const VisiteValidation = ({ onNext }) => {
     control,
     name: "rows",
   });
-
+  const updateMutation = updateItem({} as RowData, xrayApiClient);
   // Initialize rows with fetched data
   useEffect(() => {
-    if (data) {
+    if (globaldata) {
       setValue(
         "rows",
-        data.map((item) => ({
+        globaldata.map((item) => ({
           id: item.id,
           xray_type: item.xray_type,
           price: item.price,
+          type: "xray",
         }))
       );
     }
-  }, [data]);
+  }, [globaldata]);
 
   const rows = useWatch({ control, name: "rows" });
 
@@ -70,8 +81,26 @@ const VisiteValidation = ({ onNext }) => {
   };
 
   if (isLoading) return <LoadingSpinner />;
-  const onSubmit = (data: { rows: RowData[] }) => {
-    console.log(data);
+  const onSubmit = async (data: { rows: RowData[] }) => {
+    const hasEmptyXrayType = data.rows.some(
+      (row) => row.xray_type.trim() === ""
+    );
+
+    if (hasEmptyXrayType) {
+      alert("Please fill in all x-ray types before submitting.");
+      return;
+    }
+    await updateMutation.mutateAsync(
+      { data, id: globaldata[0].operation_id },
+      {
+        onSuccess: (data) => {
+          console.log(data);
+        },
+        onError: (error) => {
+          console.log(error);
+        },
+      }
+    );
   };
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">
