@@ -12,8 +12,9 @@ import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { BodySides, ViewTypes, XRayTypes } from "../../constants";
 import { useLocation } from "react-router";
-import { xrayApiClient, XrayProps } from "../../services/XrayService";
+
 import addGlobal from "../../hooks/addGlobal";
+import { XrayProps, xrayApiClient } from "../../services/XrayService";
 
 const XrayDemand = ({ onNext }) => {
   const addMutation = addGlobal({} as XrayProps, xrayApiClient, undefined);

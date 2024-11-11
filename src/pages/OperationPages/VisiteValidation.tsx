@@ -3,14 +3,11 @@ import {
   Box,
   Typography,
   FormControl,
-  Autocomplete,
-  Chip,
   TextField,
   Button,
 } from "@mui/material";
-import React from "react";
-import { Controller, useForm } from "react-hook-form";
-import { BodySides, BoneDoctorBloodTests } from "../../constants";
+import React, { useEffect, useState } from "react";
+import { Controller, useForm, useFieldArray, useWatch } from "react-hook-form";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -18,73 +15,132 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import AddIcon from "@mui/icons-material/Add";
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number
-) {
-  return { name, calories, fat, carbs, protein };
+import getGlobalById from "../../hooks/getGlobalById";
+import { PatientXrayApiClient, XrayData } from "../../services/XrayService";
+import { useLocation } from "react-router";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { CACHE_KEY_Xray } from "../../constants";
+interface RowData {
+  id?: string | number;
+  xray_type: string;
+  price: number;
 }
 const VisiteValidation = ({ onNext }) => {
-  const { handleSubmit, control } = useForm();
+  const { handleSubmit, control, setValue } = useForm<{ rows: RowData[] }>();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const patient_id = queryParams.get("id");
+  const { data, isLoading } = getGlobalById(
+    {} as XrayData,
+    [CACHE_KEY_Xray, patient_id.toString()],
+    PatientXrayApiClient,
+    undefined,
+    parseInt(patient_id)
+  );
+  const [totalPrice, setTotalPrice] = useState(0);
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "rows",
+  });
 
-  const rows = [
-    createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-    createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-    createData("Eclair", 262, 16.0, 24, 6.0),
-    createData("Cupcake", 305, 3.7, 67, 4.3),
-    createData("Gingerbread", 356, 16.0, 49, 3.9),
-  ];
+  // Initialize rows with fetched data
+  useEffect(() => {
+    if (data) {
+      setValue(
+        "rows",
+        data.map((item) => ({
+          id: item.id,
+          xray_type: item.xray_type,
+          price: item.price,
+        }))
+      );
+    }
+  }, [data]);
+
+  const rows = useWatch({ control, name: "rows" });
+
+  // Calculate total price whenever rows change
+  useEffect(() => {
+    const total = rows?.reduce((sum, row) => sum + Number(row.price || 0), 0);
+    setTotalPrice(total);
+  }, [rows]);
+
+  const handleAddRow = () => {
+    append({ xray_type: "", price: 0 });
+  };
+
+  if (isLoading) return <LoadingSpinner />;
+  const onSubmit = (data: { rows: RowData[] }) => {
+    console.log(data);
+  };
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">
       <Box
         component="form"
         noValidate
         autoComplete="off"
-        /*  onSubmit={handleSubmit(onSubmit)} */
         className="flex gap-4 flex-col"
+        onSubmit={handleSubmit(onSubmit)}
       >
         <Box className="flex justify-between">
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Validation payment
           </Typography>
-          <Button sx={{ borderRadius: 16 }} variant="outlined">
+          <Button
+            sx={{ borderRadius: 16 }}
+            variant="outlined"
+            onClick={handleAddRow}
+          >
             <AddIcon />
           </Button>
         </Box>
+
         <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center">
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
               <TableHead>
                 <TableRow>
                   <TableCell>Operation name</TableCell>
-                  <TableCell width="250px" align="start">
+                  <TableCell width="250px" align="left">
                     Price
                   </TableCell>
-                  <TableCell align="right">Action&nbsp;(g)</TableCell>
+                  <TableCell align="right">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
+                {fields.map((field, index) => (
                   <TableRow
-                    key={row.name}
+                    key={field.id}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      {row.name}
-                    </TableCell>
-                    <TableCell align="right">
                       <FormControl className="w-full md:flex-1">
                         <Controller
-                          name="nom"
+                          name={`rows.${index}.xray_type`}
                           control={control}
-                          defaultValue={row.price}
+                          defaultValue={field.xray_type}
                           render={({ field }) => (
                             <TextField
                               {...field}
-                              id="nom"
+                              id={`xray_type_${field.id}`}
+                              size="small"
+                              type="text"
+                            />
+                          )}
+                        />
+                      </FormControl>
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <FormControl className="w-full md:flex-1">
+                        <Controller
+                          name={`rows.${index}.price`}
+                          control={control}
+                          defaultValue={field.price}
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              id={`price_${field.id}`}
                               size="small"
                               type="number"
                             />
@@ -92,12 +148,28 @@ const VisiteValidation = ({ onNext }) => {
                         />
                       </FormControl>
                     </TableCell>
-                    <TableCell align="right">{row.fat}</TableCell>
+
+                    <TableCell align="right">
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => remove(index)}
+                      >
+                        Remove
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
+        </Box>
+
+        <Box className="flex justify-between items-center">
+          <h2 className="font-semibold text-base text-start">Montant Total</h2>
+          <span className="font-semibold text-sm text-end">
+            {totalPrice} MAD
+          </span>
         </Box>
         <Box className="flex mt-4">
           <Button
@@ -112,19 +184,5 @@ const VisiteValidation = ({ onNext }) => {
     </Paper>
   );
 };
-const autocompleteStyles = {
-  "& .MuiOutlinedInput-root": {
-    backgroundColor: "white",
-    borderColor: "rgba(0, 0, 0, 0.23)",
-    "& fieldset": {
-      borderColor: "rgba(0, 0, 0, 0.23)",
-    },
-    "&:hover fieldset": {
-      borderColor: "dark",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "primary.main",
-    },
-  },
-};
+
 export default VisiteValidation;

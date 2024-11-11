@@ -7,4 +7,11 @@ export interface XrayProps {
   body_side: string[];
   note?: string;
 }
+export interface XrayData {
+  operation_id: number;
+  patient_id: number;
+  xray_type: string;
+  price: number;
+}
 export const xrayApiClient = new APIClient<XrayProps>("xray");
+export const PatientXrayApiClient = new APIClient<XrayData>("showpatientxrays");

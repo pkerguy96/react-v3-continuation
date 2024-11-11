@@ -14,6 +14,18 @@ interface Operation {
   total_cost: string;
   operation_type: OperationType[];
 }
+//new
+/* export interface XrayProps {
+  patient_id?: string;
+  xray_type: string[];
+  view_type: string[];
+  body_side: string[];
+  note?: string;
+}
+
+export const xrayApiClient = new APIClient<XrayProps>("storeOperation");
+ */
+//new
 
 export interface Patientinfo extends Patient {
   operations: Operation[];
