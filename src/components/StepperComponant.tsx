@@ -14,10 +14,10 @@ interface StepperComponentProps {
 const steps = [
   "Radiographie",
   "Ordonance",
-  "Document",
   "Bilan",
-  "Opération",
+  "Document",
   "Rendez-vous",
+  "Paiement",
 ];
 
 const StepperComponant: React.FC<StepperComponentProps> = ({ activeStep }) => {
@@ -25,7 +25,7 @@ const StepperComponant: React.FC<StepperComponentProps> = ({ activeStep }) => {
   const [skipped, setSkipped] = React.useState(new Set<number>());
 
   const isStepOptional = (step: number) => {
-    return step === 1;
+    return null;
   };
 
   const isStepSkipped = (step: number) => {

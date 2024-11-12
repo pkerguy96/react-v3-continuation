@@ -18,7 +18,7 @@ const TotalAppointmentsKpi = ({ className }: { className?: string }) => {
   return (
     <div className={`p-6  flex flex-col flex-1 gap-1 ${className}`}>
       <h1 className="text-base font-medium">Rendez-vous total</h1>
-      <p className="text-4xl font-semibold">{data}</p>
+      <p className="text-4xl font-semibold">34</p>
     </div>
   );
 };

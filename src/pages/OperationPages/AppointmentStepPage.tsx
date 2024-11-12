@@ -73,7 +73,6 @@ const AppointmentStepPage = ({ onNext }: any) => {
 
     await Addmutation.mutateAsync(formData, {
       onSuccess: () => {
-        showSnackbar("Le rendez-vous a été créé", "success");
         onNext();
       },
       onError: (error: any) => {
@@ -121,16 +120,21 @@ const AppointmentStepPage = ({ onNext }: any) => {
             variant="outlined"
             fullWidth
           />
-          <Box className="flex justify-between flex-row mt-5 content-center">
+          <Box className="flex justify-between flex-row mt-8 content-center">
             <Button
+              className="w-full md:w-max !px-10 !py-3 rounded-lg "
               variant="outlined"
-              onClick={async () => {
-                await onNext();
+              onClick={() => {
+                onNext();
               }}
             >
-              <p className="text-sm">Skip</p>
+              <p className="text-sm ">Passer</p>
             </Button>
-            <Button onClick={onsubmit} variant="contained">
+            <Button
+              onClick={onsubmit}
+              variant="contained"
+              className="w-full md:w-max !px-10 !py-3 rounded-lg !ms-auto"
+            >
               Confirmer
             </Button>
           </Box>

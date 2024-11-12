@@ -12,17 +12,18 @@ import { useRef, useState } from "react";
 const DocumentPage = ({ onNext }) => {
   const ahmedtag = useRef<HTMLAnchorElement | null>(null);
   const [selectedDocuments, setSelectedDocuments] = useState([
-    { label: "Document 1", checked: false, link: "../../../public/sample.pdf" },
-    { label: "Document 2", checked: false, link: "../../../public/sample.pdf" },
-    { label: "Document 3", checked: false, link: "../../../public/sample.pdf" },
-    { label: "Document 4", checked: false, link: "../../../public/sample.pdf" },
+    { label: "Document 1", checked: false, link: "/sample.pdf" },
+    { label: "Document 2", checked: false, link: "/sample.pdf" },
+    { label: "Document 3", checked: false, link: "/sample.pdf" },
+    { label: "Document 4", checked: false, link: "/sample.pdf" },
   ]);
+
   const handleCheckboxChange = (index) => {
     const updatedDocuments = [...selectedDocuments];
     updatedDocuments[index].checked = !updatedDocuments[index].checked;
     setSelectedDocuments(updatedDocuments);
   };
-  const handlePrintAndNext = () => {
+  /* const handlePrintAndNext = () => {
     const selectedPDFs = selectedDocuments.filter((doc) => doc.checked);
 
     selectedPDFs.forEach((doc) => {
@@ -30,17 +31,43 @@ const DocumentPage = ({ onNext }) => {
         // Check if ref is defined
         ahmedtag.current.href = doc.link;
         ahmedtag.current.click();
-      }
-      /*  const newWindow = window.open(doc.link, "_blank");
+      } */
+  /*  const newWindow = window.open(doc.link, "_blank");
       if (newWindow) {
         newWindow.addEventListener("load", () => {
           newWindow.print();
         });
       } */
-    });
+  /*  });
+    onNext(); */
+  /*   onNext(); */
+  /* }; */
 
-    /*   onNext(); */
+  const handlePrintAndNext = async () => {
+    const selectedPDFs = selectedDocuments.filter((doc) => doc.checked);
+
+    const openAndPrintPDF = (doc): Promise<void> =>
+      new Promise<void>((resolve) => {
+        const newWindow = window.open(doc.link, "_blank");
+        if (newWindow) {
+          newWindow.addEventListener("load", () => {
+            newWindow.print();
+            resolve();
+          });
+        } else {
+          resolve(); // Resolve immediately if window couldn't open (e.g., popup blocker)
+        }
+      });
+
+    // Open and print each PDF, waiting for each to finish
+    for (const doc of selectedPDFs) {
+      await openAndPrintPDF(doc);
+    }
+
+    // Call onNext after all PDFs are opened and printed
+    onNext();
   };
+
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">
       <a className="hidden" target="_blank" ref={ahmedtag}></a>
@@ -71,14 +98,23 @@ const DocumentPage = ({ onNext }) => {
           ))}
         </FormGroup>
 
-        <Box className="flex mt-4">
+        <Box className="flex justify-between flex-row mt-8 content-center">
+          <Button
+            className="w-full md:w-max !px-10 !py-3 rounded-lg "
+            variant="outlined"
+            onClick={() => {
+              onNext();
+            }}
+          >
+            <p className="text-sm ">Passer</p>
+          </Button>
           <Button
             type="button"
             onClick={handlePrintAndNext}
             variant="contained"
             className="w-full md:w-max !px-10 !py-3 rounded-lg !ms-auto"
           >
-            Next
+            Suivant
           </Button>
         </Box>
       </Box>

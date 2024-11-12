@@ -15,3 +15,4 @@ export interface XrayData {
 }
 export const xrayApiClient = new APIClient<XrayProps>("xray");
 export const PatientXrayApiClient = new APIClient<XrayData>("showpatientxrays");
+export const insertOpwithoutxray = new APIClient<XrayData>("insertWihtoutxray");

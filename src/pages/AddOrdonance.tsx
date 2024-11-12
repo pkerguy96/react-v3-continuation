@@ -175,13 +175,6 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
           await editUser(formData, parseInt(ordonanceID));
         }
         queryClient.invalidateQueries({ queryKey: ["ordonance"] });
-        if (ordonanceID) {
-          navigate(`/OrdonanceDetails/${ordonanceID}`);
-        } else if (isAddMode || fromOperation) {
-          if (response?.data?.id) {
-            navigate(`/OrdonanceDetails/${response.data.id}`);
-          }
-        }
       } catch (error) {
         const message =
           error instanceof AxiosError
@@ -195,7 +188,7 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
   const createUser = async (formData: Ordonance) => {
     return await Addmutation.mutateAsync(formData, {
       onSuccess: () => {
-        showSnackbar("Ordonance ajouté avec succès.", "success");
+        onNext();
       },
       onError: (error: any) => {
         const message =
@@ -406,17 +399,16 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
               </Table>
             </TableContainer>
           </Box>
-          <Box className="flex flex-col sm:flex-row gap-4 justify-between mt-4">
-            {fromOperation && (
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  redirectTo();
-                }}
-              >
-                <p className="text-sm">Fin du traitement</p>
-              </Button>
-            )}
+          <Box className="flex justify-between flex-row mt-5 content-center">
+            <Button
+              className="w-full md:w-max !px-10 !py-3 rounded-lg "
+              variant="outlined"
+              onClick={() => {
+                onNext();
+              }}
+            >
+              <p className="text-sm ">Passer</p>
+            </Button>
             <Button
               type="submit"
               variant="contained"

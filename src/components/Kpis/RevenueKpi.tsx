@@ -40,20 +40,35 @@ const RevenueKpi = () => {
       },
     },
   };
-  const newdata = [];
-  const labels = /* newdata ? Object.keys(newdata[0]) : */ [];
+  const newdata = [
+    {
+      January: 15000,
+      February: 18000,
+      March: 17000,
+      April: 20000,
+      May: 22000,
+    },
+    {
+      January: 16000,
+      February: 19000,
+      March: 17500,
+      April: 21000,
+      May: 23000,
+    },
+  ];
+  const labels = newdata ? Object.keys(newdata[0]) : [];
 
   const data = {
     labels,
     datasets: [
       {
         label: "Le mois dernier",
-        data: /* newdata ? Object.values(newdata[0]) : */ [],
+        data: newdata ? Object.values(newdata[0]) : [],
         backgroundColor: "#f2edfd",
       },
       {
         label: "Le mois en cours",
-        data: /* newdata ? Object.values(newdata[1]) : */ [],
+        data: newdata ? Object.values(newdata[1]) : [],
         backgroundColor: "#6b37e7",
       },
     ],

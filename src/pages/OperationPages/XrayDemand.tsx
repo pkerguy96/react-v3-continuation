@@ -11,7 +11,7 @@ import {
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { BodySides, ViewTypes, XRayTypes } from "../../constants";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import addGlobal from "../../hooks/addGlobal";
 import { XrayProps, xrayApiClient } from "../../services/XrayService";
@@ -19,9 +19,17 @@ import { XrayProps, xrayApiClient } from "../../services/XrayService";
 const XrayDemand = ({ onNext }) => {
   const addMutation = addGlobal({} as XrayProps, xrayApiClient, undefined);
   const location = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const patient_id = queryParams.get("id");
-
+  if (!patient_id) {
+    return (
+      <Typography variant="h6" color="error" align="center">
+        Quelque chose s'est mal passé, veuillez refaire les étapes, si cela ne
+        fonctionne pas, signalez ce bug au développeur.
+      </Typography>
+    );
+  }
   const {
     handleSubmit,
     control,
@@ -31,8 +39,12 @@ const XrayDemand = ({ onNext }) => {
   const onSubmit = async (data: XrayProps) => {
     const dataWithId = { ...data, patient_id };
     await addMutation.mutateAsync(dataWithId, {
-      onSuccess: () => {
-        console.log("sucess");
+      onSuccess: (data: any) => {
+        const operationId = data.data;
+        navigate(`?id=${patient_id}&operation_id=${operationId}`, {
+          replace: true,
+        });
+
         onNext();
       },
     });
@@ -205,7 +217,16 @@ const XrayDemand = ({ onNext }) => {
             />
           </FormControl>
         </Box>
-        <Box className="flex mt-4">
+        <Box className="flex justify-between flex-row mt-5 content-center">
+          <Button
+            className="w-full md:w-max !px-10 !py-3 rounded-lg "
+            variant="outlined"
+            onClick={() => {
+              onNext();
+            }}
+          >
+            <p className="text-sm ">Passer</p>
+          </Button>
           <Button
             type="submit"
             variant="contained"

@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import {
   Paper,
   Box,
@@ -16,10 +18,18 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import AddIcon from "@mui/icons-material/Add";
 import getGlobalById from "../../hooks/getGlobalById";
-import { PatientXrayApiClient, XrayData } from "../../services/XrayService";
-import { useLocation } from "react-router";
+import {
+  insertOpwithoutxray,
+  PatientXrayApiClient,
+  xrayApiClient,
+  XrayData,
+} from "../../services/XrayService";
+import { useLocation, useNavigate } from "react-router";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { CACHE_KEY_Xray } from "../../constants";
+import updateItem from "../../hooks/updateItem";
+import addGlobal from "../../hooks/addGlobal";
+import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 interface RowData {
   id?: string | number;
   xray_type: string;
@@ -29,15 +39,22 @@ const VisiteValidation = ({ onNext }) => {
   const { handleSubmit, control, setValue } = useForm<{ rows: RowData[] }>();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
+  const operation_id = queryParams.get("operation_id");
   const patient_id = queryParams.get("id");
-  const { data, isLoading } = getGlobalById(
-    {} as XrayData,
-    [CACHE_KEY_Xray, patient_id.toString()],
-    PatientXrayApiClient,
-    undefined,
-    parseInt(patient_id)
-  );
+  const navigate = useNavigate();
+  const { showSnackbar } = useSnackbarStore();
+  const { data, isLoading } = operation_id
+    ? getGlobalById(
+        {} as XrayData,
+        ["CACHE_KEY_Xray", operation_id.toString()],
+        PatientXrayApiClient,
+        undefined,
+        parseInt(operation_id)
+      )
+    : { data: null, isLoading: false };
+  const addmutation = addGlobal({} as RowData, insertOpwithoutxray);
   const [totalPrice, setTotalPrice] = useState(0);
+  const updateMutation = updateItem({} as XrayData, xrayApiClient);
   const { fields, append, remove } = useFieldArray({
     control,
     name: "rows",
@@ -70,8 +87,57 @@ const VisiteValidation = ({ onNext }) => {
   };
 
   if (isLoading) return <LoadingSpinner />;
-  const onSubmit = (data: { rows: RowData[] }) => {
-    console.log(data);
+  const onSubmit = async (data: { rows: RowData[] }) => {
+    try {
+      // Check if operation_id exists
+      if (operation_id) {
+        const formData = {
+          operation_id: operation_id,
+          patient_id: patient_id,
+          ...data,
+        };
+        // If operation_id exists, update the operation
+        await updateMutation.mutateAsync(
+          {
+            data: formData,
+            id: Number(operation_id),
+          },
+          {
+            onSuccess: (data) => {
+              showSnackbar(
+                "L'opération a été enregistrée avec succès",
+                "success"
+              );
+              navigate("/Patients");
+            },
+            onError: (error) => {
+              console.error("Error updating operation:", error);
+            },
+          }
+        );
+      } else {
+        const formData = {
+          patient_id: Number(patient_id),
+          ...data,
+        };
+        console.log(formData);
+
+        await addmutation.mutateAsync(formData, {
+          onSuccess: (data) => {
+            showSnackbar(
+              "L'opération a été enregistrée avec succès",
+              "success"
+            );
+            navigate("/Patients");
+          },
+          onError: (error) => {
+            console.error("Error creating operation:", error);
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+    }
   };
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">
@@ -155,7 +221,7 @@ const VisiteValidation = ({ onNext }) => {
                         color="error"
                         onClick={() => remove(index)}
                       >
-                        Remove
+                        retirer
                       </Button>
                     </TableCell>
                   </TableRow>

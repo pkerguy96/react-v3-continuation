@@ -169,7 +169,7 @@ const AddStockForm = () => {
           </Box>
           <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
             <label htmlFor="nom" className="w-full md:w-[160px]">
-              mIN stocker
+              Min stock
             </label>
             <FormControl className="w-full md:flex-1">
               <Controller

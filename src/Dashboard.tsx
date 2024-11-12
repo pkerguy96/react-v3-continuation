@@ -11,7 +11,6 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import Container from "@mui/material/Container";
-import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -72,6 +71,7 @@ const Drawer = styled(MuiDrawer, {
     }),
   },
 }));
+const today = formatFrenchDate(new Date());
 
 export default function Dashboard(Props: React.PropsWithChildren) {
   const [open, setOpen] = React.useState(false);
@@ -101,7 +101,7 @@ export default function Dashboard(Props: React.PropsWithChildren) {
             edge="start"
             color="inherit"
             aria-label="open drawer"
-            onClick={toggleDrawer}
+            onClick={() => setOpen((prev) => !prev)}
             sx={{
               marginRight: "36px",
               ...(open && { display: "none" }),
@@ -116,7 +116,7 @@ export default function Dashboard(Props: React.PropsWithChildren) {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            tableau de bord
+            {today}
           </Typography>
           <WaitingRoomMenu />
 
@@ -131,8 +131,8 @@ export default function Dashboard(Props: React.PropsWithChildren) {
       <Drawer
         variant="permanent"
         open={open}
-        onMouseEnter={() => openDrawerOnmouse(true)}
-        onMouseLeave={() => openDrawerOnmouse(false)}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
       >
         <Toolbar className="relative flex items-center justify-end px-1">
           {/* Logo - Only visible when the drawer is open */}
@@ -147,7 +147,7 @@ export default function Dashboard(Props: React.PropsWithChildren) {
           )}
 
           {/* IconButton - Aligned to the right */}
-          <IconButton className="z-10" onClick={toggleDrawer}>
+          <IconButton className="z-10" onClick={() => setOpen((prev) => !prev)}>
             <ChevronLeftIcon />
           </IconButton>
         </Toolbar>
@@ -160,7 +160,7 @@ export default function Dashboard(Props: React.PropsWithChildren) {
           <SecondaryListItems
             toggle={openListMenu}
             isSideBarOpen={open}
-            handleClick={toggleListMenu}
+            handleClick={() => setOpenListMenu(!openListMenu)}
           />
         </List>
       </Drawer>
@@ -183,4 +183,17 @@ export default function Dashboard(Props: React.PropsWithChildren) {
       </Box>
     </Box>
   );
+}
+export function formatFrenchDate(date: Date): string {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  const formatted = new Intl.DateTimeFormat("fr-FR", options).format(date);
+
+  const [day, month, year] = formatted.split(" ");
+  const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1);
+
+  return `${day} ${capitalizedMonth} ${year}`;
 }

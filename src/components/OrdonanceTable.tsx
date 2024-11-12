@@ -20,7 +20,7 @@ import deleteItem from "../hooks/deleteItem";
 import useUserRoles from "../zustand/UseRoles";
 const OrdonanceTable = () => {
   const { showSnackbar } = useSnackbarStore();
-  const { can } = useUserRoles();
+  /*   const { can } = useUserRoles(); */
   const queryClient = useQueryClient();
 
   /* const { data, isLoading } = getGlobal(
@@ -77,33 +77,30 @@ const OrdonanceTable = () => {
         filter: true,
         sort: true,
 
-        customBodyRender: () => (
+        /*   customBodyRender: () => (
           <>
-            {can(["Super-Admin", "update_ordonance"]) && (
-              <button
-                className="btn-ordonance-edit text-gray-950 hover:text-blue-700 cursor-pointer"
-                title="Modifier"
-              >
-                <EditOutlinedIcon
-                  className="pointer-events-none"
-                  fill="currentColor"
-                />
-              </button>
-            )}
-            {can(["Super-Admin", "delete_ordonance"]) && (
-              <button
-                className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-                title="Supprimer"
-              >
-                <DeleteOutlineIcon
-                  color="error"
-                  className="pointer-events-none"
-                  fill="currentColor"
-                />
-              </button>
-            )}
+            <button
+              className="btn-ordonance-edit text-gray-950 hover:text-blue-700 cursor-pointer"
+              title="Modifier"
+            >
+              <EditOutlinedIcon
+                className="pointer-events-none"
+                fill="currentColor"
+              />
+            </button>
+
+            <button
+              className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
+              title="Supprimer"
+            >
+              <DeleteOutlineIcon
+                color="error"
+                className="pointer-events-none"
+                fill="currentColor"
+              />
+            </button>
           </>
-        ),
+        ), */
       },
     },
   ];
@@ -117,20 +114,19 @@ const OrdonanceTable = () => {
         noMatch: "Désolé, aucun ordonance n'est dans nos données",
       },
     },
-    customToolbar: () =>
-      can(["Super-Admin", "insert_ordonance"]) && (
-        <Tooltip title="Nouveau ordonance">
-          <IconButton
-            onClick={() => {
-              navigate(`/AddOrdonance`);
-            }}
-          >
-            <AddIcon />
-          </IconButton>
-        </Tooltip>
-      ),
+    customToolbar: () => (
+      <Tooltip title="Nouveau ordonance">
+        <IconButton
+          onClick={() => {
+            navigate(`/AddOrdonance`);
+          }}
+        >
+          <AddIcon />
+        </IconButton>
+      </Tooltip>
+    ),
     selectableRowsHideCheckboxes: true,
-    onRowClick: (s: any, _m: any, e: any) => {
+    /*   onRowClick: (s: any, _m: any, e: any) => {
       if (
         e.target.querySelector(".btn-ordonance-edit") ||
         e.target.classList.contains("btn-ordonance-edit")
@@ -169,7 +165,7 @@ const OrdonanceTable = () => {
       } else {
         navigate(`/OrdonanceDetails/${s[0]}`);
       }
-    },
+    }, */
   };
   const dataPlaceHolder: [] = [];
   return (

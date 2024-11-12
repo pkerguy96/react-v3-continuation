@@ -27,16 +27,20 @@ const PatientAgeGroupKpi = () => {
       },
     },
   };
-  const age = [];
+  const age = [
+    { label: "0-20", count: 120 },
+    { label: "21-30", count: 200 },
+    { label: "31-40", count: 150 },
+    { label: "41-50", count: 100 },
+    { label: "51-60", count: 80 },
+  ];
   const data = {
     labels: ["0-20", "21-30", "31-40", "41-50", "51-60"],
     datasets: [
       {
         label: "Nombre des patients",
-        data:
-          age.length > 0
-            ? age?.map((item: Agegroup) => item.count)
-            : [0, 0, 0, 0, 0],
+
+        data: age.map((item) => item.count),
         backgroundColor: [
           "#170087",
           "#005dcd",

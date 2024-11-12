@@ -24,8 +24,21 @@ const CashierKpi = () => {
     undefined
   );
   if (isLoading1 || isLoading2) return <LoadingSpinner />; */
-  const data1 = [];
-  const data2 = [];
+  const data1 = {
+    "2024-01": 1200,
+    "2024-02": 1500,
+    "2024-03": 1100,
+    "2024-04": 1800,
+    "2024-05": 2200,
+    "2024-06": 1700,
+    "2024-07": 2000,
+    "2024-08": 2100,
+    "2024-09": 1900,
+    "2024-10": 2500,
+    "2024-11": 2300,
+    "2024-12": 2600,
+  };
+  const data2 = 7500;
   const labels = data1 ? Object.keys(data1) : [];
   const dataset1 = {
     labels,

@@ -14,7 +14,7 @@ const CanceledAppointmentsKpi = ({ className }: { className?: string }) => {
     { staleTime: 3600000 }
   );
   if (isLoading) return <LoadingSpinner />; */
-  const data = [];
+  const data = ["0"];
   return (
     <div className={`p-6  flex flex-col flex-1 gap-1 ${className}`}>
       <h1 className="text-base font-medium">Rendez-vous annulés</h1>

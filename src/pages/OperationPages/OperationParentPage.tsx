@@ -21,45 +21,46 @@ const OperationParentPage = () => {
   return (
     <div className="flex flex-col w-full gap-2">
       <StepperComponant activeStep={activeStep} />
-      {/* {activeStep === 0 && (
+      {activeStep === 0 && (
         <XrayDemand
           onNext={() => {
             handleStepChange(1);
           }}
         />
-      )} */}
-      {activeStep === 0 && (
-        <VisiteValidation
-          onNext={() => {
-            handleStepChange(2);
-          }}
-        />
       )}
-      {/*  {activeStep === 0 && (
+      {activeStep === 1 && (
         <AddOrdonance
           onNext={() => {
             handleStepChange(2);
           }}
         />
-      )} */}
-      {/* document */}
-      {/* {activeStep === 0 && (
+      )}
+      {activeStep === 2 && <BloodTest onNext={() => handleStepChange(3)} />}
+
+      {activeStep === 3 && (
         <DocumentPage
           onNext={() => {
-            handleStepChange(1);
+            handleStepChange(4);
           }}
         />
-      )} */}
+      )}
+      {activeStep === 4 && (
+        <AppointmentStepPage onNext={() => handleStepChange(5)} />
+      )}
+      {activeStep === 5 && (
+        <VisiteValidation
+          onNext={() => {
+            handleStepChange(6);
+          }}
+        />
+      )}
+
       {/* BIllan */}
-      {/*    {activeStep === 0 && (
+      {/*  {activeStep === 0 && (
         <PatientOperation onNext={() => handleStepChange(4)} />
       )} */}
-      {/* {activeStep === 0 && <BloodTest onNext={() => handleStepChange(4)} />} */}
 
       {/* LKHRA  */}
-      {/*  {activeStep === 0 && (
-        <AppointmentStepPage onNext={() => handleStepChange(5)} />
-      )} */}
     </div>
   );
 };
