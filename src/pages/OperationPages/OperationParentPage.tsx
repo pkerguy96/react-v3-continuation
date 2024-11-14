@@ -21,10 +21,10 @@ const OperationParentPage = () => {
   return (
     <div className="flex flex-col w-full gap-2">
       <StepperComponant activeStep={activeStep} />
-      {activeStep === 0 && (
+      {activeStep === 10 && (
         <XrayDemand
           onNext={() => {
-            handleStepChange(1);
+            handleStepChange(11);
           }}
         />
       )}
@@ -47,7 +47,7 @@ const OperationParentPage = () => {
       {activeStep === 4 && (
         <AppointmentStepPage onNext={() => handleStepChange(5)} />
       )}
-      {activeStep === 5 && (
+      {activeStep === 0 && (
         <VisiteValidation
           onNext={() => {
             handleStepChange(6);

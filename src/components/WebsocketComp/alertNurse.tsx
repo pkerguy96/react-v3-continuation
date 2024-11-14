@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { subscribeToChannel } from "../../services/PusherService";
-
+/* import { subscribeToChannel } from "../../services/PusherService";
+ */
 const AlertNurse = () => {
-  useEffect(() => {
+  /* useEffect(() => {
     const handleEvent = (data) => {
       console.log("Event received:", data);
       alert(`Message from backend: ${data.message}`);
@@ -19,7 +19,7 @@ const AlertNurse = () => {
       console.log("Unsubscribing from my-event...");
       unsubscribe();
     };
-  }, []);
+  }, []); */
 
   return (
     <div>
