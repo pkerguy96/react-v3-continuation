@@ -26,7 +26,6 @@
     "@tanstack/react-query-devtools": "4.28",
     "axios": "^1.4.0",
     "chart.js": "^4.4.1",
-    "laravel-echo": "^1.17.0",
     "moment": "^2.29.4",
     "mui-datatables-mara": "^4.3.0",
     "pusher-js": "^8.4.0-rc2",

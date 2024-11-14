@@ -177,9 +177,9 @@ function WaitingRoomMenu() {
             <span className="flex justify-center items-center text-xl text-[#4B918C]">
               {waiting.data}
             </span>
-            <IconButton onClick={handleClose} color="inherit" size="small">
+            {/* <IconButton onClick={handleClose} color="inherit" size="small">
               <CloseOutlinedIcon />
-            </IconButton>
+            </IconButton> */}
           </Box>
         </Box>
 

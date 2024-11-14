@@ -3,7 +3,6 @@ import { subscribeToChannel } from "../../services/PusherService";
 
 const AlertNurse = () => {
   useEffect(() => {
-    // Define callback function to handle incoming data
     const handleEvent = (data) => {
       console.log("Event received:", data);
       alert(`Message from backend: ${data.message}`);
@@ -16,7 +15,6 @@ const AlertNurse = () => {
       handleEvent
     );
 
-    // Clean up by unsubscribing when component unmounts
     return () => {
       console.log("Unsubscribing from my-event...");
       unsubscribe();
