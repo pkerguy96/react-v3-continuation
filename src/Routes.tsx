@@ -33,8 +33,11 @@ import DebtPage from "./pages/DebtPage";
 import OperationsListSettings from "./components/Settings/OperationsListSettings";
 import PermissionsSettings from "./components/Settings/PermissionsSettings";
 import RolesSettings from "./components/Settings/RolesSettings";
-import IncompletedOperations from "./components/Operation/IncompletedOperations";
+
 import AddStockForm from "./pages/AddStockForm";
+import SupplierPage from "./pages/SupplierPage";
+import AddSupplier from "./pages/AddForms/AddSupplier";
+import IncompletedOperations from "./components/Tables/IncompletedOperations";
 
 const router = createBrowserRouter([
   {
@@ -88,7 +91,7 @@ const router = createBrowserRouter([
 
       {
         path: "Ordonnance",
-        element: <OrdonnancePage />,
+        element: <OrdonnancePage />, 
       },
       {
         path: "Opérations-inachevées",
@@ -141,6 +144,16 @@ const router = createBrowserRouter([
           {
             path: "ajouter",
             element: <AddStockForm />,
+          },
+        ],
+      },
+      {
+        path: "Supplier",
+        element: <SupplierPage />,
+        children: [
+          {
+            path: "ajouter",
+            element: <AddSupplier />,
           },
         ],
       },

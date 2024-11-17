@@ -55,12 +55,17 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
   useEffect(() => {
     if (data && data.payments) {
       setFetchedOperations(data.payments);
-      const cost = data.operation_details.reduce(
-        (total: any, fetchedoperations: any) =>
-          total + Number(fetchedoperations.price),
+      const operationDetailsCost = data.operation_details.reduce(
+        (total: number, detail: any) => total + Number(detail.price),
         0
       );
-      setTotalCost(cost);
+
+      const xraysCost = data.xrays.reduce(
+        (total: number, xray: any) => total + Number(xray.price),
+        0
+      );
+
+      setTotalCost(operationDetailsCost + xraysCost);
     }
   }, [data]);
   //TODO: remove only operation with the specify id
@@ -69,7 +74,7 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
   const onSubmit = async (data: FormData) => {
     if (data) {
       if (totalpaid + Number(data.amount_paid) > totalCost) {
-        showSnackbar("Total payment exceeds total cost.");
+        showSnackbar("Le paiement total dépasse le coût total.");
         return;
       }
 
@@ -107,11 +112,14 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
         });
     }
   };
+
   const totalpaid = fetchedoperations.reduce(
-    (total, payment) => total + Number(payment.amount_paid),
+    (total, payment) => total + parseFloat(payment.amount_paid || "0"),
     0
   );
+
   const outstandingAmount = totalCost - totalpaid;
+
   const deletePayment = async (id: number) => {
     try {
       const deletionSuccessful = await deleteItem(
@@ -173,10 +181,23 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                         key={i}
                       >
                         <span className="text-gray-500 text-base text-start">
-                          {detail.name || "No Operation Name"}
+                          {detail.operation_type || "No Operation Name"}
                         </span>
                         <span className="text-gray-500 text-sm text-end">
                           {detail.price} MAD
+                        </span>
+                      </Box>
+                    ))}
+                    {data?.xrays?.map((xray: any, i: number) => (
+                      <Box
+                        className="flex items-center justify-between"
+                        key={`xray-${i}`}
+                      >
+                        <span className="text-gray-500 text-base text-start">
+                          {xray.xray_type.join(", ") || "No X-Ray Type"}
+                        </span>
+                        <span className="text-gray-500 text-sm text-end">
+                          {xray.price} MAD
                         </span>
                       </Box>
                     ))}
@@ -210,7 +231,7 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                           <span className="text-gray-500 text-sm text-center w-1/3">
                             {payment.amount_paid === null
                               ? "0.00"
-                              : payment.amount_paid}{" "}
+                              : payment.amount_paid}
                             MAD
                           </span>
                           <span className="text-gray-500 text-sm text-end w-1/3">
@@ -228,7 +249,7 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                     })}
                   </Box>
                 </Box>
-                {outstandingAmount !== 0 && (
+                {outstandingAmount && (
                   <Box className="flex items-center flex-wrap gap-2">
                     <Controller
                       //@ts-ignore

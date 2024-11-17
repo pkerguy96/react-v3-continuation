@@ -1,4 +1,4 @@
-import OrdonanceTable from "../components/OrdonanceTable";
+import OrdonanceTable from "../components/Tables/OrdonanceTable";
 import useUserRoles from "../zustand/UseRoles";
 
 const OrdonnancePage = () => {

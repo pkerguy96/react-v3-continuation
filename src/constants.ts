@@ -28,6 +28,8 @@ export const CACHE_KEY_Products = ["Products"];
 export const CACHE_KEY_Xray = "Xray";
 export const CACHE_KEY_Bloodtest = ["BloodTest"];
 
+export const CACHE_KEY_RecurringOperations = ["RecurringOperations"];
+
 export const CACHE_KEY_MonthlyAppointments = ["MonthlyAppointments"];
 export const CACHE_KEY_CanceledMonthlyAppointments = [
   "CanceledMonthlyAppointments",

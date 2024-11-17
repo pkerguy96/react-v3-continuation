@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router";
-import PatientsTable from "../components/PatientsTable";
+import PatientsTable from "../components/Tables/PatientsTable";
 
 const PatientsPage = () => {
   const location = useLocation();

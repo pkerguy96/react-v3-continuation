@@ -7,6 +7,7 @@ import {
   FormControl,
   TextField,
   Button,
+  IconButton,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm, useFieldArray, useWatch } from "react-hook-form";
@@ -30,17 +31,29 @@ import { CACHE_KEY_Xray } from "../../constants";
 import updateItem from "../../hooks/updateItem";
 import addGlobal from "../../hooks/addGlobal";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
+
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 interface RowData {
   id?: string | number;
   xray_type: string;
   price: number;
 }
+interface Consomables {
+  id?: string | number;
+  consomable: string;
+  qte: number;
+}
 const VisiteValidation = ({ onNext }) => {
-  const { handleSubmit, control, setValue } = useForm<{ rows: RowData[] }>();
+  const [consomableTotal, setConsomableTotal] = useState(0);
+  const { handleSubmit, control, setValue } = useForm<{
+    rows: RowData[];
+    consomables: Consomables[];
+  }>();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const operation_id = queryParams.get("operation_id");
   const patient_id = queryParams.get("id");
+  const isdone = queryParams.get("isdone");
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbarStore();
   const { data, isLoading } = operation_id
@@ -51,7 +64,7 @@ const VisiteValidation = ({ onNext }) => {
         undefined,
         parseInt(operation_id)
       )
-    : { data: null, isLoading: false };
+    : { data: [], isLoading: false };
   const addmutation = addGlobal({} as RowData, insertOpwithoutxray);
   const [totalPrice, setTotalPrice] = useState(0);
   const updateMutation = updateItem({} as XrayData, xrayApiClient);
@@ -60,43 +73,52 @@ const VisiteValidation = ({ onNext }) => {
     name: "rows",
   });
 
-  // Initialize rows with fetched data
-  useEffect(() => {
-    if (data) {
-      setValue(
-        "rows",
-        data.map((item) => ({
-          id: item.id,
-          xray_type: item.xray_type,
-          price: item.price,
-        }))
-      );
-    }
-  }, [data]);
+  const {
+    fields: consomableFields,
+    append: appendConsomable,
+    remove: removeConsomable,
+  } = useFieldArray({
+    control,
+    name: "consomables",
+  });
 
   const rows = useWatch({ control, name: "rows" });
-
-  // Calculate total price whenever rows change
-  useEffect(() => {
-    const total = rows?.reduce((sum, row) => sum + Number(row.price || 0), 0);
-    setTotalPrice(total);
-  }, [rows]);
+  const consomables = useWatch({ control, name: "consomables" });
 
   const handleAddRow = () => {
     append({ xray_type: "", price: 0 });
   };
+  const handleAddConsomable = () => {
+    appendConsomable({ consomable: "", qte: 0 });
+  };
 
-  if (isLoading) return <LoadingSpinner />;
   const onSubmit = async (data: {
     rows: RowData[];
     consomables: RowData[];
   }) => {
+    if (data.rows.length === 0) {
+      showSnackbar(
+        "Vous devez remplir au moins une opération avant de soumettre",
+        "error"
+      );
+      return;
+    }
+    const validRows = data.rows.filter((row) => row.xray_type.trim() !== "");
+
+    if (validRows.length === 0) {
+      showSnackbar(
+        "Veuillez remplir le nom de l'opération avant de soumettre",
+        "error"
+      );
+      return;
+    }
     try {
       // Check if operation_id exists
       if (operation_id) {
         const formData = {
           operation_id: operation_id,
           patient_id: patient_id,
+          treatment_isdone: isdone ?? 1,
           ...data,
         };
         // If operation_id exists, update the operation
@@ -121,6 +143,7 @@ const VisiteValidation = ({ onNext }) => {
       } else {
         const formData = {
           patient_id: Number(patient_id),
+          treatment_isdone: isdone ?? 1,
           ...data,
         };
         console.log(formData);
@@ -142,30 +165,35 @@ const VisiteValidation = ({ onNext }) => {
       console.error("Unexpected error:", error);
     }
   };
-
-  const {
-    fields: consomableFields,
-    append: appendConsomable,
-    remove: removeConsomable,
-  } = useFieldArray({
-    control,
-    name: "consomables",
-  });
-
-  const consomables = useWatch({ control, name: "consomables" });
-
-  const handleAddConsomable = () => {
-    appendConsomable({ consomable: "", price: 0 });
-  };
-
-  const [consomableTotal, setConsomableTotal] = useState(0);
+  // Initialize rows with fetched data
   useEffect(() => {
+    if (data && data.length > 0) {
+      // If data exists, initialize with fetched rows
+      setValue(
+        "rows",
+        data.map((item) => ({
+          id: item.id,
+          xray_type: item.xray_type,
+          price: item.price,
+        }))
+      );
+    }
+  }, [data]);
+
+  useEffect(() => {
+    const total = rows?.reduce((sum, row) => sum + Number(row.price || 0), 0);
+    setTotalPrice(total);
+  }, [rows]);
+
+  useEffect(() => {
+    console.log("2000", consomableFields);
     const total = consomables?.reduce(
-      (sum, row) => sum + Number(row.price || 0),
+      (sum, row) => sum + Number(row.qte || 0),
       0
     );
     setConsomableTotal(total);
   }, [consomables]);
+  if (isLoading) return <LoadingSpinner />;
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">
       <Box
@@ -244,13 +272,13 @@ const VisiteValidation = ({ onNext }) => {
                       </TableCell>
 
                       <TableCell align="right">
-                        <Button
+                        <IconButton
                           variant="contained"
                           color="error"
                           onClick={() => remove(index)}
                         >
-                          retirer
-                        </Button>
+                          <DeleteOutlineOutlinedIcon />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -287,9 +315,9 @@ const VisiteValidation = ({ onNext }) => {
               <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Operation name</TableCell>
+                    <TableCell>Consommable</TableCell>
                     <TableCell width="250px" align="left">
-                      Price
+                      Quantité
                     </TableCell>
                     <TableCell align="right">Action</TableCell>
                   </TableRow>
@@ -297,7 +325,7 @@ const VisiteValidation = ({ onNext }) => {
                 <TableBody>
                   {consomableFields.map((carry, index) => (
                     <TableRow
-                      key={"consomable." + carry.id}
+                      key={"consomable." + index}
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
                       <TableCell component="th" scope="consomables">
@@ -321,13 +349,13 @@ const VisiteValidation = ({ onNext }) => {
                       <TableCell align="right">
                         <FormControl className="w-full md:flex-1">
                           <Controller
-                            name={`consomables.${index}.price`}
+                            name={`consomables.${index}.qte`}
                             control={control}
-                            defaultValue={carry.price}
+                            defaultValue={carry.qte}
                             render={({ field }) => (
                               <TextField
                                 {...field}
-                                id={`consomables.price_${index}`}
+                                id={`consomables.qte_${index}`}
                                 size="small"
                                 type="number"
                               />
@@ -337,13 +365,13 @@ const VisiteValidation = ({ onNext }) => {
                       </TableCell>
 
                       <TableCell align="right">
-                        <Button
+                        <IconButton
                           variant="contained"
                           color="error"
                           onClick={() => removeConsomable(index)}
                         >
-                          retirer
-                        </Button>
+                          <DeleteOutlineOutlinedIcon />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -354,10 +382,10 @@ const VisiteValidation = ({ onNext }) => {
 
           <Box className="flex justify-between items-center">
             <h2 className="font-semibold text-base text-start">
-              Montant Total
+              Quantité Total
             </h2>
             <span className="font-semibold text-sm text-end">
-              {consomableTotal} MAD
+              {consomableTotal} Pièces
             </span>
           </Box>
         </Box>

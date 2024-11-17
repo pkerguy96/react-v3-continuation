@@ -6,24 +6,20 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import PaymentModal from "./PaymentModal";
 import { useState } from "react";
 import { confirmDialog } from "./ConfirmDialog";
-
 import { useSnackbarStore } from "../zustand/useSnackbarStore";
-
 import { useQueryClient } from "@tanstack/react-query";
 import getGlobal from "../hooks/getGlobal";
-import operationApiClient, { Operation } from "../services/OperationService";
+import operationApiClient from "../services/OperationService";
 import { CACHE_KEY_Operation } from "../constants";
 import deleteItem from "../hooks/deleteItem";
-import useUserRoles from "../zustand/UseRoles";
+import DataTable from "./DataTable";
+import getGlobalv2 from "../hooks/getGlobalv2";
 
 interface CustomPaymentInfo {
   id: number;
   date: string;
-  nom: string;
-  operation_type: null | string;
+  full_name: string;
   patient_id: number;
-  payments: Payment[];
-  prenom: string;
   totalPaid: number;
   total_cost: number;
   isPaid: boolean;
@@ -39,56 +35,31 @@ const ReglementTable = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalOperationId, setModalOperationId] = useState<number | null>(null);
   const { showSnackbar } = useSnackbarStore();
-  const { can } = useUserRoles();
-  /*   const { data, isLoading } = getGlobal(
-    {} as Operation,
-    [CACHE_KEY_Operation[0]],
-    operationApiClient,
-    undefined
-  ); */
 
   const queryClient = useQueryClient();
-  /*  if (isLoading) return <LoadingSpinner />;
+
   const handleCloseModal = () => {
     setOpenModal(false);
-  }; */
-
-  /*   const formattedData = data?.map((Paymentinfo: CustomPaymentInfo) => {
-    return {
-      id: Paymentinfo.id,
-      nom: `${Paymentinfo.nom} ${Paymentinfo.prenom}`,
-      date: Paymentinfo.date,
-      prix: `${Paymentinfo.total_cost} MAD`,
-      amount_paid: `${Paymentinfo.totalPaid.toFixed(2)} MAD`,
-      ispaid: Boolean(Paymentinfo.isPaid) ? "true" : "false",
-    };
-  }); */
+  };
 
   const columns = [
     {
-      name: "id",
+      name: "id", // Matches the "id" key in data
       label: "#",
       options: {
-        display: "none",
+        display: false,
       },
     },
     {
-      name: "ispaid",
-      label: "ispaid",
-      options: {
-        display: "excluded",
-      },
-    },
-    {
-      name: "nom",
-      label: "Nom",
+      name: "full_name", // Matches the "full_name" key in data
+      label: "Nom complet",
       options: {
         filter: true,
         sort: true,
       },
     },
     {
-      name: "date",
+      name: "date", // Matches the "date" key in data
       label: "Date",
       options: {
         filter: true,
@@ -96,7 +67,7 @@ const ReglementTable = () => {
       },
     },
     {
-      name: "prix",
+      name: "total_cost", // Matches the "total_cost" key in data
       label: "Prix Total",
       options: {
         filter: true,
@@ -104,7 +75,7 @@ const ReglementTable = () => {
       },
     },
     {
-      name: "amount_paid",
+      name: "totalPaid", // Matches the "totalPaid" key in data
       label: "Montant Payé",
       options: {
         filter: true,
@@ -112,23 +83,16 @@ const ReglementTable = () => {
       },
     },
     {
-      name: "status",
+      name: "isPaid", // Matches the "isPaid" key in data
       label: "Status",
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (
-          _value: any,
-          tableMeta: { rowData: string[]; currentTableData: string[] },
-          _updateValue: any
-        ) => {
-          console.log(typeof tableMeta.rowData);
-
-          const color = tableMeta.rowData[1] === "true" ? "success" : "error";
-
+        customBodyRender: (value: boolean) => {
+          const color = value ? "success" : "error";
           return (
             <Chip
-              label={color === "success" ? "Entièrement payé" : "Non payé"}
+              label={value ? "Entièrement payé" : "Non payé"}
               color={color}
               variant="outlined"
             />
@@ -140,90 +104,136 @@ const ReglementTable = () => {
       name: "Actions",
       label: "Actions",
       options: {
-        filter: true,
-        sort: true,
-        customBodyRender: () =>
-          can(["Super-Admin", "delete_debt"]) && (
-            <button
-              className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-              title="Supprimer"
-            >
-              <DeleteOutlineIcon
-                color="error"
-                className="pointer-events-none"
-                fill="currentColor"
-              />
-            </button>
-          ),
+        filter: false,
+        sort: false,
+        customBodyRender: (value: any, tableMeta: any) => (
+          <button
+            className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
+            title="Supprimer"
+            onClick={() => {
+              const id = tableMeta.rowData[0]; // "id" is the first column
+              confirmDialog(
+                "Voulez-vous vraiment supprimer le paiement ?",
+                async () => {
+                  try {
+                    const deletionSuccessful = await deleteItem(
+                      id,
+                      operationApiClient
+                    );
+                    if (deletionSuccessful) {
+                      queryClient.invalidateQueries({
+                        queryKey: ["operation"],
+                      });
+                      showSnackbar(
+                        "La suppression du paiement a réussi",
+                        "success"
+                      );
+                    } else {
+                      showSnackbar(
+                        "La suppression du paiement a échoué",
+                        "error"
+                      );
+                    }
+                  } catch (error) {
+                    showSnackbar(
+                      `Une erreur s'est produite lors de la suppression du paiement: ${error}`,
+                      "error"
+                    );
+                  }
+                }
+              );
+            }}
+          >
+            <DeleteOutlineIcon
+              color="error"
+              className="pointer-events-none"
+              fill="currentColor"
+            />
+          </button>
+        ),
       },
     },
   ];
+  //TODO REMOVE THE CACHE WHEN OPERATION IS ADDED
+  const dataHook = (page: number, searchQuery: string, rowsPerPage: number) =>
+    getGlobalv2(
+      {},
+      CACHE_KEY_Operation,
+      operationApiClient,
+      page,
+      rowsPerPage,
+      searchQuery,
 
-  const options = {
-    searchOpen: true,
-    filterType: "dropdown",
-    searchPlaceholder: "Rechercher une paiement",
-    textLabels: {
-      body: {
-        noMatch: "Désolé, aucun paiement n'est dans nos données",
-      },
-    },
-
-    selectableRowsHideCheckboxes: true,
-    onRowClick: (s: [number, number], _m: any, e: any) => {
-      if (
-        e.target.querySelector(".btn-ordonance-delete") ||
-        e.target.classList.contains("btn-ordonance-delete")
-      ) {
-        confirmDialog(
-          "Voulez-vous vraiment supprimer le paiement ?",
-          async () => {
-            try {
-              const deletionSuccessful = await deleteItem(
-                s[0],
-                operationApiClient
-              );
-
-              if (deletionSuccessful) {
-                queryClient.invalidateQueries({ queryKey: ["operation"] });
-                showSnackbar("La suppression du paiement a réussi", "success");
-              } else {
-                showSnackbar("La suppression du paiement a échoué", "error");
-              }
-            } catch (error) {
-              showSnackbar(
-                `Une erreur s'est produite lors de la suppression du paiement :${error}`,
-                "error"
-              );
-            }
-          }
-        );
-      } else {
-        setModalOperationId(s[0]);
-        setOpenModal(true);
+      {
+        staleTime: 60000,
+        cacheTime: 300000,
       }
-    },
-  };
-
-  const formatedLoL: [] = [];
+    );
   return (
     <>
       <Box className="relative">
-        <MUIDataTable
-          title={"Liste des Règlement"}
-          data={formatedLoL}
+        <DataTable
+          title="Liste des paiements des opérations"
+          noMatchMessage="Désolé, aucune opération n'est présente dans nos données"
           columns={columns}
-          options={options}
+          dataHook={dataHook}
+          options={{
+            searchPlaceholder: "Rechercher une opération",
+            selectableRowsHideCheckboxes: true,
+            onRowClick: (s: any, _m: any, e: any) => {
+              console.log(s);
+
+              if (
+                e.target.querySelector(".btn-ordonance-delete") ||
+                e.target.classList.contains("btn-ordonance-delete")
+              ) {
+                confirmDialog(
+                  "Voulez-vous vraiment supprimer le paiement ?",
+                  async () => {
+                    try {
+                      const deletionSuccessful = await deleteItem(
+                        s[0],
+                        operationApiClient
+                      );
+
+                      if (deletionSuccessful) {
+                        queryClient.invalidateQueries({
+                          queryKey: ["operation"],
+                        });
+                        showSnackbar(
+                          "La suppression du paiement a réussi",
+                          "success"
+                        );
+                      } else {
+                        showSnackbar(
+                          "La suppression du paiement a échoué",
+                          "error"
+                        );
+                      }
+                    } catch (error) {
+                      showSnackbar(
+                        `Une erreur s'est produite lors de la suppression du paiement :${error}`,
+                        "error"
+                      );
+                    }
+                  }
+                );
+              } else {
+                setModalOperationId(s[0]);
+                setOpenModal(true);
+              }
+            },
+          }}
         />
       </Box>
 
-      {/*  {can(["Super-Admin", "insert_debt"]) && openModal && (
-          <PaymentModal
-            open={openModal}
-            onClose={handleCloseModal}
-            operationID={modalOperationId}
-          />
-        )} */}
+      {openModal && (
+        <PaymentModal
+          open={openModal}
+          onClose={handleCloseModal}
+          operationID={modalOperationId}
+        />
+      )}
     </>
   );
 };

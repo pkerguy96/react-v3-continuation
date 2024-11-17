@@ -1,15 +1,15 @@
-import DataTable from "./DataTable";
+import DataTable from "../DataTable";
 import { useNavigate } from "react-router";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { CACHE_KEY_PATIENTS } from "../constants";
-import patientAPIClient from "../services/PatientService";
+import { CACHE_KEY_PATIENTS } from "../../constants";
+import patientAPIClient from "../../services/PatientService";
 import { useQueryClient } from "@tanstack/react-query";
-import { confirmDialog } from "./ConfirmDialog";
-import deleteItem from "../hooks/deleteItem";
-import { useSnackbarStore } from "../zustand/useSnackbarStore";
+import { confirmDialog } from "../ConfirmDialog";
+import deleteItem from "../../hooks/deleteItem";
+import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 
-import getGlobalv2 from "../hooks/getGlobalv2";
+import getGlobalv2 from "../../hooks/getGlobalv2";
 import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -122,6 +122,7 @@ const PatientsTable = () => {
       columns={columns}
       dataHook={dataHook}
       options={{
+        searchPlaceholder: "Rechercher un patient",
         customToolbar: () => (
           <Tooltip title="Nouveau patient">
             <IconButton onClick={() => navigate("/AddPatient")}>

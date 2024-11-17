@@ -15,7 +15,7 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { Controller, useForm } from "react-hook-form";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { Patient } from "./AddPatientForm";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { redirect, useLocation, useNavigate, useParams } from "react-router";
 import { AxiosError } from "axios";
 
 import Table from "@mui/material/Table";
@@ -38,11 +38,6 @@ import { PayementVerificationApiClient } from "../services/OperationService";
 import getGlobalById from "../hooks/getGlobalById";
 
 const AddOrdonanceUpdated = ({ onNext }: any) => {
-  const {
-    id: zuId,
-    ordonanceId: zuOrdonanceid,
-    operationId: zuOperationid,
-  } = useGlobalStore();
   const [drugs, setDrugs] = useState([]);
   const [drug, setDrug] = useState({});
   const [name, setName] = useState("");
@@ -50,6 +45,7 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
   const [optionsArray, setOptionsArray] = useState(null);
   const [iserror, setIsError] = useState(false);
   const queryClient = useQueryClient();
+
   const { showSnackbar } = useSnackbarStore();
   const Addmutation = addGlobal({} as Ordonance, ordonanceApiClient);
   const useUpdateOrdonance = updateItem<Ordonance>(
@@ -63,16 +59,6 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
     undefined // opts
   );
 
-  const { data: data1, isLoading: isloading1 } = zuOperationid
-    ? getGlobalById(
-        {} as any,
-        [CACHE_KEY_Operation[0], zuOperationid],
-        PayementVerificationApiClient,
-        undefined,
-        parseInt(zuOperationid)
-      )
-    : { data: {}, isLoading: false };
-
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
 
@@ -80,10 +66,11 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
   const id = queryParams.get("id");
   const ordonanceID = queryParams.get("ordonanceID");
   const operation_id = queryParams.get("operation_id");
-
+  const direct = queryParams.get("direct");
   const navigate = useNavigate();
+  console.log("100", ordonanceID);
 
-  const isAddMode = !id && !zuId;
+  const isAddMode = !id;
 
   let dataArray: Patient[] = [];
   let specifiedPatient;
@@ -101,7 +88,7 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
         ? patientsData?.find((patient) => patient.id === parseInt(id))
         : patientsData?.find((patient) => patient.id === parseInt(zuId));
 
-      if (specifiedPatient && (zuId || id) && !ordonanceID) {
+      if (specifiedPatient && id && !ordonanceID) {
         setValue("patient", specifiedPatient);
         setFromOperation(true);
       } else if (specifiedPatient) {
@@ -126,7 +113,7 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
         }
       }
     }
-  }, [patientsData, id, zuId]);
+  }, [patientsData, id]);
 
   const {
     handleSubmit,
@@ -138,23 +125,10 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
       date: new Date().toISOString().split("T")[0],
     },
   });
-  if (isLoading || isloading1) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  const redirectTo = () => {
-    const isPaid = parseInt(data1);
-
-    if (isPaid === 1) {
-      navigate(`/dashboard`);
-      showSnackbar(
-        "Le traitement du patient est terminé avec paiement complet.",
-        "success"
-      );
-    } else {
-      return navigate(`/PatientCheckout/${zuOperationid}`);
-    }
-  };
   const onSubmit = async (data: any) => {
     data.drugs = drugs;
 
@@ -188,7 +162,12 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
   const createUser = async (formData: Ordonance) => {
     return await Addmutation.mutateAsync(formData, {
       onSuccess: () => {
-        onNext();
+        if (direct) {
+          showSnackbar("Ordonnance ajoutée avec succès.", "success");
+          navigate("/Ordonnance");
+        } else if (onNext) {
+          onNext();
+        }
       },
       onError: (error: any) => {
         const message =
@@ -205,6 +184,7 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
       {
         onSuccess: () => {
           showSnackbar("Ordonnance Modifiée avec succès.", "success");
+          navigate("/Ordonnance");
         },
         onError: (error: any) => {
           const message =
@@ -400,15 +380,17 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
             </TableContainer>
           </Box>
           <Box className="flex justify-between flex-row mt-5 content-center">
-            <Button
-              className="w-full md:w-max !px-10 !py-3 rounded-lg "
-              variant="outlined"
-              onClick={() => {
-                onNext();
-              }}
-            >
-              <p className="text-sm ">Passer</p>
-            </Button>
+            {!direct && !ordonanceID && (
+              <Button
+                className="w-full md:w-max !px-10 !py-3 rounded-lg "
+                variant="outlined"
+                onClick={() => {
+                  onNext();
+                }}
+              >
+                <p className="text-sm ">Passer</p>
+              </Button>
+            )}
             <Button
               type="submit"
               variant="contained"

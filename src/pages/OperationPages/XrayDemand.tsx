@@ -24,8 +24,10 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 
 const XrayDemand = ({ onNext }) => {
+  const { showSnackbar } = useSnackbarStore();
   const addMutation = addGlobal({} as XrayProps, xrayApiClient, undefined);
   const location = useLocation();
   const navigate = useNavigate();
@@ -50,10 +52,16 @@ const XrayDemand = ({ onNext }) => {
   } = useForm<XrayProps>();
 
   const onSubmit = async (data: XrayProps) => {
-    const dataWithId = { ...data, patient_id };
-    console.log(xrays);
+    const dataWithId = { ...xrays, patient_id };
+    const payload = {
+      patient_id,
+      xrays, // Grouped X-rays
+      note: data.note, // Optional note
+    };
 
-    /* await addMutation.mutateAsync(dataWithId, {
+    console.log("Payload:", payload);
+
+    await addMutation.mutateAsync(payload, {
       onSuccess: (data: any) => {
         const operationId = data.data;
         navigate(`?id=${patient_id}&operation_id=${operationId}`, {
@@ -62,12 +70,23 @@ const XrayDemand = ({ onNext }) => {
 
         onNext();
       },
-    }); */
+    });
   };
 
   const addRow = () => {
     const { body_side, view_type, xray_type } = getValues();
-    if (!body_side.length || !view_type.length || !xray_type.length) return;
+    if (
+      !body_side ||
+      !view_type ||
+      !xray_type ||
+      !body_side.length ||
+      !view_type.length ||
+      !xray_type.length
+    ) {
+      //TODO rewrite the error msgs
+      showSnackbar("please fill details", "error");
+      return;
+    }
     setXrays([...xrays, { body_side, view_type, xray_type, id: xrays.length }]);
     reset({ xray_type: [], view_type: [], body_side: [] });
   };

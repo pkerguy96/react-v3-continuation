@@ -18,7 +18,7 @@ import appointmentAPIClient from "../../services/AppointmentService";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import { AxiosError } from "axios";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 interface DataSend {
   patient_id: number;
@@ -29,6 +29,8 @@ interface DataSend {
 const AppointmentStepPage = ({ onNext }: any) => {
   const [selectedDateTime, setSelectedDateTime] = useState(moment());
   const location = useLocation();
+  const navigate = useNavigate();
+
   const queryParams = new URLSearchParams(location.search);
   const patient_id = queryParams.get("id");
   const { showSnackbar } = useSnackbarStore();
@@ -73,6 +75,12 @@ const AppointmentStepPage = ({ onNext }: any) => {
 
     await Addmutation.mutateAsync(formData, {
       onSuccess: () => {
+        const currentParams = new URLSearchParams(location.search);
+        currentParams.set("isdone", "0");
+        navigate(`${location.pathname}?${currentParams.toString()}`, {
+          replace: true,
+        });
+
         onNext();
       },
       onError: (error: any) => {

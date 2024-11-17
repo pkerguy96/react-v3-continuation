@@ -4,18 +4,18 @@
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true, // Already skipping library type checks
+    "skipLibCheck": false, // Enable library type checking
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true, // Prevents emitting files
+    "noEmit": true,
     "jsx": "react-jsx",
-    "strict": false, // Disable strict type checks
-    "noUnusedLocals": false, // Disable warnings about unused local variables
-    "noUnusedParameters": false, // Disable warnings about unused parameters
-    "noFallthroughCasesInSwitch": false, // Disable switch case fallthrough checking
-    "allowJs": true // Allow JavaScript files to be included
+    "strict": true, // Enable strict type-checking
+    "noUnusedLocals": true, // Show warnings for unused local variables
+    "noUnusedParameters": true, // Show warnings for unused parameters
+    "noFallthroughCasesInSwitch": true, // Enable switch case fallthrough checking
+    "allowJs": false // Disallow JavaScript files
   },
   "include": ["src", "public/viewer.js"],
   "references": [{ "path": "./tsconfig.node.json" }]

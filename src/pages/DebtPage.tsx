@@ -9,63 +9,67 @@ import {
   TextField,
 } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import DebtTableComponant from "../components/DebtTableComponant";
+import DebtTableComponant from "../components/Tables/DebtTableComponant";
 import addGlobal from "../hooks/addGlobal";
 import {
   OperationDataDebt,
   PatientsDebtKpiClient,
 } from "../services/KpisService";
 import useUserRoles from "../zustand/UseRoles";
+
 interface SentDebtData {
   date: string;
   date2: string;
 }
+
 const DebtPage = () => {
   const [data, setData] = useState<OperationDataDebt[]>([]);
-  const { can } = useUserRoles();
-  /*   const addMutation = addGlobal(
+
+  const addMutation = addGlobal(
     {} as SentDebtData,
     PatientsDebtKpiClient,
     undefined
-  ); */
+  );
+
   const {
     handleSubmit,
     control,
     getValues,
     formState: { errors },
   } = useForm();
-  /*   const onSubmit = async (data: any) => {
+
+  const onSubmit = async (formData: SentDebtData) => {
     setData([]);
 
     await addMutation.mutateAsync(
-      { date: data.date, date2: data.date2 },
+      { date: formData.date, date2: formData.date2 },
       {
         onSuccess: (response: any) => {
-          console.log(data);
+          console.log(response);
+
           const transformedData = response?.data?.map((item: any) => ({
             name: item.name,
             date: item.date,
-            operation_type: item.operation_type.join(", "),
-            total_cost: `${item.total_cost} MAD`,
-            total_amount_paid: `${item.total_amount_paid} MAD`,
-            amount_due: `${item.amount_due} MAD`,
+            operation_type: item.operation_type, // Already formatted as a string
+            total_cost: `${item.total_cost.toFixed(2)} MAD`,
+            total_amount_paid: `${item.total_amount_paid.toFixed(2)} MAD`,
+            amount_due: `${item.amount_due.toFixed(2)} MAD`,
           }));
           setData(transformedData);
         },
       }
     );
-  }; */
-  //TODO also here
-  const dataPlaceHolder: [] = [];
+  };
+
   return (
     <Paper className="p-4">
       <Box
         component="form"
         className="w-full flex flex-col gap-4"
         autoComplete="off"
-        /* onSubmit={handleSubmit(onSubmit)} */
+        onSubmit={handleSubmit(onSubmit)}
       >
-        <Box className="flex justify-center  text-lg  text-gray-400 uppercase">
+        <Box className="flex justify-center text-lg text-gray-400 uppercase">
           <span>Page des créances</span>
         </Box>
         <Divider
@@ -75,8 +79,8 @@ const DebtPage = () => {
           variant="middle"
         />
 
-        <Box className="w-full flex  flex-col md:flex-row gap-4 md:items-center">
-          <Box className="flex  md:flex-row items-center gap-4">
+        <Box className="w-full flex flex-col md:flex-row gap-4 md:items-center">
+          <Box className="flex md:flex-row items-center gap-4">
             <label htmlFor="date">Start date:</label>
             <FormControl className="w-full md:flex-1">
               <Controller
@@ -98,13 +102,11 @@ const DebtPage = () => {
                 control={control}
                 rules={{
                   validate: (value) => {
-                    console.log("value", value);
-
                     const startDate = new Date(getValues("date"));
                     const currentDate = new Date(value);
                     return (
                       startDate <= currentDate ||
-                      "La date ne peut pas être dans le futur."
+                      "La date de fin doit être après la date de début."
                     );
                   },
                 }}
@@ -131,14 +133,15 @@ const DebtPage = () => {
               type="submit"
               variant="outlined"
               startIcon={<SearchOutlinedIcon />}
-              className="w-full md:w-max !px-10 !py-3 rounded-lg !ml-auto "
+              className="w-full md:w-max !px-10 !py-3 rounded-lg !ml-auto"
             >
               Search
             </Button>
           </Box>
         </Box>
 
-        <DebtTableComponant data={dataPlaceHolder} />
+        {/* Pass the fetched data to the DebtTableComponant */}
+        <DebtTableComponant data={data} />
       </Box>
     </Paper>
   );
