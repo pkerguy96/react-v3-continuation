@@ -158,7 +158,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import { confirmDialog } from "../ConfirmDialog";
-import { Box } from "@mui/material";
+import { Box, Chip } from "@mui/material";
 import deleteItem from "../../hooks/deleteItem";
 import appointmentAPIClient from "../../services/AppointmentService";
 import moment from "moment"; // Import moment for time handling
@@ -167,16 +167,37 @@ import {
   decrementPatientApiClient,
   FetchWaitingList,
 } from "../../services/WaitingroomService";
+import { useNavigate } from "react-router";
+import getGlobalv2 from "../../hooks/getGlobalv2";
+import DataTable from "../DataTable";
+import { useQueryClient } from "@tanstack/react-query";
 
 const AppointmentsTableKpi = () => {
   const { showSnackbar } = useSnackbarStore();
-  const { data, isLoading, refetch } = getGlobal(
+  const queryClient = useQueryClient();
+
+  /*  const { data, isLoading, refetch } = getGlobal(
     {},
     CACHE_KEY_WAITINGLIST,
     FetchWaitingList,
     undefined
-  );
+  ); */
 
+  const dataHook = (page: number, searchQuery: string, rowsPerPage: number) =>
+    getGlobalv2(
+      {},
+      CACHE_KEY_WAITINGLIST,
+      FetchWaitingList,
+      page,
+      5,
+      searchQuery,
+
+      {
+        staleTime: 60000,
+        cacheTime: 300000,
+      }
+    );
+  const navigate = useNavigate();
   const [lastUpdateTime, setLastUpdateTime] = React.useState(Date.now()); // Store last update time
 
   // Function to calculate waiting time
@@ -217,6 +238,13 @@ const AppointmentsTableKpi = () => {
       },
     },
     {
+      name: "patient_id",
+      label: "#d",
+      options: {
+        display: false,
+      },
+    },
+    {
       name: "patient_name",
       label: "Nom",
       options: {
@@ -234,6 +262,22 @@ const AppointmentsTableKpi = () => {
         customBodyRender: (value) => {
           // Calculate and display waiting time based on current time
           return calculateWaitingTime(value);
+        },
+      },
+    },
+    {
+      name: "status",
+      label: "Statut",
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value: string) => {
+          const color = {
+            waiting: "info",
+            pending: "warning",
+            current: "success",
+          }[value];
+          return <Chip label={value} color={color} variant="outlined" />;
         },
       },
     },
@@ -286,7 +330,8 @@ const AppointmentsTableKpi = () => {
                 decrementPatientApiClient
               );
               if (deletionSuccessful) {
-                refetch();
+                queryClient.invalidateQueries(CACHE_KEY_WAITINGLIST);
+
                 showSnackbar(
                   "La suppression du rendez-vous a réussi",
                   "success"
@@ -302,21 +347,66 @@ const AppointmentsTableKpi = () => {
             }
           }
         );
+      } else {
+        navigate(`/Patients/Xray?id=${rowData[1]}`);
       }
     },
   };
 
-  if (isLoading) return <LoadingSpinner />;
   /*   const deletezaba = async ($id) => {
     await deleteItem($id, decrementPatientApiClient);
   }; */
+
   return (
     <Box className="relative">
-      <MUIDataTable
-        title={"Liste des rendez-vous"}
-        data={data}
+      <DataTable
+        title="Liste des ordonances"
+        noMatchMessage="Désolé, aucun ordonance n'est dans nos données"
         columns={columns}
-        options={options}
+        dataHook={dataHook}
+        options={{
+          searchPlaceholder: "Rechercher une ordonance",
+
+          selectableRowsHideCheckboxes: true,
+          onRowClick: (rowData: any, _m: any, e: any) => {
+            if (
+              e.target.querySelector(".btn-ordonance-delete") ||
+              e.target.classList.contains("btn-ordonance-delete")
+            ) {
+              confirmDialog(
+                "Voulez-vous vraiment supprimer le rendez-vous ?",
+                async () => {
+                  try {
+                    console.log(rowData[0]);
+
+                    const deletionSuccessful = await deleteItem(
+                      rowData[0],
+                      decrementPatientApiClient
+                    );
+                    if (deletionSuccessful) {
+                      showSnackbar(
+                        "La suppression du rendez-vous a réussi",
+                        "success"
+                      );
+                    } else {
+                      showSnackbar(
+                        "La suppression du rendez-vous a échoué",
+                        "error"
+                      );
+                    }
+                  } catch (error) {
+                    showSnackbar(
+                      `Une erreur s'est produite lors de la suppression du rendez-vous ${error}`,
+                      "error"
+                    );
+                  }
+                }
+              );
+            } else {
+              navigate(`/Patients/Xray?id=${rowData[1]}`);
+            }
+          },
+        }}
       />
     </Box>
   );

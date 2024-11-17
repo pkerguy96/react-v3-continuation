@@ -91,7 +91,7 @@ export default function Dashboard(Props: React.PropsWithChildren) {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", height: "100dvh" }}>
       <CssBaseline />
       <AppBar position="absolute" open={open}>
         <Toolbar

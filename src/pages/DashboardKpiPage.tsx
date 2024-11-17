@@ -8,6 +8,7 @@ import TotalpatientsKpi from "../components/Kpis/TotalpatientsKpi";
 import AppointmentsTableKpi from "../components/Kpis/AppointmentsTableKpi";
 import CashierKpi from "../components/Kpis/CashierKpi";
 import LinechartKPI from "../components/Kpis/LinechartKPI";
+import { useNavigate } from "react-router";
 
 // Sample mock data for charts
 const labels = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin"];
@@ -22,6 +23,7 @@ const ageGroups = [
 ];
 
 const DashboardKpiPage = () => {
+  const navigate = useNavigate();
   const appointmentDataset = {
     labels,
     datasets: [
@@ -52,7 +54,10 @@ const DashboardKpiPage = () => {
         <Box className="!w-full shadow-md lg:col-span-4 bg-gradient-to-br from-blue-400 via-blue-300 to-blue-200 text-gray-950 ">
           <CashierKpi />
         </Box>
-        <Box className="!w-full shadow-md text-white bg-[#6b37e7] lg:col-span-4">
+        <Box
+          className="!w-full shadow-md text-white bg-[#6b37e7] lg:col-span-4 cursor-pointer "
+          onClick={() => navigate("/Supplier")}
+        >
           <TotalAppointmentsKpi />
           <LinechartKPI dataset={appointmentDataset} />
         </Box>
@@ -61,7 +66,14 @@ const DashboardKpiPage = () => {
           <LinechartKPI dataset={canceledDataset} />
         </Box>
       </div>
-
+      <Box className="Flex w-full ">
+        <Box className="w-full shadow-md bg-[#eff0f1] text-gray-950 flex flex-col">
+          <h1 className="text-xl font-semibold p-6">
+            Dernière activité en salle d'attente
+          </h1>
+          <AppointmentsTableKpi />
+        </Box>
+      </Box>
       <div className="grid grid-rows-1 grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="flex flex-col gap-6 lg:col-span-9">
           <Box className="!w-full shadow-md bg-[#eff0f1] text-gray-950 flex flex-col">
@@ -81,14 +93,7 @@ const DashboardKpiPage = () => {
           </Box>
         </div>
       </div>
-      <Box className="Flex w-full ">
-        <Box className="w-full shadow-md bg-[#eff0f1] text-gray-950 flex flex-col">
-          <h1 className="text-xl font-semibold p-6">
-            Dernière activité en salle d'attente
-          </h1>
-          <AppointmentsTableKpi />
-        </Box>
-      </Box>
+
       <Box className="flex w-full "></Box>
     </div>
   );

@@ -38,6 +38,8 @@ import AddStockForm from "./pages/AddStockForm";
 import SupplierPage from "./pages/SupplierPage";
 import AddSupplier from "./pages/AddForms/AddSupplier";
 import IncompletedOperations from "./components/Tables/IncompletedOperations";
+import NursePaymentpage from "./pages/NursePaymentpage";
+import CalenderTable from "./components/Tables/CalenderTable";
 
 const router = createBrowserRouter([
   {
@@ -91,7 +93,7 @@ const router = createBrowserRouter([
 
       {
         path: "Ordonnance",
-        element: <OrdonnancePage />, 
+        element: <OrdonnancePage />,
       },
       {
         path: "Opérations-inachevées",
@@ -149,7 +151,7 @@ const router = createBrowserRouter([
       },
       {
         path: "Supplier",
-        element: <SupplierPage />,
+        element: <CalenderTable />,
         children: [
           {
             path: "ajouter",

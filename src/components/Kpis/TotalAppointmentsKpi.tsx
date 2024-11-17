@@ -4,8 +4,10 @@ import AppointmentsKpiClient, {
 } from "../../services/KpisService";
 import { CACHE_KEY_AppointmentsCount } from "../../constants";
 import LoadingSpinner from "../LoadingSpinner";
+import { Navigate, useNavigate } from "react-router";
 
 const TotalAppointmentsKpi = ({ className }: { className?: string }) => {
+  const navigate = useNavigate();
   /*  const { data, isLoading } = getGlobal(
     {} as appointmentsCount,
     CACHE_KEY_AppointmentsCount,

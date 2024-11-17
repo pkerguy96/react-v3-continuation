@@ -9,4 +9,5 @@ export interface Appointments {
   patient_name?: string;
 }
 const appointmentAPIClient = new APIClient<Appointments>("/Appointment");
+export const paginatedAppointmentApiClient = new APIClient<Appointments>("/GetAppointmentPagated");
 export default appointmentAPIClient;
