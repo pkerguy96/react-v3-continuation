@@ -9,7 +9,7 @@ import {
   Button,
   IconButton,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm, useFieldArray, useWatch } from "react-hook-form";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -27,12 +27,14 @@ import {
 } from "../../services/XrayService";
 import { useLocation, useNavigate } from "react-router";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { CACHE_KEY_Xray } from "../../constants";
+import { CACHE_KEY_OperationPref, CACHE_KEY_Xray } from "../../constants";
 import updateItem from "../../hooks/updateItem";
 import addGlobal from "../../hooks/addGlobal";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import getGlobal from "../../hooks/getGlobal";
+import { OperationPrefApiClient } from "../../services/SettingsService";
 interface RowData {
   id?: string | number;
   xray_type: string;
@@ -44,18 +46,17 @@ interface Consomables {
   qte: number;
 }
 const VisiteValidation = ({ onNext }) => {
-  const [consomableTotal, setConsomableTotal] = useState(0);
-  const { handleSubmit, control, setValue } = useForm<{
-    rows: RowData[];
-    consomables: Consomables[];
-  }>();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const operation_id = queryParams.get("operation_id");
   const patient_id = queryParams.get("id");
   const isdone = queryParams.get("isdone");
-  const navigate = useNavigate();
-  const { showSnackbar } = useSnackbarStore();
+  const {
+    data: Operationprefs,
+    refetch,
+    isLoading: isloading2,
+  } = getGlobal({}, CACHE_KEY_OperationPref, OperationPrefApiClient, undefined);
+  const [consomableTotal, setConsomableTotal] = useState(0);
   const { data, isLoading } = operation_id
     ? getGlobalById(
         {} as XrayData,
@@ -65,6 +66,14 @@ const VisiteValidation = ({ onNext }) => {
         parseInt(operation_id)
       )
     : { data: [], isLoading: false };
+  const { handleSubmit, control, setValue } = useForm<{
+    rows: RowData[];
+    consomables: Consomables[];
+  }>();
+
+  const navigate = useNavigate();
+  const { showSnackbar } = useSnackbarStore();
+
   const addmutation = addGlobal({} as RowData, insertOpwithoutxray);
   const [totalPrice, setTotalPrice] = useState(0);
   const updateMutation = updateItem({} as XrayData, xrayApiClient);
@@ -121,6 +130,18 @@ const VisiteValidation = ({ onNext }) => {
           treatment_isdone: isdone ?? 1,
           ...data,
         };
+        formData.rows = formData.rows.map((e) => {
+          if (e.id)
+            if (String(e.id).startsWith("pref-")) {
+              delete e.id; // Remove the id property if it starts with "pref-"
+            } else {
+              e.id = String(e.id).replace(/^data-(\d+)$/, "$1"); // Keep only the number for "data-"
+            }
+          return e;
+        });
+
+        console.log(formData);
+
         // If operation_id exists, update the operation
         await updateMutation.mutateAsync(
           {
@@ -166,34 +187,41 @@ const VisiteValidation = ({ onNext }) => {
     }
   };
   // Initialize rows with fetched data
-  useEffect(() => {
-    if (data && data.length > 0) {
-      // If data exists, initialize with fetched rows
-      setValue(
-        "rows",
-        data.map((item) => ({
-          id: item.id,
-          xray_type: item.xray_type,
-          price: item.price,
-        }))
-      );
-    }
-  }, [data]);
+  const rowsInitialized = useRef(false);
 
+  useEffect(() => {
+    const combinedRows = [
+      ...(data || []).map((item, index) => ({
+        id: `data-${item.id || index}`, // Ensure unique id
+        xray_type: item.xray_type || "", // Default to empty string
+        price: item.price || 0, // Default to 0
+      })),
+      ...(Operationprefs || []).map((pref, index) => ({
+        id: `pref-${pref.id || index}`, // Ensure unique id
+        xray_type: pref.operation_type || "", // Default to empty string
+        price: parseFloat(pref.price || "0"), // Default to 0
+      })),
+    ];
+
+    if (combinedRows.length > 0) {
+      setValue("rows", combinedRows); // Set combined rows only if not empty
+    }
+
+    console.log("Combined Rows After Transformation:", combinedRows);
+  }, [data, Operationprefs, setValue]);
   useEffect(() => {
     const total = rows?.reduce((sum, row) => sum + Number(row.price || 0), 0);
     setTotalPrice(total);
   }, [rows]);
 
   useEffect(() => {
-    console.log("2000", consomableFields);
     const total = consomables?.reduce(
       (sum, row) => sum + Number(row.qte || 0),
       0
     );
     setConsomableTotal(total);
   }, [consomables]);
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading || isloading2) return <LoadingSpinner />;
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">
       <Box

@@ -1,63 +1,58 @@
-//@ts-nocheck
-
 import {
   Box,
-  Button,
   FormControl,
-  Table,
-  TableBody,
-  TableCell,
+  TextField,
+  Button,
   TableContainer,
+  Table,
   TableHead,
   TableRow,
-  TextField,
+  TableCell,
+  TableBody,
 } from "@mui/material";
-
+import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { AddoperationPreference } from "../../hooks/AddoperationPreference";
 import {
-  DeleteOperationsPrefApiClient,
-  OperationPrefApiClient,
   OperationPreference,
+  XrayPreference,
+  XrayPreferenceApiClient,
+  XrayPreferencesResponse,
 } from "../../services/SettingsService";
-
-import deleteItem from "../../hooks/deleteItem";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
-import { useGlobalOperationPreference } from "../../hooks/getOperationPrefs";
-import LoadingSpinner from "../LoadingSpinner";
+import { AddoperationPreference } from "../../hooks/AddoperationPreference";
 import { AxiosError } from "axios";
+import deleteItem from "../../hooks/deleteItem";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { useGlobalOperationPreference } from "../../hooks/getOperationPrefs";
 import getGlobal from "../../hooks/getGlobal";
-import { CACHE_KEY_OperationPref, referral } from "../../constants";
+import { CACHE_KEY_XrayPreferences } from "../../constants";
 import addGlobal from "../../hooks/addGlobal";
-const OperationsListSettings = () => {
+import LoadingSpinner from "../LoadingSpinner";
+interface xrayProps {
+  xray_type: string;
+  price: number;
+}
+const XraySettings = () => {
   const { showSnackbar } = useSnackbarStore();
-
   const { data, refetch, isLoading } = getGlobal(
-    {},
-    CACHE_KEY_OperationPref,
-    OperationPrefApiClient,
+    {} as XrayPreferencesResponse,
+    CACHE_KEY_XrayPreferences,
+    XrayPreferenceApiClient,
     undefined
   );
-  const { control, handleSubmit, reset } = useForm<OperationPreference>();
-  const Addmutation = addGlobal({}, OperationPrefApiClient);
-  const addOperationMutation = AddoperationPreference(() => {
-    reset({
-      name: "",
-      price: 0.0,
-      code: "",
-    });
-  });
-  const onSubmit = async (data: OperationPreference) => {
-    await Addmutation.mutateAsync(
+  const addmutation = addGlobal({}, XrayPreferenceApiClient);
+  const { control, handleSubmit, reset } = useForm<xrayProps>();
+
+  const onSubmit = async (data: xrayProps) => {
+    await addmutation.mutateAsync(
       {
-        code: data.code,
+        xray_type: data.xray_type,
         price: data.price,
-        operation_type: data.name,
       },
       {
         onSuccess: () => {
           showSnackbar("L'Opération a été créé", "success");
+          reset();
           refetch();
         },
         onError: (error: any) => {
@@ -71,7 +66,7 @@ const OperationsListSettings = () => {
     );
   };
   const onDelete = async (key: number) => {
-    const response = await deleteItem(key, OperationPrefApiClient);
+    const response = await deleteItem(key, XrayPreferenceApiClient);
     if (response) {
       refetch();
       showSnackbar("La suppression d'Opération a réussi", "success");
@@ -79,8 +74,8 @@ const OperationsListSettings = () => {
       showSnackbar("La suppression d'Opération a échoué", "error");
     }
   };
-  if (isLoading) return <LoadingSpinner />;
 
+  if (isLoading) return <LoadingSpinner />;
   return (
     <Box
       className="flex flex-col w-full h-full p-4 gap-4"
@@ -91,26 +86,26 @@ const OperationsListSettings = () => {
         Ajouter une opération
       </p>
       <p className=" text-start font-thin  text-sm md:text-lg">
-        Entrez les détails de l'opération.
+        Entrez les détails de la radiographie.
       </p>
       <Box className=" flex flex-col md:flex-row gap-4 flex-wrap ">
         <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center ">
           <label htmlFor="nom" className="w-full md:w-[160px]">
-            Opération:
+            Radiographie:
           </label>
           <FormControl className="w-full md:flex-1">
             <Controller
               defaultValue=""
-              name="name"
+              name="xray_type"
               control={control}
               render={({ field }) => (
-                <TextField {...field} id="name" label="Opération" />
+                <TextField {...field} id="xray_type" label="Radiographie" />
               )}
             />
           </FormControl>
         </Box>
         <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center">
-          <label htmlFor="nom" className="w-full md:w-[160px]">
+          <label htmlFor="price" className="w-full md:w-[160px]">
             Prix:
           </label>
           <FormControl className="w-full md:flex-1">
@@ -125,21 +120,7 @@ const OperationsListSettings = () => {
             />
           </FormControl>
         </Box>
-        <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center">
-          <label htmlFor="nom" className="w-full md:w-[160px]">
-            Code:
-          </label>
-          <FormControl className="w-full md:flex-1">
-            <Controller
-              name="code"
-              defaultValue=""
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} id="code" label="Code" />
-              )}
-            />
-          </FormControl>
-        </Box>
+
         <Box className="flex ml-auto mt-4">
           <Button
             type="submit"
@@ -155,11 +136,9 @@ const OperationsListSettings = () => {
           <TableHead>
             <TableRow className="bg-gray-300 !rounded-2xl	sticky top-0 z-10">
               <TableCell>
-                <strong>Nom de l'opération</strong>
+                <strong>Nom de la radiographie</strong>
               </TableCell>
-              <TableCell>
-                <strong>Code</strong>
-              </TableCell>
+
               <TableCell>
                 <strong>Prix</strong>
               </TableCell>
@@ -167,18 +146,18 @@ const OperationsListSettings = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.map((operation: OperationPreference, index: number) => (
+            {data?.map((xray: XrayPreference, index: number) => (
               <TableRow key={index}>
-                <TableCell>{operation.operation_type}</TableCell>
-                <TableCell>{operation.code}</TableCell>
-                <TableCell>{operation.price}</TableCell>
+                <TableCell>{xray.xray_type}</TableCell>
+
+                <TableCell>{xray.price}</TableCell>
                 <TableCell className="w-20">
                   <Button
-                    onClick={() => onDelete(operation.id!)}
+                    onClick={() => onDelete(xray.id!)}
                     className="w-max mx-auto"
                     variant="outlined"
                     color="error"
-                    disabled={operation.id === undefined}
+                    disabled={xray.id === undefined}
                   >
                     <DeleteOutlineIcon />
                   </Button>
@@ -192,4 +171,4 @@ const OperationsListSettings = () => {
   );
 };
 
-export default OperationsListSettings;
+export default XraySettings;

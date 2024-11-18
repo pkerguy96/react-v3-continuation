@@ -15,6 +15,7 @@ import appointmentAPIClient, {
 } from "../../services/AppointmentService";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import { useQueryClient } from "@tanstack/react-query";
+import { APIClient } from "../../services/Http";
 
 const CalenderTable = () => {
   const navigate = useNavigate();
@@ -58,16 +59,6 @@ const CalenderTable = () => {
         customBodyRender: () => (
           <>
             <button
-              className="btn-ordonance-edit text-gray-950 hover:text-blue-700 cursor-pointer"
-              title="Modifier"
-            >
-              <EditOutlinedIcon
-                className="pointer-events-none"
-                fill="currentColor"
-              />
-            </button>
-
-            <button
               className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
               title="Supprimer"
             >
@@ -102,19 +93,12 @@ const CalenderTable = () => {
   return (
     <Box className="relative">
       <DataTable
-        title="Liste des ordonances"
-        noMatchMessage="Désolé, aucun ordonance n'est dans nos données"
+        title="Liste des rendez-vous"
+        noMatchMessage="Désolé, aucune ordonnance n'a été trouvée dans nos données."
         columns={columns}
         dataHook={dataHook}
         options={{
-          searchPlaceholder: "Rechercher une ordonance",
-          customToolbar: () => (
-            <Tooltip title="Nouveau ordonance">
-              <IconButton onClick={() => navigate(`/AddOrdonance?direct=true`)}>
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          ),
+          searchPlaceholder: "Rechercher un rendez-vous",
 
           selectableRowsHideCheckboxes: true,
           onRowClick: (s: any, _m: any, e: any) => {
@@ -124,36 +108,29 @@ const CalenderTable = () => {
             ) {
               // api
               confirmDialog(
-                "Voulez-vous vraiment supprimer le ordonance ?",
+                "Voulez-vous vraiment supprimer rendez-vous ?",
                 async () => {
                   try {
-                    const deletionSuccessful = await deleteItem(
-                      s[0],
-                      ordonanceApiClient
-                    );
-                    if (deletionSuccessful) {
-                      queryClient.invalidateQueries(CACHE_KEY_Ordonance);
+                    const apiclient = new APIClient("Appointment");
+                    const deletionSuccessful = await apiclient.DeleteOne(s[0]);
 
-                      showSnackbar(
-                        "La suppression du ordonance a réussi",
-                        "success"
-                      );
+                    if (deletionSuccessful) {
+                      queryClient.invalidateQueries(CACHE_KEY_APPOINTMENTS);
+                      showSnackbar("Le rendez-vous est supprimé", "warning");
                     } else {
                       showSnackbar(
-                        "La suppression du ordonance a échoué",
+                        "La suppression du rendez-vous a échoué",
                         "error"
                       );
                     }
                   } catch (error) {
                     showSnackbar(
-                      `Une erreur s'est produite lors de la suppression du ordonance:${error}`,
+                      `Une erreur s'est produite lors de la suppression du rendez-vous:${error}`,
                       "error"
                     );
                   }
                 }
               );
-            } else {
-              navigate(`/OrdonanceDetails/${s[0]}`);
             }
           },
         }}

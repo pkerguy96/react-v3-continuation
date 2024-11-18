@@ -21,7 +21,7 @@ ChartJS.register(
   Legend
 );
 const RevenueKpi = () => {
-  /*   const { data: newdata, isLoading } = getGlobal(
+  const { data: newdata, isLoading } = getGlobal(
     {} as Revenue,
     CACHE_KEY_RevenueKpi,
     TotalRevenueKpiClient,
@@ -30,7 +30,7 @@ const RevenueKpi = () => {
     }
   );
 
-  if (isLoading) return <LoadingSpinner />; */
+  if (isLoading) return <LoadingSpinner />;
 
   const options = {
     responsive: true,
@@ -40,22 +40,7 @@ const RevenueKpi = () => {
       },
     },
   };
-  const newdata = [
-    {
-      January: 15000,
-      February: 18000,
-      March: 17000,
-      April: 20000,
-      May: 22000,
-    },
-    {
-      January: 16000,
-      February: 19000,
-      March: 17500,
-      April: 21000,
-      May: 23000,
-    },
-  ];
+
   const labels = newdata ? Object.keys(newdata[0]) : [];
 
   const data = {
@@ -64,12 +49,12 @@ const RevenueKpi = () => {
       {
         label: "Le mois dernier",
         data: newdata ? Object.values(newdata[0]) : [],
-        backgroundColor: "#f2edfd",
+        backgroundColor: "#015093",
       },
       {
         label: "Le mois en cours",
         data: newdata ? Object.values(newdata[1]) : [],
-        backgroundColor: "#6b37e7",
+        backgroundColor: "#528f8a",
       },
     ],
   };

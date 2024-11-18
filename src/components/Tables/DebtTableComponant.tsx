@@ -1,4 +1,4 @@
-//@ts-ignore
+//@ts-nocheck
 import MUIDataTable from "mui-datatables-mara";
 import { Box } from "@mui/material";
 

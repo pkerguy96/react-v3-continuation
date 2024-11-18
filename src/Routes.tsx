@@ -40,6 +40,8 @@ import AddSupplier from "./pages/AddForms/AddSupplier";
 import IncompletedOperations from "./components/Tables/IncompletedOperations";
 import NursePaymentpage from "./pages/NursePaymentpage";
 import CalenderTable from "./components/Tables/CalenderTable";
+import AppointmentsTableKpi from "./components/Kpis/AppointmentsTableKpi";
+import XraySettings from "./components/Settings/XraySettings";
 
 const router = createBrowserRouter([
   {
@@ -151,7 +153,7 @@ const router = createBrowserRouter([
       },
       {
         path: "Supplier",
-        element: <CalenderTable />,
+        element: <SupplierPage />,
         children: [
           {
             path: "ajouter",
@@ -173,6 +175,14 @@ const router = createBrowserRouter([
       },
       //TODO: translate this to french
       {
+        path: "/InvoicePage",
+        element: <NursePaymentpage />,
+      },
+      {
+        path: "/Appointmens/table",
+        element: <CalenderTable />,
+      },
+      {
         path: "Settings",
         element: <SettingsPage />,
         children: [
@@ -191,6 +201,10 @@ const router = createBrowserRouter([
           {
             path: "Autorisations",
             element: <PermissionsSettings />,
+          },
+          {
+            path: "Xrays",
+            element: <XraySettings />,
           },
         ],
       },

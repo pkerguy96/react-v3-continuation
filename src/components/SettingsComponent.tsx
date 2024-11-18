@@ -15,6 +15,8 @@ import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
 import MedicationLiquidOutlinedIcon from "@mui/icons-material/MedicationLiquidOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LocalPoliceOutlinedIcon from "@mui/icons-material/LocalPoliceOutlined";
+import LocalHospitalOutlinedIcon from "@mui/icons-material/LocalHospitalOutlined";
+import { useSnackbarStore } from "../zustand/useSnackbarStore";
 /*  */
 const SettingsComponent = () => {
   const location = useLocation();
@@ -38,6 +40,11 @@ const SettingsComponent = () => {
       name: "Paramètres d'opérations",
       url: "/Settings/Operations",
       icon: MedicationLiquidOutlinedIcon,
+    },
+    {
+      name: " Gestion des radiographie",
+      url: "/Settings/Xrays",
+      icon: LocalHospitalOutlinedIcon,
     },
     {
       name: "Gestion des rôles",

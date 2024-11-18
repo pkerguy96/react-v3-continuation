@@ -13,7 +13,13 @@ import { Controller, useForm } from "react-hook-form";
 import addGlobal from "../hooks/addGlobal";
 import { StockApiClient } from "../services/StockService";
 import { useSnackbarStore } from "../zustand/useSnackbarStore";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import getGlobalById from "../hooks/getGlobalById";
+import { CACHE_KEY_Products } from "../constants";
+import { useEffect } from "react";
+import updateItem from "../hooks/updateItem";
+import { AxiosError } from "axios";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface FormData {
   bar_code?: string;
@@ -21,15 +27,28 @@ interface FormData {
   product_family: string;
   product_nature?: string;
   min_stock?: number;
+  productData?: string;
+  qte?: number;
+}
+interface UpdateData {
+  id: string;
+  data: FormData;
 }
 
 const AddStockForm = () => {
+  const queryClient = useQueryClient();
   const { showSnackbar } = useSnackbarStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+  const addMutation = addGlobal({} as FormData, StockApiClient, undefined);
+  const updateMutation = updateItem({}, StockApiClient);
   const {
     handleSubmit,
     control,
     formState: { errors },
+    setValue,
   } = useForm<FormData>({
     defaultValues: {
       bar_code: "",
@@ -37,23 +56,72 @@ const AddStockForm = () => {
       product_family: "none",
       product_nature: "",
       min_stock: 0,
+      qte: 0,
     },
   });
-  const addMutation = addGlobal({} as FormData, StockApiClient, undefined);
-  const onSubmit = async (data) => {
+
+  let productData: FormData | undefined;
+  if (id) {
+    const queryResult = getGlobalById(
+      {} as FormData,
+      [CACHE_KEY_Products[0], id],
+      StockApiClient,
+      undefined,
+      parseInt(id)
+    );
+    productData = queryResult.data;
+  }
+  const isAddMode = !productData;
+  const onSubmit = async (data: FormData) => {
     try {
-      await addMutation.mutateAsync(data, {
-        onSuccess: (data: { message: string }) => {
-          navigate("/Stock");
-          showSnackbar(data.message, "success");
-        },
-      });
+      if (!id) {
+        await addMutation.mutateAsync(data, {
+          onSuccess: (data: { message: string }) => {
+            navigate("/Stock");
+            showSnackbar(data.message, "success");
+            queryClient.invalidateQueries(CACHE_KEY_Products);
+          },
+        });
+      } else {
+        await updateProduct({ data, id });
+      }
     } catch (error: any) {
       const errorMessage =
         error?.response?.data?.message || "Une erreur s'est produite";
       showSnackbar(errorMessage, "error");
     }
   };
+  const updateProduct = async (updateData: UpdateData) => {
+    const { data, id } = updateData;
+    if (!id) {
+      showSnackbar("L'identifiant du fournisseur est manquant.", "error");
+      return;
+    }
+
+    await updateMutation.mutateAsync(
+      { data, id: parseInt(id) },
+      {
+        onSuccess: () => {
+          showSnackbar("Fournisseur modifié avec succès.", "success");
+          navigate("/Stock");
+        },
+        onError: (error: any) => {
+          const message =
+            error instanceof AxiosError
+              ? error.response?.data?.message
+              : error.message;
+          showSnackbar(message, "warning");
+        },
+      }
+    );
+  };
+  useEffect(() => {
+    if (!isAddMode) {
+      Object.keys(productData ?? {}).forEach((key) =>
+        setValue(key as keyof FormData, productData[key] ?? "")
+      );
+    }
+  }, [id, productData]);
   return (
     <Paper className="p-4">
       <Box
@@ -180,9 +248,30 @@ const AddStockForm = () => {
                     {...field}
                     type="number"
                     id="min_stock"
-                    label="Nature du produit"
+                    label="Stock minimum"
                     error={!!errors.min_stock}
                     helperText={errors.min_stock?.message}
+                  />
+                )}
+              />
+            </FormControl>
+          </Box>
+          <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
+            <label htmlFor="nom" className="w-full md:w-[160px]">
+              Quantité en stock
+            </label>
+            <FormControl className="w-full md:flex-1">
+              <Controller
+                name="qte"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    type="number"
+                    id="qte"
+                    label="Quantité"
+                    error={!!errors.qte}
+                    helperText={errors.qte?.message}
                   />
                 )}
               />

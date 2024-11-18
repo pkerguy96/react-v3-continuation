@@ -8,19 +8,17 @@ import { Navigate, useNavigate } from "react-router";
 
 const TotalAppointmentsKpi = ({ className }: { className?: string }) => {
   const navigate = useNavigate();
-  /*  const { data, isLoading } = getGlobal(
+  const { data, isLoading } = getGlobal(
     {} as appointmentsCount,
     CACHE_KEY_AppointmentsCount,
     AppointmentsKpiClient,
-    {
-      staleTime: 3600000, // 1 hour
-    }
+    undefined
   );
-  if (isLoading) return <LoadingSpinner /> */ const data = [];
+  if (isLoading) return <LoadingSpinner />;
   return (
     <div className={`p-6  flex flex-col flex-1 gap-1 ${className}`}>
       <h1 className="text-base font-medium">Rendez-vous total</h1>
-      <p className="text-4xl font-semibold">34</p>
+      <p className="text-4xl font-semibold">{data}</p>
     </div>
   );
 };

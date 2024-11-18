@@ -13,6 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {
   FetchPatientsWaitingRoom,
   PatientNameWaitingRoom,
+  WaitingroomCounter,
   clearPatientCounterApiClient,
   incrementPatientApiClient,
   incrementbyone,
@@ -37,10 +38,12 @@ function WaitingRoomMenu() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const waiting = getGlobal(
-    {},
+    {} as WaitingroomCounter,
     CACHE_KEY_PatientsWaitingRoom,
     waitingRoomApiClient,
-    undefined
+    {
+      refetchInterval: 10000,
+    }
   );
 
   const searchMutation = addGlobal(
@@ -89,7 +92,7 @@ function WaitingRoomMenu() {
     fetchPatients();
   }, [debouncedSearchQuery]);
 
-  const handlePatientSelect = useCallback((event, newValue) => {
+  const handlePatientSelect = useCallback((event: any, newValue: any) => {
     setSelectedPatient(newValue);
   }, []);
 
@@ -119,7 +122,7 @@ function WaitingRoomMenu() {
 
   const addPatientToWaitingList = async () => {
     await AddPatient.mutateAsync(
-      { patient_id: selectedPatient.id },
+      { patient_id: selectedPatient?.id },
       {
         onSuccess(data: any) {
           waiting.refetch();
@@ -140,6 +143,7 @@ function WaitingRoomMenu() {
   };
 
   if (waiting.isLoading) return <LoadingSpinner />;
+
   return (
     <div>
       <IconButton

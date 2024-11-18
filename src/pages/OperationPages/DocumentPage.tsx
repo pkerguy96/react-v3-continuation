@@ -11,17 +11,42 @@ import { useRef, useState } from "react";
 
 const DocumentPage = ({ onNext }) => {
   const ahmedtag = useRef<HTMLAnchorElement | null>(null);
-  const [selectedDocuments, setSelectedDocuments] = useState([
+
+  const [selectedDocuments1, setSelectedDocuments1] = useState([
+    { label: "Acromioplastie", checked: false, link: "/Acromioplastie.pdf" },
+    { label: "Arthroscopie", checked: false, link: "/Arthroscopie.pdf" },
+    {
+      label: "L’arthrodèse de cheville",
+      checked: false,
+      link: "/Larthrodèsedecheville.pdf",
+    },
+    {
+      label: "La prothèse totale de genou",
+      checked: false,
+      link: "/Laprothèseotaledegenou.pdf",
+    },
+    {
+      label: "Le ligament croisé antérieur",
+      checked: false,
+      link: "/Leligamentcroiséantérieur.pdf",
+    },
+  ]);
+  const [selectedDocuments2, setSelectedDocuments2] = useState([
     { label: "Document 1", checked: false, link: "/sample.pdf" },
     { label: "Document 2", checked: false, link: "/sample.pdf" },
     { label: "Document 3", checked: false, link: "/sample.pdf" },
     { label: "Document 4", checked: false, link: "/sample.pdf" },
   ]);
 
-  const handleCheckboxChange = (index) => {
-    const updatedDocuments = [...selectedDocuments];
+  const handleCheckboxChange1 = (index) => {
+    const updatedDocuments = [...selectedDocuments1];
     updatedDocuments[index].checked = !updatedDocuments[index].checked;
-    setSelectedDocuments(updatedDocuments);
+    setSelectedDocuments1(updatedDocuments);
+  };
+  const handleCheckboxChange2 = (index) => {
+    const updatedDocuments = [...selectedDocuments2];
+    updatedDocuments[index].checked = !updatedDocuments[index].checked;
+    setSelectedDocuments2(updatedDocuments);
   };
   /* const handlePrintAndNext = () => {
     const selectedPDFs = selectedDocuments.filter((doc) => doc.checked);
@@ -44,7 +69,9 @@ const DocumentPage = ({ onNext }) => {
   /* }; */
 
   const handlePrintAndNext = async () => {
-    const selectedPDFs = selectedDocuments.filter((doc) => doc.checked);
+    const selectedPDFs1 = selectedDocuments1.filter((doc) => doc.checked);
+    const selectedPDFs2 = selectedDocuments2.filter((doc) => doc.checked);
+    const selectedPDFs = [...selectedPDFs1, ...selectedPDFs2];
 
     const openAndPrintPDF = (doc): Promise<void> =>
       new Promise<void>((resolve) => {
@@ -76,29 +103,51 @@ const DocumentPage = ({ onNext }) => {
         noValidate
         autoComplete="off"
         /*  onSubmit={handleSubmit(onSubmit)} */
-        className="flex gap-4 flex-col"
+        className="grid grid-rows-1 grid-cols-1 lg:grid-cols-2 gap-4"
       >
-        <Box className="flex justify-between">
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Document demandée
-          </Typography>
+        <Box className="flex flex-col gap-4">
+          <Box className="flex justify-between">
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Document demandée
+            </Typography>
+          </Box>
+          <FormGroup>
+            {selectedDocuments1.map((doc, index) => (
+              <FormControlLabel
+                key={index}
+                control={
+                  <Checkbox
+                    checked={doc.checked}
+                    onChange={() => handleCheckboxChange1(index)}
+                  />
+                }
+                label={doc.label}
+              />
+            ))}
+          </FormGroup>
         </Box>
-        <FormGroup>
-          {selectedDocuments.map((doc, index) => (
-            <FormControlLabel
-              key={index}
-              control={
-                <Checkbox
-                  checked={doc.checked}
-                  onChange={() => handleCheckboxChange(index)}
-                />
-              }
-              label={doc.label}
-            />
-          ))}
-        </FormGroup>
-
-        <Box className="flex justify-between flex-row mt-8 content-center">
+        <Box className="flex flex-col gap-4">
+          <Box className="flex justify-between">
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Document demandée
+            </Typography>
+          </Box>
+          <FormGroup>
+            {selectedDocuments2.map((doc, index) => (
+              <FormControlLabel
+                key={index}
+                control={
+                  <Checkbox
+                    checked={doc.checked}
+                    onChange={() => handleCheckboxChange2(index)}
+                  />
+                }
+                label={doc.label}
+              />
+            ))}
+          </FormGroup>
+        </Box>
+        <Box className="flex justify-between flex-row mt-8 content-center lg:col-span-2">
           <Button
             className="w-full md:w-max !px-10 !py-3 rounded-lg "
             variant="outlined"

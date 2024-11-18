@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { Box } from "@mui/material";
 import RevenueKpi from "../components/Kpis/RevenueKpi";
 import TotalAppointmentsKpi from "../components/Kpis/TotalAppointmentsKpi";
@@ -9,45 +8,59 @@ import AppointmentsTableKpi from "../components/Kpis/AppointmentsTableKpi";
 import CashierKpi from "../components/Kpis/CashierKpi";
 import LinechartKPI from "../components/Kpis/LinechartKPI";
 import { useNavigate } from "react-router";
-
-// Sample mock data for charts
-const labels = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin"];
-const appointmentData = [30, 45, 55, 40, 60, 70];
-const canceledData = [0, 0, 0, 0, 0, 0];
-const ageGroups = [
-  { label: "0-20", count: 120 },
-  { label: "21-30", count: 150 },
-  { label: "31-40", count: 200 },
-  { label: "41-50", count: 180 },
-  { label: "51-60", count: 110 },
-];
+import getGlobal from "../hooks/getGlobal";
+import LoadingSpinner from "../components/LoadingSpinner";
+import {
+  CACHE_KEY_MonthlyAppointments,
+  CACHE_KEY_CanceledMonthlyAppointments,
+} from "../constants";
+import {
+  NewAppointments,
+  MonthlyAppointmentsKpiClient,
+  CanceledAppointments,
+  CanceledMonthlyAppointmentsKpiClient,
+} from "../services/KpisService";
 
 const DashboardKpiPage = () => {
   const navigate = useNavigate();
-  const appointmentDataset = {
+
+  const { data, isLoading } = getGlobal(
+    {} as NewAppointments,
+    CACHE_KEY_MonthlyAppointments,
+    MonthlyAppointmentsKpiClient,
+    { staleTime: 30000 }
+  );
+  const { data: data1, isLoading: isLoading1 } = getGlobal(
+    {} as CanceledAppointments,
+    CACHE_KEY_CanceledMonthlyAppointments,
+    CanceledMonthlyAppointmentsKpiClient,
+    { staleTime: 300000 }
+  );
+  if (isLoading || isLoading1) return <LoadingSpinner />;
+  Object;
+  const labels = data ? Object.keys(data) : [];
+  const dataset = {
     labels,
     datasets: [
       {
         label: "Rendez-vous",
-        data: appointmentData,
+        data: data ? Object.values(data1) : [],
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
     ],
   };
-
-  const canceledDataset = {
+  const dataset1 = {
     labels,
     datasets: [
       {
         label: "Rendez-vous annulés",
-        data: canceledData,
+        data: data ? Object.values(data1) : [],
         borderColor: "#db2777",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
     ],
   };
-
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-rows-1 grid-cols-1 lg:grid-cols-12 gap-6">
@@ -56,14 +69,14 @@ const DashboardKpiPage = () => {
         </Box>
         <Box
           className="!w-full shadow-md text-white bg-[#6b37e7] lg:col-span-4 cursor-pointer "
-          onClick={() => navigate("/Supplier")}
+          onClick={() => navigate("/Appointmens/table")}
         >
           <TotalAppointmentsKpi />
-          <LinechartKPI dataset={appointmentDataset} />
+          <LinechartKPI dataset={dataset} />
         </Box>
         <Box className="!w-full shadow-md bg-[#eff0f1] text-gray-950 lg:col-span-4 ">
           <CanceledAppointmentsKpi />
-          <LinechartKPI dataset={canceledDataset} />
+          <LinechartKPI dataset={dataset1} />
         </Box>
       </div>
       <Box className="Flex w-full ">
@@ -86,7 +99,7 @@ const DashboardKpiPage = () => {
             <h1 className="text-xl font-semibold p-6">
               Groupe d’âge des patients
             </h1>
-            <PatientAgeGroupKpi ageData={ageGroups} />
+            <PatientAgeGroupKpi />
           </Box>
           <Box className="w-full shadow-md bg-[#eff0f1] text-gray-950 flex flex-col">
             <TotalpatientsKpi />

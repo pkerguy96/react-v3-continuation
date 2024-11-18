@@ -7,14 +7,14 @@ import {
 import LoadingSpinner from "../LoadingSpinner";
 
 const CanceledAppointmentsKpi = ({ className }: { className?: string }) => {
-  /*   const { data, isLoading } = getGlobal(
+  const { data, isLoading } = getGlobal(
     {} as CanceledappointmentsCount,
     CACHE_KEY_CanceledApppointments,
     CanceledAppointmentsKpiClient,
-    { staleTime: 3600000 }
+    undefined
   );
-  if (isLoading) return <LoadingSpinner />; */
-  const data = ["0"];
+  if (isLoading) return <LoadingSpinner />;
+
   return (
     <div className={`p-6  flex flex-col flex-1 gap-1 ${className}`}>
       <h1 className="text-base font-medium">Rendez-vous annulés</h1>

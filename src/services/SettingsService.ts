@@ -4,7 +4,7 @@ export interface SettingsData {
 }
 export interface OperationPreference {
   id?: number | undefined;
-  name: string;
+  name?: string;
   code?: string;
   price: number;
   operation_type?: string;
@@ -16,10 +16,24 @@ export const SettingsApiClient = new APIClient<SettingsData>(
   "DashboardKpiUserPref"
 );
 export const OperationPrefApiClient = new APIClient<OperationPreference>(
-  "OperationUserPref"
+  "OperationPreferences"
 );
 export const OperationsPrefApiClient = new APIClient<OperationPreference[]>(
   "getOperationPrefs"
 );
 export const DeleteOperationsPrefApiClient =
   new APIClient<DeleteOperationPreference>("deleteOperationPrefs");
+
+export interface XrayPreference {
+  id: number;
+  xray_type: string;
+  price: string;
+}
+
+export interface XrayPreferencesResponse {
+  data: XrayPreference[];
+}
+
+export const XrayPreferenceApiClient = new APIClient<XrayPreferencesResponse>(
+  "XrayPreferences"
+);

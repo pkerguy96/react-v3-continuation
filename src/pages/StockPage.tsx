@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router";
-import StockTable from "../components/StockTable";
+import StockTable from "../components/Tables/StockTable";
 
 const StockPage = () => {
   const location = useLocation();

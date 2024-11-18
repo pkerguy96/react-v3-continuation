@@ -41,7 +41,6 @@ export const MainListItems = () => {
           <ListItemText primary="Rendez-vous" />
         </ListItemButton>
       </Link>
-
       <Link to="/Patients" className="no-underline">
         <ListItemButton>
           <ListItemIcon>
@@ -51,8 +50,6 @@ export const MainListItems = () => {
         </ListItemButton>
       </Link>
 
-      {/*   TODO:: add permissions */}
-
       <Link to="/Opérations-inachevées" className="no-underline">
         <ListItemButton>
           <ListItemIcon>
@@ -61,7 +58,6 @@ export const MainListItems = () => {
           <ListItemText primary="Opérations inachevées" />
         </ListItemButton>
       </Link>
-
       <Link to="/Ordonnance" className="no-underline">
         <ListItemButton>
           <ListItemIcon>
@@ -70,7 +66,6 @@ export const MainListItems = () => {
           <ListItemText primary="Ordonnance" />
         </ListItemButton>
       </Link>
-
       <Link to="/Creance" className="no-underline">
         <ListItemButton>
           <ListItemIcon>
@@ -79,7 +74,6 @@ export const MainListItems = () => {
           <ListItemText primary="Créance" />
         </ListItemButton>
       </Link>
-
       <Link to="/Reglement" className="no-underline">
         <ListItemButton>
           <ListItemIcon>

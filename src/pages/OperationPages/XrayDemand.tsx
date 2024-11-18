@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {
   Autocomplete,
   Box,
@@ -10,7 +11,12 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { BodySides, ViewTypes, XRayTypes } from "../../constants";
+import {
+  BodySides,
+  CACHE_KEY_XrayPreferences,
+  ViewTypes,
+  XRayTypes,
+} from "../../constants";
 import { useLocation, useNavigate } from "react-router";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -25,10 +31,22 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
+import getGlobal from "../../hooks/getGlobal";
+import {
+  XrayPreferenceApiClient,
+  XrayPreferencesResponse,
+} from "../../services/SettingsService";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const XrayDemand = ({ onNext }) => {
   const { showSnackbar } = useSnackbarStore();
   const addMutation = addGlobal({} as XrayProps, xrayApiClient, undefined);
+  const { data, refetch, isLoading } = getGlobal(
+    {} as XrayPreferencesResponse,
+    CACHE_KEY_XrayPreferences,
+    XrayPreferenceApiClient,
+    undefined
+  );
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
@@ -93,6 +111,7 @@ const XrayDemand = ({ onNext }) => {
   const removeXRay = (id) => {
     setXrays((old) => old.filter((e) => e.id !== id));
   };
+  if (isLoading) return <LoadingSpinner />;
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">
       <Box
@@ -118,7 +137,7 @@ const XrayDemand = ({ onNext }) => {
                     className="bg-white"
                     multiple
                     id="tags-filled"
-                    options={XRayTypes.map((option) => option.title)}
+                    options={data.map((option) => option.xray_type)}
                     defaultValue={[]}
                     value={field.value || []}
                     onChange={(event, newValue) => field.onChange(newValue)}

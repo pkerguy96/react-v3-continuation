@@ -80,11 +80,12 @@ const IncompletedOperations = () => {
   return (
     <Box className="relative">
       <DataTable
-        title="Liste des patients"
-        noMatchMessage="Désolé, aucun patient n'est dans nos données."
+        title="Liste des opérations incomplètes"
+        noMatchMessage="Désolé, aucune opération incomplète n'est dans nos données."
         columns={columns}
         dataHook={dataHook}
         options={{
+          searchPlaceholder: "Rechercher une opération ",
           selectableRows: "none",
         }}
       />

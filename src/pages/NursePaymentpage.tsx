@@ -21,6 +21,8 @@ import { useSnackbarStore } from "../zustand/useSnackbarStore";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import LoadingSpinner from "../components/LoadingSpinner";
 import deleteItem from "../hooks/deleteItem";
+
+import { useSearchParams } from "react-router-dom";
 interface FormData {
   amount_paid: number;
   // Add other form fields here
@@ -35,15 +37,18 @@ const NursePaymentpage = () => {
   );
   const { showSnackbar } = useSnackbarStore();
   const queryClient = useQueryClient();
-  const operationID = 1;
-  if (!operationID) return null;
+  // Extract query parameter target_id
+  const [searchParams] = useSearchParams();
+  const target_id = searchParams.get("target_id"); // Get target_id from query string
 
+  if (!target_id) return <div>No operation selected</div>;
+  const operationID = target_id;
   const { data, isLoading, refetch } = getGlobalById(
     {} as OperationDetail,
-    [CACHE_KEY_OperationDetail, operationID.toString()],
+    [CACHE_KEY_OperationDetail, target_id.toString()],
     operationDetailsApiClient,
     undefined,
-    operationID
+    parseInt(target_id)
   );
 
   useEffect(() => {

@@ -20,7 +20,7 @@ import DashboardMenu from "./components/DashboardMenu";
 
 import WaitingRoomMenu from "./components/WaitingRoomMenu";
 import useUserRoles from "./zustand/UseRoles";
-import AlertNurse from "./components/WebsocketComp/alertNurse";
+
 import NotificationComponent from "./components/NotificationComponent";
 
 const drawerWidth: number = 280;
@@ -128,7 +128,7 @@ export default function Dashboard(Props: React.PropsWithChildren) {
             </Badge>
           </IconButton> */}
           <NotificationComponent />
-          <AlertNurse />
+
           <DashboardMenu />
         </Toolbar>
       </AppBar>

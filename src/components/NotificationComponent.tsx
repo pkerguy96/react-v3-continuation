@@ -1,7 +1,20 @@
 import { Badge, Box, IconButton, Menu, Typography } from "@mui/material";
 import React, { useCallback } from "react";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import getGlobal from "../hooks/getGlobal";
+import { CACHE_KEY_Notification } from "../constants";
+import {
+  markAsReadApiClient,
+  NotificationApiClient,
+  NotificationProps,
+} from "../services/NotificationService";
+import LoadingSpinner from "./LoadingSpinner";
+import getUrls from "../hooks/getUrls";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 const NotificationComponent = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = useCallback(
@@ -13,6 +26,27 @@ const NotificationComponent = () => {
   const handleClose = useCallback(() => {
     setAnchorEl(null);
   }, []);
+
+  const { data, isLoading } = getGlobal(
+    {} as NotificationProps,
+    CACHE_KEY_Notification,
+    NotificationApiClient,
+    {
+      refetchInterval: 10000,
+    }
+  );
+  if (isLoading) return <NotificationsIcon />;
+
+  const unreadCount =
+    data?.filter((notification: NotificationProps) => !notification.is_read)
+      .length || 0;
+  const markAsRead = async (id: string, target_id: string) => {
+    console.log(target_id);
+
+    await getUrls(id, markAsReadApiClient);
+    queryClient.invalidateQueries(CACHE_KEY_Notification);
+    navigate(`/InvoicePage?target_id=${target_id}`);
+  };
   return (
     <>
       <IconButton
@@ -23,7 +57,7 @@ const NotificationComponent = () => {
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
       >
-        <Badge badgeContent={10} color="secondary">
+        <Badge badgeContent={unreadCount} color="secondary">
           <NotificationsIcon />
         </Badge>
       </IconButton>
@@ -56,7 +90,37 @@ const NotificationComponent = () => {
           </Box>
         </Box>
         <Box className="flex flex-col">
-          <Box className="flex flex-wrap gap-2 items-center border-t border-gray-200 p-4">
+          {data?.length === 0 ? (
+            <Box className="flex justify-center items-center py-4">
+              <Typography className="text-gray-500 text-sm">
+                Aucune notification pour le moment
+              </Typography>
+            </Box>
+          ) : (
+            data?.map((notification: NotificationProps, index: number) => {
+              return (
+                <Box
+                  className="flex flex-wrap gap-2 items-center border-t border-gray-200 p-4 cursor-pointer"
+                  key={index}
+                  onClick={() => {
+                    console.log(notification.target_id);
+                    markAsRead(notification.id, notification.target_id);
+                  }}
+                >
+                  <Box className="w-0 flex-1">
+                    <Typography>{notification.title}</Typography>
+                    <Typography className="text-xs text-gray-500">
+                      {notification.date}
+                    </Typography>
+                  </Box>
+                  {!notification.is_read && (
+                    <span className="block w-2 h-2 rounded-full bg-blue-500"></span>
+                  )}
+                </Box>
+              );
+            })
+          )}
+          {/*   <Box className="flex flex-wrap gap-2 items-center border-t border-gray-200 p-4">
             <Box className="w-0 flex-1">
               <Typography>Some Notification</Typography>
               <Typography className="text-xs text-gray-500">
@@ -64,16 +128,7 @@ const NotificationComponent = () => {
               </Typography>
             </Box>
             <span className="block w-2 h-2 rounded-full bg-blue-500"></span>
-          </Box>
-          <Box className="flex flex-wrap gap-2 items-center border-t border-gray-200 p-4">
-            <Box className="w-0 flex-1">
-              <Typography>Some Notification</Typography>
-              <Typography className="text-xs text-gray-500">
-                time here
-              </Typography>
-            </Box>
-            <span className="block w-2 h-2 rounded-full bg-blue-500"></span>
-          </Box>
+          </Box> */}
         </Box>
       </Menu>
     </>

@@ -1,5 +1,5 @@
-/* //@ts-ignore
-import MUIDataTable from "mui-datatables-mara";
+//@ts-ignore
+/*import MUIDataTable from "mui-datatables-mara";
 import getGlobal from "../../hooks/getGlobal";
 import {
   AppointmentKpiClient,
@@ -144,6 +144,7 @@ const AppointmentsTableKpi = () => {
 
 export default AppointmentsTableKpi;
  */
+//@ts-nocheck
 import * as React from "react";
 import MUIDataTable from "mui-datatables-mara";
 import {

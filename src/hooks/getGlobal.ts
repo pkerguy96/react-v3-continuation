@@ -8,7 +8,11 @@ const getGlobal = <T>(
 ) => {
   return useQuery<T[], Error, any, any>({
     queryKey: queryKey,
-    queryFn: service.getall,
+    queryFn: async () => {
+      const data = await service.getall();
+
+      return data;
+    },
     ...opts,
   });
 };

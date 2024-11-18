@@ -103,7 +103,7 @@ const AppointmentsCalendar = () => {
           right: "prev,next,dayGridMonth,timeGridWeek,timeGridDay",
         }}
         initialView="dayGridMonth"
-        timeZone="GMT"
+        timeZone="Africa/Casablanca"
         //@ts-ignore
         events={formattedEvents} // Use formatted events with start and end time
         eventClick={handleEventClick}

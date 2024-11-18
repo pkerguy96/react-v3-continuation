@@ -7,18 +7,18 @@ import { CACHE_KEY_totalPatients } from "../../constants";
 import LoadingSpinner from "../LoadingSpinner";
 
 const TotalpatientsKpi = () => {
-  /*  const { data, isLoading } = getGlobal(
+  const { data, isLoading } = getGlobal(
     {} as TotalPatients,
     CACHE_KEY_totalPatients,
     TotalPatientKpiClient,
-    { staleTime: 300000 }
+    undefined
   );
-  if (isLoading) return <LoadingSpinner />; */
-  const data = [];
+  if (isLoading) return <LoadingSpinner />;
+
   return (
     <div className="p-6 pb-2 flex flex-col flex-1 gap-1">
       <h1 className="text-base font-semibold">Nombre total de patients</h1>
-      <p className="text-4xl font-semibold text-blue-600">160</p>
+      <p className="text-4xl font-semibold text-blue-600">{data}</p>
     </div>
   );
 };

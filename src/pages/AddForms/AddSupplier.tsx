@@ -3,11 +3,22 @@ import {
   Button,
   Divider,
   FormControl,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   TextField,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
+import addGlobal from "../../hooks/addGlobal";
+import { Supplier, SupplierApiClient } from "../../services/SupplierService";
+import { useSnackbarStore } from "../../zustand/useSnackbarStore";
+import { useLocation } from "react-router";
+import getGlobalById from "../../hooks/getGlobalById";
+import { CACHE_KEY_Suppliers } from "../../constants";
+import updateItem from "../../hooks/updateItem";
+import { AxiosError } from "axios";
 interface SupplierFormValues {
   name: string;
   address?: string;
@@ -20,11 +31,38 @@ interface SupplierFormValues {
   status?: "active" | "inactive";
   note?: string;
 }
+
+interface UpdateData {
+  data: SupplierFormValues;
+  supplierId: string | undefined;
+}
 const AddSupplier = () => {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const supplierId = params.get("supplierId");
+  const addMutation = addGlobal({} as SupplierFormValues, SupplierApiClient);
+  const { showSnackbar } = useSnackbarStore();
+
+  const updateMutation = updateItem({}, SupplierApiClient);
+
+  let SupplierData: Supplier | undefined;
+  if (supplierId) {
+    const queryResult = getGlobalById(
+      {} as Supplier,
+      [CACHE_KEY_Suppliers[0], supplierId],
+      SupplierApiClient,
+      undefined,
+      parseInt(supplierId)
+    );
+
+    SupplierData = queryResult.data;
+  }
+  const isAddMode = !SupplierData;
   const {
     control,
     formState: { errors },
     handleSubmit,
+    setValue,
   } = useForm<SupplierFormValues>({
     defaultValues: {
       name: "",
@@ -35,13 +73,59 @@ const AddSupplier = () => {
       company_name: "",
       supply_type: "",
       tax_id: "",
-      status: "active", // Default to "active"
+      status: "active",
       note: "",
     },
   });
-  const onSubmit = (data: SupplierFormValues) => {
-    console.log(data);
+  const onSubmit = async (data: SupplierFormValues) => {
+    try {
+      if (!supplierId) {
+        await addMutation.mutateAsync(data, {
+          onSuccess: () => {
+            showSnackbar("Fournisseur ajouté avec succès", "success");
+          },
+          onError: () => {
+            showSnackbar("Le fournisseur n'a pas pu être créé", "error");
+          },
+        });
+      } else {
+        await updateUser({ data, supplierId });
+      }
+    } catch (error) {}
   };
+
+  const updateUser = async (updateData: UpdateData) => {
+    const { data, supplierId } = updateData;
+    if (!supplierId) {
+      showSnackbar("L'identifiant du fournisseur est manquant.", "error");
+      return;
+    }
+    console.log("Update Payload:", { data, supplierId });
+
+    await updateMutation.mutateAsync(
+      { data, id: parseInt(supplierId) }, // Ensure ID is included in the API call
+      {
+        onSuccess: () => {
+          showSnackbar("Fournisseur modifié avec succès.", "success");
+        },
+        onError: (error: any) => {
+          const message =
+            error instanceof AxiosError
+              ? error.response?.data?.message
+              : error.message;
+          showSnackbar(message, "warning");
+        },
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (!isAddMode) {
+      Object.keys(SupplierData ?? {}).forEach((key) =>
+        setValue(key as keyof Supplier, SupplierData[key] ?? "")
+      );
+    }
+  }, [supplierId, SupplierData]);
   return (
     <Paper className="p-4">
       <Box
@@ -224,21 +308,25 @@ const AddSupplier = () => {
             </FormControl>
           </Box>
           <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
-            <label htmlFor="nom" className="w-full md:w-[160px]">
+            <label htmlFor="status" className="w-full md:w-[160px]">
               Statut
             </label>
             <FormControl className="w-full md:flex-1">
+              <InputLabel id="status-label">Statut</InputLabel>
               <Controller
                 name="status"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Select
                     {...field}
                     id="status"
+                    labelId="status-label"
                     label="Statut"
                     error={!!errors.status}
-                    helperText={errors.status?.message}
-                  />
+                  >
+                    <MenuItem value="active">Actif</MenuItem>
+                    <MenuItem value="inactive">Inactif</MenuItem>
+                  </Select>
                 )}
               />
             </FormControl>
