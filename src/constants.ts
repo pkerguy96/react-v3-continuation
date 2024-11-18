@@ -30,6 +30,7 @@ export const CACHE_KEY_Bloodtest = ["BloodTest"];
 export const CACHE_KEY_Notification = ["Notifications"];
 export const CACHE_KEY_XrayPreferences = ["XrayPreferences"];
 export const CACHE_KEY_Suppliers = ["Suppliers"];
+export const CACHE_KEY_NurseXray = ["NurseXray"];
 
 export const CACHE_KEY_RecurringOperations = ["RecurringOperations"];
 

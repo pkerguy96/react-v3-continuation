@@ -142,6 +142,7 @@ const SupplierTable = () => {
         columns={columns}
         dataHook={dataHook}
         options={{
+          searchPlaceholder: "Rechercher un fournisseur",
           customToolbar: () => (
             <Tooltip title="Nouveau patient">
               <IconButton onClick={() => navigate("/Supplier/ajouter")}>

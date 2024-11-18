@@ -9,6 +9,7 @@ import DocumentPage from "./DocumentPage";
 import BloodTest from "./BloodTest";
 
 import VisiteValidation from "./VisiteValidation";
+import NursePatientXrays from "../NursePatientXrays";
 
 const OperationParentPage = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -27,6 +28,7 @@ const OperationParentPage = () => {
           }}
         />
       )}
+      {/*  {activeStep === 0 && <NursePatientXrays />} */}
       {activeStep === 1 && (
         <AddOrdonance
           onNext={() => {

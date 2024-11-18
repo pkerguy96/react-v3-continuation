@@ -40,12 +40,14 @@ const NotificationComponent = () => {
   const unreadCount =
     data?.filter((notification: NotificationProps) => !notification.is_read)
       .length || 0;
-  const markAsRead = async (id: string, target_id: string) => {
-    console.log(target_id);
-
+  const markAsRead = async (id: string, target_id: string, type: string) => {
     await getUrls(id, markAsReadApiClient);
     queryClient.invalidateQueries(CACHE_KEY_Notification);
-    navigate(`/InvoicePage?target_id=${target_id}`);
+    if (type === "payment") {
+      navigate(`/InvoicePage?target_id=${target_id}`);
+    } else {
+      navigate(`/Xraydemand?target_id=${target_id}`);
+    }
   };
   return (
     <>
@@ -82,7 +84,7 @@ const NotificationComponent = () => {
           tabIndex={-1}
           className="flex items-center justify-between p-2 px-4"
         >
-          <span className="font-medium text-md">Notificationss</span>
+          <span className="font-medium text-md">Notifications</span>
           <Box className="flex flex-row gap-2">
             {/* <IconButton onClick={handleClose} color="inherit" size="small">
               <CloseOutlinedIcon />
@@ -104,7 +106,11 @@ const NotificationComponent = () => {
                   key={index}
                   onClick={() => {
                     console.log(notification.target_id);
-                    markAsRead(notification.id, notification.target_id);
+                    markAsRead(
+                      notification.id,
+                      notification.target_id,
+                      notification.type
+                    );
                   }}
                 >
                   <Box className="w-0 flex-1">

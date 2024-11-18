@@ -94,7 +94,7 @@ const CalenderTable = () => {
     <Box className="relative">
       <DataTable
         title="Liste des rendez-vous"
-        noMatchMessage="Désolé, aucune ordonnance n'a été trouvée dans nos données."
+        noMatchMessage="Désolé, aucune rendez-vous n'a été trouvée dans nos données."
         columns={columns}
         dataHook={dataHook}
         options={{

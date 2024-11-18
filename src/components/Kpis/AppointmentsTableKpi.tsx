@@ -194,8 +194,9 @@ const AppointmentsTableKpi = () => {
       searchQuery,
 
       {
-        staleTime: 60000,
-        cacheTime: 300000,
+        staleTime: 60000, // Data stays fresh for 60 seconds
+        cacheTime: 300000, // Cache lasts for 300 seconds
+        refetchInterval: 10000, // Refetch every 10 seconds (in milliseconds)
       }
     );
   const navigate = useNavigate();

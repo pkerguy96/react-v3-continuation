@@ -35,6 +35,7 @@ import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import getGlobal from "../../hooks/getGlobal";
 import { OperationPrefApiClient } from "../../services/SettingsService";
+import { useQueryClient } from "@tanstack/react-query";
 interface RowData {
   id?: string | number;
   xray_type: string;
@@ -46,6 +47,7 @@ interface Consomables {
   qte: number;
 }
 const VisiteValidation = ({ onNext }) => {
+  const queryClient = useQueryClient();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const operation_id = queryParams.get("operation_id");
@@ -140,8 +142,6 @@ const VisiteValidation = ({ onNext }) => {
           return e;
         });
 
-        console.log(formData);
-
         // If operation_id exists, update the operation
         await updateMutation.mutateAsync(
           {
@@ -150,6 +150,10 @@ const VisiteValidation = ({ onNext }) => {
           },
           {
             onSuccess: (data) => {
+              queryClient.invalidateQueries({
+                queryKey: ["operation"],
+                exact: false,
+              });
               showSnackbar(
                 "L'opération a été enregistrée avec succès",
                 "success"
@@ -171,6 +175,10 @@ const VisiteValidation = ({ onNext }) => {
 
         await addmutation.mutateAsync(formData, {
           onSuccess: (data) => {
+            queryClient.invalidateQueries({
+              queryKey: ["operation"],
+              exact: false,
+            });
             showSnackbar(
               "L'opération a été enregistrée avec succès",
               "success"

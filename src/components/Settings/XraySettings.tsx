@@ -83,7 +83,7 @@ const XraySettings = () => {
       onSubmit={handleSubmit(onSubmit)}
     >
       <p className="font-light text-gray-600 text-md md:text-xl text-center">
-        Ajouter une opération
+        Ajouter une radiographie
       </p>
       <p className=" text-start font-thin  text-sm md:text-lg">
         Entrez les détails de la radiographie.

@@ -42,6 +42,7 @@ import NursePaymentpage from "./pages/NursePaymentpage";
 import CalenderTable from "./components/Tables/CalenderTable";
 import AppointmentsTableKpi from "./components/Kpis/AppointmentsTableKpi";
 import XraySettings from "./components/Settings/XraySettings";
+import NursePatientXrays from "./pages/NursePatientXrays";
 
 const router = createBrowserRouter([
   {
@@ -177,6 +178,10 @@ const router = createBrowserRouter([
       {
         path: "/InvoicePage",
         element: <NursePaymentpage />,
+      },
+      {
+        path: "/Xraydemand",
+        element: <NursePatientXrays />,
       },
       {
         path: "/Appointmens/table",

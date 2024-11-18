@@ -37,8 +37,10 @@ import {
   XrayPreferencesResponse,
 } from "../../services/SettingsService";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { useQueryClient } from "@tanstack/react-query";
 
 const XrayDemand = ({ onNext }) => {
+  const queryClient = useQueryClient();
   const { showSnackbar } = useSnackbarStore();
   const addMutation = addGlobal({} as XrayProps, xrayApiClient, undefined);
   const { data, refetch, isLoading } = getGlobal(
@@ -85,7 +87,10 @@ const XrayDemand = ({ onNext }) => {
         navigate(`?id=${patient_id}&operation_id=${operationId}`, {
           replace: true,
         });
-
+        queryClient.invalidateQueries({
+          queryKey: ["Waitinglist"],
+          exact: false,
+        });
         onNext();
       },
     });

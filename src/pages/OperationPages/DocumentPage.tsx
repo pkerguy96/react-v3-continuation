@@ -108,7 +108,7 @@ const DocumentPage = ({ onNext }) => {
         <Box className="flex flex-col gap-4">
           <Box className="flex justify-between">
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              Document demandée
+              fiche des informations
             </Typography>
           </Box>
           <FormGroup>
@@ -129,7 +129,7 @@ const DocumentPage = ({ onNext }) => {
         <Box className="flex flex-col gap-4">
           <Box className="flex justify-between">
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              Document demandée
+              lettre de reeducation
             </Typography>
           </Box>
           <FormGroup>

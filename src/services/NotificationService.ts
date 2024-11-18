@@ -6,7 +6,8 @@ export interface NotificationProps {
   message: string; // Message content of the notification
   is_read: boolean; // Read status (true if the notification is read)
   date: string;
-  target_id: string; // Timestamp when the notification was created
+  target_id: string;
+  type?: string // Timestamp when the notification was created
 }
 
 export const NotificationApiClient = new APIClient<Notification>(

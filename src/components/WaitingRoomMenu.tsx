@@ -142,8 +142,6 @@ function WaitingRoomMenu() {
     );
   };
 
-  if (waiting.isLoading) return <LoadingSpinner />;
-
   return (
     <div>
       <IconButton
@@ -156,6 +154,7 @@ function WaitingRoomMenu() {
       >
         <AlarmIcon />
       </IconButton>
+
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
@@ -175,56 +174,61 @@ function WaitingRoomMenu() {
           "aria-labelledby": "basic-button",
         }}
       >
-        <Box tabIndex={-1} className="flex items-center justify-between">
-          <span className="font-medium text-md">Nombre patients</span>
-          <Box className="flex flex-row gap-2">
-            <span className="flex justify-center items-center text-xl text-[#4B918C]">
-              {waiting.data}
-            </span>
-            {/* <IconButton onClick={handleClose} color="inherit" size="small">
+        {waiting.isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <Box className="flex flex-col gap-4">
+            <Box tabIndex={-1} className="flex items-center justify-between">
+              <span className="font-medium text-md">Nombre patients</span>
+              <Box className="flex flex-row gap-2">
+                <span className="flex justify-center items-center text-xl text-[#4B918C]">
+                  {waiting.data}
+                </span>
+                {/* <IconButton onClick={handleClose} color="inherit" size="small">
               <CloseOutlinedIcon />
             </IconButton> */}
+              </Box>
+            </Box>
+            <Box className="flex justify-center items-center w-full gap-8">
+              <Autocomplete
+                disablePortal
+                options={options}
+                getOptionLabel={(option) => option.name}
+                sx={{ width: "100%" }}
+                loading={isLoadingPatient}
+                loadingText={<LoadingSpinner size="2rem" />}
+                onInputChange={(event, newInputValue) => {
+                  handleSearch(newInputValue);
+                }}
+                onChange={handlePatientSelect}
+                renderInput={(params) => (
+                  <TextField {...params} label="Search Patients" />
+                )}
+              />
+            </Box>
+            <Box className="flex flex-wrap items-center justify-end gap-4">
+              <Button
+                type="submit"
+                variant="contained"
+                size="small"
+                className="rounded-lg !ms-auto"
+                onClick={addPatientToWaitingList}
+              >
+                Ajouter
+              </Button>
+              <Button
+                className="ml-auto mb-2"
+                variant="outlined"
+                size="small"
+                color="error"
+                endIcon={<DeleteIcon />}
+                onClick={resetPatientCounter}
+              >
+                Clear
+              </Button>
+            </Box>
           </Box>
-        </Box>
-
-        <Box className="flex justify-center items-center w-full gap-8">
-          <Autocomplete
-            disablePortal
-            options={options}
-            getOptionLabel={(option) => option.name}
-            sx={{ width: "100%" }}
-            loading={isLoadingPatient}
-            loadingText={<LoadingSpinner size="2rem" />}
-            onInputChange={(event, newInputValue) => {
-              handleSearch(newInputValue);
-            }}
-            onChange={handlePatientSelect}
-            renderInput={(params) => (
-              <TextField {...params} label="Search Patients" />
-            )}
-          />
-        </Box>
-        <Box className="flex flex-wrap items-center justify-end gap-4">
-          <Button
-            type="submit"
-            variant="contained"
-            size="small"
-            className="rounded-lg !ms-auto"
-            onClick={addPatientToWaitingList}
-          >
-            Ajouter
-          </Button>
-          <Button
-            className="ml-auto mb-2"
-            variant="outlined"
-            size="small"
-            color="error"
-            endIcon={<DeleteIcon />}
-            onClick={resetPatientCounter}
-          >
-            Clear
-          </Button>
-        </Box>
+        )}
       </Menu>
     </div>
   );

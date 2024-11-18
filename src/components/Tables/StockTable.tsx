@@ -108,13 +108,14 @@ const stockTable = () => {
   return (
     <Box className="relative">
       <DataTable
-        title="Liste des patients"
-        noMatchMessage="Désolé, aucun patient n'est dans nos données."
+        title="Liste des produits"
+        noMatchMessage="Désolé, aucun produit n'est dans nos données."
         columns={columns}
         dataHook={dataHook}
         options={{
+          searchPlaceholder: "Rechercher un produit",
           customToolbar: () => (
-            <Tooltip title="Nouveau patient">
+            <Tooltip title="Nouveau produit">
               <IconButton onClick={() => navigate("/Stock/ajouter")}>
                 <AddIcon />
               </IconButton>
