@@ -38,8 +38,11 @@ import {
 } from "../../services/SettingsService";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { useQueryClient } from "@tanstack/react-query";
+import useOperationStore from "../../zustand/usePatientOperation";
 
 const XrayDemand = ({ onNext }) => {
+  const { addOrUpdateOperation, findPatientById } = useOperationStore();
+
   const queryClient = useQueryClient();
   const { showSnackbar } = useSnackbarStore();
   const addMutation = addGlobal({} as XrayProps, xrayApiClient, undefined);
@@ -54,6 +57,7 @@ const XrayDemand = ({ onNext }) => {
   const queryParams = new URLSearchParams(location.search);
   const patient_id = queryParams.get("id");
   const [xrays, setXrays] = useState([]);
+  const patient = findPatientById(patient_id);
   if (!patient_id) {
     return (
       <Typography variant="h6" color="error" align="center">
@@ -62,6 +66,7 @@ const XrayDemand = ({ onNext }) => {
       </Typography>
     );
   }
+
   const {
     handleSubmit,
     control,
@@ -84,6 +89,7 @@ const XrayDemand = ({ onNext }) => {
     await addMutation.mutateAsync(payload, {
       onSuccess: (data: any) => {
         const operationId = data.data;
+
         navigate(`?id=${patient_id}&operation_id=${operationId}`, {
           replace: true,
         });
@@ -91,6 +97,7 @@ const XrayDemand = ({ onNext }) => {
           queryKey: ["Waitinglist"],
           exact: false,
         });
+        addOrUpdateOperation(operationId, patient_id);
         onNext();
       },
     });
@@ -116,6 +123,16 @@ const XrayDemand = ({ onNext }) => {
   const removeXRay = (id) => {
     setXrays((old) => old.filter((e) => e.id !== id));
   };
+  useEffect(() => {
+    if (patient) {
+      const url = `/Patients/Xray?operation_id=${patient.operationId}&id=${patient.patientId}`;
+      navigate(url, {
+        replace: true,
+      });
+      //  window.history.replaceState(null, "", url);
+      onNext(); // Proceed to the next step
+    }
+  }, [patient]);
   if (isLoading) return <LoadingSpinner />;
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">

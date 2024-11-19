@@ -36,7 +36,40 @@ import CreateAppointmentModal from "../components/CreateAppointmentModal";
 import useGlobalStore from "../zustand/useGlobalStore";
 import { PayementVerificationApiClient } from "../services/OperationService";
 import getGlobalById from "../hooks/getGlobalById";
+function $tempkate(opts: any) {
+  const { lang, dir, size, margin, css, page } = opts;
+  return `<!DOCTYPE html><html lang="${lang}"dir="${dir}"><head><meta charset="UTF-8"/><meta http-equiv="X-UA-Compatible"content="IE=edge"/><meta name="viewport"content="width=device-width, initial-scale=1.0"/><style>@page{size:${size.page};margin:${margin}}#page{width:100%}#head{height:${size.head}}#foot{height:${size.foot}}</style>${css}</head><body><table id="page"><thead><tr><td><div id="head"></div></td></tr></thead><tbody><tr><td><main id="main">${page}</main></td></tr></tbody><tfoot><tr><td><div id=foot></div></td></tr></tfoot></table></body></html>`;
+}
+function Print(target: any) {
+  const page = document.querySelector(target);
 
+  var iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  document.body.appendChild(iframe);
+  var iframeDoc = iframe.contentDocument || iframe?.contentWindow?.document;
+  iframeDoc?.open();
+  iframeDoc?.write(
+    $tempkate({
+      size: {
+        page: "A5",
+        head: "100px",
+        foot: "80px",
+      },
+      page: page.innerHTML,
+      margin: "10mm 10mm 10mm 10mm",
+      css: [
+        '<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">',
+      ],
+    })
+  );
+  iframeDoc?.close();
+  iframe.onload = function () {
+    iframe?.contentWindow?.print();
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 1000);
+  };
+}
 const AddOrdonanceUpdated = ({ onNext }: any) => {
   const [drugs, setDrugs] = useState([]);
   const [drug, setDrug] = useState({});
@@ -162,6 +195,7 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
   const createUser = async (formData: Ordonance) => {
     return await Addmutation.mutateAsync(formData, {
       onSuccess: () => {
+        Print("#page");
         if (direct) {
           showSnackbar("Ordonnance ajoutée avec succès.", "success");
           navigate("/Ordonnance");
@@ -204,6 +238,8 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
       )
     );
   };
+
+  const FormattedDate = new Date().toISOString().split("T")[0].split("-");
   return (
     <Paper className="p-4">
       <Box
@@ -401,6 +437,35 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
           </Box>
         </Box>
       </Box>
+      <div
+        id="page"
+        className="hidden w-full flex-col gap-4 bg-white rounded-sm"
+      >
+        <div className="w-full flex flex-col gap-6">
+          <div className="w-full flex gap-4 items-center flex-col">
+            <p className="font-semibold">
+              Fait a beni mellal Le {FormattedDate[0]}/{FormattedDate[1]}/
+              {FormattedDate[2]}
+            </p>
+            <p className="font-semibold">
+              Nom & Prenom: {specifiedPatient?.patient.nom}
+              {specifiedPatient?.patient.prenom}
+            </p>
+          </div>
+          <div className="w-full flex flex-col gap-4">
+            <div className="w-full flex flex-col gap-2">
+              {drugs.map((details: any, index: number) => (
+                <div key={index}>
+                  <h3 className="font-bold">
+                    {index + 1}- {details.medicine_name}
+                  </h3>
+                  <p className="ms-4">{details.note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </Paper>
   );
 };

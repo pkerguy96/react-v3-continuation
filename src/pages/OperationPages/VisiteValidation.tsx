@@ -36,6 +36,7 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import getGlobal from "../../hooks/getGlobal";
 import { OperationPrefApiClient } from "../../services/SettingsService";
 import { useQueryClient } from "@tanstack/react-query";
+import useOperationStore from "../../zustand/usePatientOperation";
 interface RowData {
   id?: string | number;
   xray_type: string;
@@ -47,12 +48,16 @@ interface Consomables {
   qte: number;
 }
 const VisiteValidation = ({ onNext }) => {
+  const { clearPatientOperation } = useOperationStore();
   const queryClient = useQueryClient();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const operation_id = queryParams.get("operation_id");
   const patient_id = queryParams.get("id");
   const isdone = queryParams.get("isdone");
+  console.log("====================================");
+  console.log(operation_id, patient_id);
+  console.log("====================================");
   const {
     data: Operationprefs,
     refetch,
@@ -158,6 +163,7 @@ const VisiteValidation = ({ onNext }) => {
                 "L'opération a été enregistrée avec succès",
                 "success"
               );
+              clearPatientOperation(patient_id);
               navigate("/Patients");
             },
             onError: (error) => {
