@@ -33,6 +33,7 @@ export const CACHE_KEY_Suppliers = ["Suppliers"];
 export const CACHE_KEY_NurseXray = ["NurseXray"];
 
 export const CACHE_KEY_RecurringOperations = ["RecurringOperations"];
+export const CACHE_KEY_SupplierTinyData = ["SupplierTinyData"];
 
 export const CACHE_KEY_MonthlyAppointments = ["MonthlyAppointments"];
 export const CACHE_KEY_CanceledMonthlyAppointments = [

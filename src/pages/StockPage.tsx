@@ -5,7 +5,8 @@ const StockPage = () => {
   const location = useLocation();
 
   const isAddRoute = location.pathname === "/Stock/ajouter";
-  return <>{isAddRoute ? <Outlet /> : <StockTable />}</>;
+  const isProductAddStock = location.pathname === "/Stock/product";
+  return <>{isAddRoute || isProductAddStock ? <Outlet /> : <StockTable />}</>;
 };
 
 export default StockPage;

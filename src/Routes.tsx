@@ -43,6 +43,7 @@ import CalenderTable from "./components/Tables/CalenderTable";
 import AppointmentsTableKpi from "./components/Kpis/AppointmentsTableKpi";
 import XraySettings from "./components/Settings/XraySettings";
 import NursePatientXrays from "./pages/NursePatientXrays";
+import AddStockToProduct from "./pages/AddForms/AddStockToProduct";
 
 const router = createBrowserRouter([
   {
@@ -149,6 +150,10 @@ const router = createBrowserRouter([
           {
             path: "ajouter",
             element: <AddStockForm />,
+          },
+          {
+            path: "product",
+            element: <AddStockToProduct />,
           },
         ],
       },

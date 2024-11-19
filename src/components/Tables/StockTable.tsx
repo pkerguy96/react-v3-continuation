@@ -13,6 +13,8 @@ import getGlobalv2 from "../../hooks/getGlobalv2";
 import { useQueryClient } from "@tanstack/react-query";
 import deleteItem from "../../hooks/deleteItem";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
+import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
+
 const stockTable = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -56,6 +58,12 @@ const stockTable = () => {
 
           return (
             <Box style={{ width: "90px" }}>
+              <button
+                className="btn-stock-add text-gray-950 hover:text-blue-700 cursor-pointer"
+                onClick={() => navigate(`/Stock/product?id=${StockID}`)}
+              >
+                <Inventory2OutlinedIcon />
+              </button>
               <button
                 className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
                 onClick={() => navigate(`/Stock/ajouter?id=${StockID}`)}
