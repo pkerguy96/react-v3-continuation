@@ -46,6 +46,8 @@ import NursePatientXrays from "./pages/NursePatientXrays";
 import AddStockToProduct from "./pages/AddForms/AddStockToProduct";
 import StockEntryTable from "./components/Tables/StockEntryTable";
 import StockExitTable from "./components/Tables/StockExitTable";
+import HospitalsSettings from "./components/Settings/HospitalsSettings";
+import ClinicOperationsTable from "./components/Tables/ClinicOperationsTable";
 
 const router = createBrowserRouter([
   {
@@ -203,6 +205,10 @@ const router = createBrowserRouter([
         element: <CalenderTable />,
       },
       {
+        path: "/External",
+        element: <ClinicOperationsTable />,
+      },
+      {
         path: "Settings",
         element: <SettingsPage />,
         children: [
@@ -225,6 +231,10 @@ const router = createBrowserRouter([
           {
             path: "Xrays",
             element: <XraySettings />,
+          },
+          {
+            path: "Clinic",
+            element: <HospitalsSettings />,
           },
         ],
       },

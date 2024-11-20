@@ -18,7 +18,7 @@ function $tempkate(opts: any) {
   const { lang, dir, size, margin, css, page } = opts;
   return `<!DOCTYPE html><html lang="${lang}"dir="${dir}"><head><meta charset="UTF-8"/><meta http-equiv="X-UA-Compatible"content="IE=edge"/><meta name="viewport"content="width=device-width, initial-scale=1.0"/><style>@page{size:${size.page};margin:${margin}}#page{width:100%}#head{height:${size.head}}#foot{height:${size.foot}}</style>${css}</head><body><table id="page"><thead><tr><td><div id="head"></div></td></tr></thead><tbody><tr><td><main id="main">${page}</main></td></tr></tbody><tfoot><tr><td><div id=foot></div></td></tr></tfoot></table></body></html>`;
 }
-function Print(target: any) {
+function Print(target: any, callback: Function = () => {}) {
   const page = document.querySelector(target);
 
   var iframe = document.createElement("iframe");
@@ -43,6 +43,7 @@ function Print(target: any) {
   iframeDoc?.close();
   iframe.onload = function () {
     iframe?.contentWindow?.print();
+    callback();
     setTimeout(() => {
       document.body.removeChild(iframe);
     }, 1000);
@@ -56,7 +57,8 @@ const BloodTest = ({ onNext }) => {
   const queryParams = new URLSearchParams(location.search);
   const patient_id = queryParams.get("id");
   const operationId = queryParams.get("operation_id");
-  const [data, setData] = useState<any>();
+  const [row, setRow] = useState<any>();
+  const [call, setCall] = useState<any>(false);
   const { handleSubmit, control, watch } = useForm<Props>();
   const addMutation = addGlobal({} as BloodTestProps, bloodTestApiClient);
   if (!patient_id) {
@@ -73,12 +75,12 @@ const BloodTest = ({ onNext }) => {
       operation_id: operationId ? parseInt(operationId) : null,
       ...data,
     };
+
     try {
       addMutation.mutateAsync(formatedData, {
         onSuccess: (data) => {
-          setData(data.data);
-          Print("#page");
-          onNext();
+          setRow(data.data);
+          setCall(true);
         },
         onError: (error) => {
           console.log(error);
@@ -88,6 +90,12 @@ const BloodTest = ({ onNext }) => {
   };
   const rows = watch("blood_test") || [];
   const FormattedDate = new Date().toISOString().split("T")[0].split("-");
+  useEffect(() => {
+    if (!row || !call) return;
+    Print("#page", () => {
+      onNext();
+    });
+  }, [row, call]);
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">
       <Box
@@ -176,8 +184,8 @@ const BloodTest = ({ onNext }) => {
               {FormattedDate[2]}
             </p>
             <p className="font-semibold">
-              Nom & Prenom: {data?.nom}
-              {data?.prenom}
+              Nom & Prenom: {row?.nom}
+              {row?.prenom}
             </p>
           </div>
           <div className="w-full flex flex-col gap-4">

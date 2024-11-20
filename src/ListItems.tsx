@@ -14,7 +14,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import BadgeIcon from "@mui/icons-material/Badge";
 import ContentPasteSearchOutlinedIcon from "@mui/icons-material/ContentPasteSearchOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
-import { Divider } from "@mui/material";
+import { Collapse, Divider, List } from "@mui/material";
 import RequestQuoteOutlinedIcon from "@mui/icons-material/RequestQuoteOutlined";
 import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlined";
 import useUserRoles from "./zustand/UseRoles";
@@ -22,6 +22,11 @@ import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 import PersonAddAlt1OutlinedIcon from "@mui/icons-material/PersonAddAlt1Outlined";
 import InputOutlinedIcon from "@mui/icons-material/InputOutlined";
 import OutputOutlinedIcon from "@mui/icons-material/OutputOutlined";
+import { useState } from "react";
+
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
+import AddBusinessOutlinedIcon from "@mui/icons-material/AddBusinessOutlined";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 export const MainListItems = () => {
   const { can } = useUserRoles();
 
@@ -93,7 +98,11 @@ interface Props {
   handleClick: () => void;
 }
 export function SecondaryListItems({}: Props) {
-  const { can } = useUserRoles();
+  const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
   return (
     <React.Fragment>
       <Link to="/Nurses" className="no-underline">
@@ -112,41 +121,73 @@ export function SecondaryListItems({}: Props) {
           <ListItemIcon>
             <ContentPasteSearchOutlinedIcon color="primary" />
           </ListItemIcon>
-          <ListItemText primary="Documents" />
+          <ListItemText primary="imagerie" />
         </ListItemButton>
       </Link>
+      <ListItemButton
+        onClick={handleClick}
+        style={{
+          flexGrow: "0",
+          WebkitFlexGrow: "0",
+        }}
+      >
+        <ListItemIcon>
+          <Inventory2OutlinedIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText primary="Gestion des stocks" />
+        {open ? <ExpandLess /> : <ExpandMore />}
+      </ListItemButton>
+      <Collapse
+        in={open}
+        timeout="auto"
+        unmountOnExit
+        style={{
+          minHeight: "unset",
+        }}
+      >
+        <List component="div" disablePadding>
+          <Link to="/Stock" className="no-underline">
+            <ListItemButton>
+              <ListItemIcon>
+                <InventoryOutlinedIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText primary="Stock" />
+            </ListItemButton>
+          </Link>
+          <Link to="/Stock/entry" className="no-underline">
+            <ListItemButton>
+              <ListItemIcon>
+                <InputOutlinedIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText primary="Historique des entrées" />
+            </ListItemButton>
+          </Link>
+          <Link to="/Stock/exit" className="no-underline">
+            <ListItemButton>
+              <ListItemIcon>
+                <OutputOutlinedIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText primary="Historique des sorties" />
+            </ListItemButton>
+          </Link>
 
-      <Link to="/Stock" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <Inventory2OutlinedIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Stock" />
-        </ListItemButton>
-      </Link>
-      <Link to="/Stock/entry" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <InputOutlinedIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Historique des entrées" />
-        </ListItemButton>
-      </Link>
-      <Link to="/Stock/exit" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <OutputOutlinedIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Historique des sorties" />
-        </ListItemButton>
-      </Link>
+          <Link to="/Supplier" className="no-underline">
+            <ListItemButton>
+              <ListItemIcon>
+                <PersonAddAlt1OutlinedIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText primary="Fournisseur" />
+            </ListItemButton>
+          </Link>
+        </List>
+      </Collapse>
 
-      <Link to="/Supplier" className="no-underline">
+      <Link to="/External" className="no-underline">
         <ListItemButton>
           <ListItemIcon>
-            <PersonAddAlt1OutlinedIcon color="primary" />
+            <AddBusinessOutlinedIcon color="primary" />
           </ListItemIcon>
-          <ListItemText primary="Fournisseur" />
+          <ListItemText primary="règlement extérieur" />
         </ListItemButton>
       </Link>
 

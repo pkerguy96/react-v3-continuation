@@ -16,6 +16,7 @@ import MedicationLiquidOutlinedIcon from "@mui/icons-material/MedicationLiquidOu
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LocalPoliceOutlinedIcon from "@mui/icons-material/LocalPoliceOutlined";
 import LocalHospitalOutlinedIcon from "@mui/icons-material/LocalHospitalOutlined";
+import HealingOutlinedIcon from "@mui/icons-material/HealingOutlined";
 import { useSnackbarStore } from "../zustand/useSnackbarStore";
 /*  */
 const SettingsComponent = () => {
@@ -55,6 +56,11 @@ const SettingsComponent = () => {
       name: " Gestion des Autorisations",
       url: "/Settings/Autorisations",
       icon: AdminPanelSettingsOutlinedIcon,
+    },
+    {
+      name: " Gestion des cliniques",
+      url: "/Settings/Clinic",
+      icon: HealingOutlinedIcon,
     },
   ];
 

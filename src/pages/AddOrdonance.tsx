@@ -40,7 +40,7 @@ function $tempkate(opts: any) {
   const { lang, dir, size, margin, css, page } = opts;
   return `<!DOCTYPE html><html lang="${lang}"dir="${dir}"><head><meta charset="UTF-8"/><meta http-equiv="X-UA-Compatible"content="IE=edge"/><meta name="viewport"content="width=device-width, initial-scale=1.0"/><style>@page{size:${size.page};margin:${margin}}#page{width:100%}#head{height:${size.head}}#foot{height:${size.foot}}</style>${css}</head><body><table id="page"><thead><tr><td><div id="head"></div></td></tr></thead><tbody><tr><td><main id="main">${page}</main></td></tr></tbody><tfoot><tr><td><div id=foot></div></td></tr></tfoot></table></body></html>`;
 }
-function Print(target: any) {
+function Print(target: any, callback: Function = () => {}) {
   const page = document.querySelector(target);
 
   var iframe = document.createElement("iframe");
@@ -67,6 +67,7 @@ function Print(target: any) {
     iframe?.contentWindow?.print();
     setTimeout(() => {
       document.body.removeChild(iframe);
+      callback();
     }, 1000);
   };
 }
@@ -148,12 +149,7 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
     }
   }, [patientsData, id]);
 
-  const {
-    handleSubmit,
-    setValue,
-
-    control,
-  } = useForm({
+  const { handleSubmit, setValue, getValues, control } = useForm({
     defaultValues: {
       date: new Date().toISOString().split("T")[0],
     },
@@ -195,13 +191,14 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
   const createUser = async (formData: Ordonance) => {
     return await Addmutation.mutateAsync(formData, {
       onSuccess: () => {
-        Print("#page");
-        if (direct) {
-          showSnackbar("Ordonnance ajoutée avec succès.", "success");
-          navigate("/Ordonnance");
-        } else if (onNext) {
-          onNext();
-        }
+        Print("#page", () => {
+          if (direct) {
+            showSnackbar("Ordonnance ajoutée avec succès.", "success");
+            navigate("/Ordonnance");
+          } else if (onNext) {
+            onNext();
+          }
+        });
       },
       onError: (error: any) => {
         const message =
@@ -448,8 +445,8 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
               {FormattedDate[2]}
             </p>
             <p className="font-semibold">
-              Nom & Prenom: {specifiedPatient?.patient.nom}
-              {specifiedPatient?.patient.prenom}
+              Nom & Prenom: {getValues("patient")?.nom}
+              {getValues("patient")?.prenom}
             </p>
           </div>
           <div className="w-full flex flex-col gap-4">
