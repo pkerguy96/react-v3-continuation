@@ -1,5 +1,4 @@
-import create from "zustand";
-
+import { create } from "zustand";
 export const useOperationStore = create((set) => ({
   operations: [], // Array of objects { operationId, patientId }
 

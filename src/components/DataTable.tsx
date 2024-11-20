@@ -71,10 +71,37 @@ const DataTable = ({
       filterType: "dropdown",
       textLabels: {
         body: {
-          noMatch: noMatchMessage,
+          noMatch:
+            noMatchMessage || "Aucun enregistrement correspondant trouvé.",
+          toolTip: "Trier",
+          columnHeaderTooltip: (column: any) => `Trier par ${column.label}`,
         },
         pagination: {
+          next: "Page suivante",
+          previous: "Page précédente",
           rowsPerPage: "Lignes par page:",
+          displayRows: "sur",
+        },
+        toolbar: {
+          search: "Rechercher",
+          downloadCsv: "Télécharger CSV",
+          print: "Imprimer",
+          viewColumns: "Afficher les colonnes",
+          filterTable: "Filtrer les données",
+        },
+        filter: {
+          all: "Tous",
+          title: "FILTRES",
+          reset: "RÉINITIALISER",
+        },
+        viewColumns: {
+          title: "Afficher les colonnes",
+          titleAria: "Afficher/Cacher les colonnes",
+        },
+        selectedRows: {
+          text: "ligne(s) sélectionnée(s)",
+          delete: "Supprimer",
+          deleteAria: "Supprimer les lignes sélectionnées",
         },
       },
       ...options,

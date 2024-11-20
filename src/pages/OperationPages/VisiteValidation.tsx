@@ -1,5 +1,4 @@
 //@ts-nocheck
-
 import {
   Paper,
   Box,
@@ -8,8 +7,10 @@ import {
   TextField,
   Button,
   IconButton,
+  Select,
+  MenuItem,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm, useFieldArray, useWatch } from "react-hook-form";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -27,7 +28,11 @@ import {
 } from "../../services/XrayService";
 import { useLocation, useNavigate } from "react-router";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { CACHE_KEY_OperationPref, CACHE_KEY_Xray } from "../../constants";
+import {
+  CACHE_KEY_OperationPref,
+  CACHE_KEY_ProductOperation,
+  CACHE_KEY_Xray,
+} from "../../constants";
 import updateItem from "../../hooks/updateItem";
 import addGlobal from "../../hooks/addGlobal";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
@@ -37,6 +42,8 @@ import getGlobal from "../../hooks/getGlobal";
 import { OperationPrefApiClient } from "../../services/SettingsService";
 import { useQueryClient } from "@tanstack/react-query";
 import useOperationStore from "../../zustand/usePatientOperation";
+import { productOperationApiClient } from "../../services/StockService";
+import { AxiosError } from "axios";
 interface RowData {
   id?: string | number;
   xray_type: string;
@@ -48,6 +55,7 @@ interface Consomables {
   qte: number;
 }
 const VisiteValidation = ({ onNext }) => {
+  const [isInitialized, setIsInitialized] = useState(false);
   const { clearPatientOperation } = useOperationStore();
   const queryClient = useQueryClient();
   const location = useLocation();
@@ -55,16 +63,19 @@ const VisiteValidation = ({ onNext }) => {
   const operation_id = queryParams.get("operation_id");
   const patient_id = queryParams.get("id");
   const isdone = queryParams.get("isdone");
-  console.log("====================================");
-  console.log(operation_id, patient_id);
-  console.log("====================================");
+  const { data: ConsumablesPref, isLoading: isLoading3 } = getGlobal(
+    {},
+    CACHE_KEY_ProductOperation,
+    productOperationApiClient,
+    undefined
+  );
   const {
     data: Operationprefs,
     refetch,
     isLoading: isloading2,
   } = getGlobal({}, CACHE_KEY_OperationPref, OperationPrefApiClient, undefined);
   const [consomableTotal, setConsomableTotal] = useState(0);
-  const { data, isLoading } = operation_id
+  const { data: xrayData, isLoading } = operation_id
     ? getGlobalById(
         {} as XrayData,
         ["CACHE_KEY_Xray", operation_id.toString()],
@@ -73,11 +84,24 @@ const VisiteValidation = ({ onNext }) => {
         parseInt(operation_id)
       )
     : { data: [], isLoading: false };
-  const { handleSubmit, control, setValue } = useForm<{
+  const { handleSubmit, control, setValue, getValues } = useForm<{
     rows: RowData[];
     consomables: Consomables[];
   }>();
-
+  const Zok = [
+    {
+      id: 1,
+      name: "tichkbila",
+    },
+    {
+      id: 2,
+      name: "zaba",
+    },
+    {
+      id: 3,
+      name: "zaka",
+    },
+  ];
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbarStore();
 
@@ -128,6 +152,7 @@ const VisiteValidation = ({ onNext }) => {
       );
       return;
     }
+
     try {
       // Check if operation_id exists
       if (operation_id) {
@@ -167,7 +192,9 @@ const VisiteValidation = ({ onNext }) => {
               navigate("/Patients");
             },
             onError: (error) => {
-              console.error("Error updating operation:", error);
+              const message = error.response?.data?.error;
+
+              showSnackbar(message, "error");
             },
           }
         );
@@ -192,7 +219,9 @@ const VisiteValidation = ({ onNext }) => {
             navigate("/Patients");
           },
           onError: (error) => {
-            console.error("Error creating operation:", error);
+            const message = error.response?.data?.error;
+
+            showSnackbar(message, "error");
           },
         });
       }
@@ -201,11 +230,10 @@ const VisiteValidation = ({ onNext }) => {
     }
   };
   // Initialize rows with fetched data
-  const rowsInitialized = useRef(false);
 
-  useEffect(() => {
-    const combinedRows = [
-      ...(data || []).map((item, index) => ({
+  const combinedRows = useMemo(() => {
+    return [
+      ...(xrayData || []).map((item, index) => ({
         id: `data-${item.id || index}`, // Ensure unique id
         xray_type: item.xray_type || "", // Default to empty string
         price: item.price || 0, // Default to 0
@@ -216,13 +244,24 @@ const VisiteValidation = ({ onNext }) => {
         price: parseFloat(pref.price || "0"), // Default to 0
       })),
     ];
-
-    if (combinedRows.length > 0) {
-      setValue("rows", combinedRows); // Set combined rows only if not empty
+  }, [xrayData, Operationprefs]);
+  useEffect(() => {
+    if (!isInitialized && combinedRows.length > 0) {
+      setValue("rows", combinedRows);
+      setIsInitialized(true); // Mark as initialized
     }
+  }, [combinedRows, setValue, isInitialized]);
+  useEffect(() => {
+    if (isInitialized && combinedRows.length > 0) {
+      const currentRows = getValues("rows");
+      const hasDifference =
+        JSON.stringify(currentRows) !== JSON.stringify(combinedRows);
 
-    console.log("Combined Rows After Transformation:", combinedRows);
-  }, [data, Operationprefs, setValue]);
+      if (hasDifference) {
+        setValue("rows", combinedRows); // Update rows if there's a difference
+      }
+    }
+  }, [combinedRows, setValue, getValues, isInitialized]);
   useEffect(() => {
     const total = rows?.reduce((sum, row) => sum + Number(row.price || 0), 0);
     setTotalPrice(total);
@@ -235,7 +274,7 @@ const VisiteValidation = ({ onNext }) => {
     );
     setConsomableTotal(total);
   }, [consomables]);
-  if (isLoading || isloading2) return <LoadingSpinner />;
+  if (isLoading || isloading2 || isLoading3) return <LoadingSpinner />;
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">
       <Box
@@ -377,12 +416,30 @@ const VisiteValidation = ({ onNext }) => {
                             control={control}
                             defaultValue={carry.consomable}
                             render={({ field }) => (
-                              <TextField
+                              <Select
                                 {...field}
+                                labelId="demo-select-small-label"
                                 id={`consomables.consomable_${index}`}
                                 size="small"
-                                type="text"
-                              />
+                              >
+                                {ConsumablesPref &&
+                                ConsumablesPref.length > 0 ? (
+                                  ConsumablesPref.map(
+                                    (consumable: SupplierTinyData) => (
+                                      <MenuItem
+                                        key={consumable.id}
+                                        value={consumable.id}
+                                      >
+                                        {consumable.product_name}
+                                      </MenuItem>
+                                    )
+                                  )
+                                ) : (
+                                  <MenuItem value="none" disabled>
+                                    <em>Aucun fournisseur disponible</em>
+                                  </MenuItem>
+                                )}
+                              </Select>
                             )}
                           />
                         </FormControl>

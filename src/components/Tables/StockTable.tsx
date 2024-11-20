@@ -31,7 +31,7 @@ const stockTable = () => {
       label: "Désignation",
       options: { filter: true, sort: true },
     },
-    { name: "date", label: "Date", options: { filter: true, sort: true } },
+    { name: "qte", label: "Quantité", options: { filter: true, sort: true } },
     {
       name: "product_family",
       label: "Famille",
@@ -58,25 +58,30 @@ const stockTable = () => {
 
           return (
             <Box style={{ width: "90px" }}>
-              <button
-                className="btn-stock-add text-gray-950 hover:text-blue-700 cursor-pointer"
-                onClick={() => navigate(`/Stock/product?id=${StockID}`)}
-              >
-                <Inventory2OutlinedIcon />
-              </button>
-              <button
-                className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
-                onClick={() => navigate(`/Stock/ajouter?id=${StockID}`)}
-              >
-                <EditOutlinedIcon />
-              </button>
-
-              <button
-                className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-                onClick={() => handleStockDelete(StockID)}
-              >
-                <DeleteOutlineIcon color="error" />
-              </button>
+              <Tooltip title="Ajouter du stock" arrow>
+                <button
+                  className="btn-stock-add text-gray-950 hover:text-blue-700 cursor-pointer"
+                  onClick={() => navigate(`/Stock/product?id=${StockID}`)}
+                >
+                  <Inventory2OutlinedIcon />
+                </button>
+              </Tooltip>
+              <Tooltip title="Modifier le stock" arrow>
+                <button
+                  className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
+                  onClick={() => navigate(`/Stock/ajouter?id=${StockID}`)}
+                >
+                  <EditOutlinedIcon />
+                </button>
+              </Tooltip>
+              <Tooltip title="Supprimer le produit" arrow>
+                <button
+                  className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
+                  onClick={() => handleStockDelete(StockID)}
+                >
+                  <DeleteOutlineIcon color="error" />
+                </button>
+              </Tooltip>
             </Box>
           );
         },
@@ -108,7 +113,7 @@ const stockTable = () => {
       CACHE_KEY_Products, // Query key
       StockApiClient, // Service function
       page, // Current page
-      rowsPerPage, // Number of rows per page
+      rowsPerPage, // Number of rows per  age
       searchQuery,
       undefined
     );

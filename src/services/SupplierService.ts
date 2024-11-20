@@ -19,12 +19,16 @@ export interface SupplierTinyData {
 }
 
 export interface ProductSupplier {
-  buy_price: number; // The purchase price per unit
-  sell_price: number; // The selling price per unit
-  date: string; // Date in "YYYY-MM-DD" format
-  quantity: number; // Quantity purchased
-  supplier_id: number; // ID of the supplier
-  patient_id: number;
+  id?: number;
+  product_name?: string;
+  supplier_name?: string;
+  supplier_id?: string;
+  quantity?: number;
+  buy_price?: string; // Use string since it's formatted as a decimal string
+  sell_price?: string; // Use string for consistency with buy_price
+  expiry_date?: string | null; // Nullable if expiry_date might not always be present
+  invoice?: string | null; // Nullable if invoice might not always be present
+  created_at?: string;
 }
 
 export const SupplierApiClient = new APIClient<Supplier>("/Supplier");

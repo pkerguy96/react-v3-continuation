@@ -20,6 +20,8 @@ import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlin
 import useUserRoles from "./zustand/UseRoles";
 import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 import PersonAddAlt1OutlinedIcon from "@mui/icons-material/PersonAddAlt1Outlined";
+import InputOutlinedIcon from "@mui/icons-material/InputOutlined";
+import OutputOutlinedIcon from "@mui/icons-material/OutputOutlined";
 export const MainListItems = () => {
   const { can } = useUserRoles();
 
@@ -122,6 +124,23 @@ export function SecondaryListItems({}: Props) {
           <ListItemText primary="Stock" />
         </ListItemButton>
       </Link>
+      <Link to="/Stock/entry" className="no-underline">
+        <ListItemButton>
+          <ListItemIcon>
+            <InputOutlinedIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary="Historique des entrées" />
+        </ListItemButton>
+      </Link>
+      <Link to="/Stock/exit" className="no-underline">
+        <ListItemButton>
+          <ListItemIcon>
+            <OutputOutlinedIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary="Historique des sorties" />
+        </ListItemButton>
+      </Link>
+
       <Link to="/Supplier" className="no-underline">
         <ListItemButton>
           <ListItemIcon>

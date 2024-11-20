@@ -34,7 +34,7 @@ import OperationsListSettings from "./components/Settings/OperationsListSettings
 import PermissionsSettings from "./components/Settings/PermissionsSettings";
 import RolesSettings from "./components/Settings/RolesSettings";
 
-import AddStockForm from "./pages/AddStockForm";
+import AddStockForm from "./pages/AddForms/AddStockForm";
 import SupplierPage from "./pages/SupplierPage";
 import AddSupplier from "./pages/AddForms/AddSupplier";
 import IncompletedOperations from "./components/Tables/IncompletedOperations";
@@ -44,6 +44,8 @@ import AppointmentsTableKpi from "./components/Kpis/AppointmentsTableKpi";
 import XraySettings from "./components/Settings/XraySettings";
 import NursePatientXrays from "./pages/NursePatientXrays";
 import AddStockToProduct from "./pages/AddForms/AddStockToProduct";
+import StockEntryTable from "./components/Tables/StockEntryTable";
+import StockExitTable from "./components/Tables/StockExitTable";
 
 const router = createBrowserRouter([
   {
@@ -154,6 +156,14 @@ const router = createBrowserRouter([
           {
             path: "product",
             element: <AddStockToProduct />,
+          },
+          {
+            path: "entry",
+            element: <StockEntryTable />,
+          },
+          {
+            path: "exit",
+            element: <StockExitTable />,
           },
         ],
       },

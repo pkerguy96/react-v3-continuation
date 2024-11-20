@@ -102,7 +102,7 @@ const XrayDemand = ({ onNext }) => {
       },
     });
   };
-
+  //TODO price filtrating in tables is fucked
   const addRow = () => {
     const { body_side, view_type, xray_type } = getValues();
     if (

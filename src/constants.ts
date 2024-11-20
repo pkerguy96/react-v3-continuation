@@ -31,15 +31,18 @@ export const CACHE_KEY_Notification = ["Notifications"];
 export const CACHE_KEY_XrayPreferences = ["XrayPreferences"];
 export const CACHE_KEY_Suppliers = ["Suppliers"];
 export const CACHE_KEY_NurseXray = ["NurseXray"];
-
 export const CACHE_KEY_RecurringOperations = ["RecurringOperations"];
 export const CACHE_KEY_SupplierTinyData = ["SupplierTinyData"];
-
+export const CACHE_KEY_ProductOperation = ["ProductOperation"];
+export const CACHE_KEY_ProductConsumed = ["ProductConsumed"];
 export const CACHE_KEY_MonthlyAppointments = ["MonthlyAppointments"];
 export const CACHE_KEY_CanceledMonthlyAppointments = [
   "CanceledMonthlyAppointments",
 ];
 export const CACHE_KEY_Url = "urllist";
+export const CACHE_KEY_StockExit = ["StockExit"];
+export const CACHE_KEY_StockEntry = ["StockEntry"];
+export const CACHE_KEY_StockEntryUpdate = ["StockEntryUpdate"];
 
 export const PermissionListpatient = [
   { name: "access_patient", display: "Accès complet" },

@@ -10,14 +10,14 @@ import {
   TextField,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import addGlobal from "../hooks/addGlobal";
-import { StockApiClient } from "../services/StockService";
-import { useSnackbarStore } from "../zustand/useSnackbarStore";
+import addGlobal from "../../hooks/addGlobal";
+import { StockApiClient } from "../../services/StockService";
+import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import { useLocation, useNavigate } from "react-router";
-import getGlobalById from "../hooks/getGlobalById";
-import { CACHE_KEY_Products } from "../constants";
+import getGlobalById from "../../hooks/getGlobalById";
+import { CACHE_KEY_Products } from "../../constants";
 import { useEffect } from "react";
-import updateItem from "../hooks/updateItem";
+import updateItem from "../../hooks/updateItem";
 import { AxiosError } from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -53,7 +53,7 @@ const AddStockForm = () => {
     defaultValues: {
       bar_code: "",
       product_name: "",
-      product_family: "none",
+      product_family: "Aucune",
       product_nature: "",
       min_stock: 0,
       qte: 0,
@@ -202,7 +202,7 @@ const AddStockForm = () => {
                     label="product_family"
                     error={!!errors.product_family}
                   >
-                    <MenuItem value="none">
+                    <MenuItem value="Aucune">
                       <em>Aucune</em>
                     </MenuItem>
                     <MenuItem value="Médical">Médical</MenuItem>
