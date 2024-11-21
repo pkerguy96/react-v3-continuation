@@ -72,6 +72,7 @@ const ReglementTable = () => {
       options: {
         filter: true,
         sort: true,
+        customBodyRender: (value: any) => `${value} MAD`,
       },
     },
     {
@@ -80,6 +81,7 @@ const ReglementTable = () => {
       options: {
         filter: true,
         sort: true,
+        customBodyRender: (value: any) => `${value} MAD`,
       },
     },
     {

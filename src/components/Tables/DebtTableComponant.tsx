@@ -30,7 +30,7 @@ const DebtTableComponant = ({ data }: DebtApiResponse) => {
     },
     {
       name: "operation_type",
-      label: "Code Opération",
+      label: "Type d'opération",
 
       options: {
         filter: true,

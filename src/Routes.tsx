@@ -48,6 +48,8 @@ import StockEntryTable from "./components/Tables/StockEntryTable";
 import StockExitTable from "./components/Tables/StockExitTable";
 import HospitalsSettings from "./components/Settings/HospitalsSettings";
 import ClinicOperationsTable from "./components/Tables/ClinicOperationsTable";
+import AddOutsourceOperation from "./pages/AddForms/AddOutsourceOperation";
+import OutsourceOperation from "./pages/OutsourceOperation";
 
 const router = createBrowserRouter([
   {
@@ -206,7 +208,13 @@ const router = createBrowserRouter([
       },
       {
         path: "/External",
-        element: <ClinicOperationsTable />,
+        element: <OutsourceOperation />,
+        children: [
+          {
+            path: "ajouter",
+            element: <AddOutsourceOperation />,
+          },
+        ],
       },
       {
         path: "Settings",

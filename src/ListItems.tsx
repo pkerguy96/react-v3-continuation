@@ -89,6 +89,14 @@ export const MainListItems = () => {
           <ListItemText primary="Règlement" />
         </ListItemButton>
       </Link>
+      <Link to="/External" className="no-underline">
+        <ListItemButton>
+          <ListItemIcon>
+            <AddBusinessOutlinedIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary="Règlement extérieur" />
+        </ListItemButton>
+      </Link>
     </React.Fragment>
   );
 };
@@ -146,6 +154,14 @@ export function SecondaryListItems({}: Props) {
         }}
       >
         <List component="div" disablePadding>
+          <Link to="/Supplier" className="no-underline">
+            <ListItemButton>
+              <ListItemIcon>
+                <PersonAddAlt1OutlinedIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText primary="Fournisseur" />
+            </ListItemButton>
+          </Link>
           <Link to="/Stock" className="no-underline">
             <ListItemButton>
               <ListItemIcon>
@@ -170,26 +186,8 @@ export function SecondaryListItems({}: Props) {
               <ListItemText primary="Historique des sorties" />
             </ListItemButton>
           </Link>
-
-          <Link to="/Supplier" className="no-underline">
-            <ListItemButton>
-              <ListItemIcon>
-                <PersonAddAlt1OutlinedIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText primary="Fournisseur" />
-            </ListItemButton>
-          </Link>
         </List>
       </Collapse>
-
-      <Link to="/External" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <AddBusinessOutlinedIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="règlement extérieur" />
-        </ListItemButton>
-      </Link>
 
       <Link to="/Settings" className="no-underline mt-auto">
         <ListItemButton>

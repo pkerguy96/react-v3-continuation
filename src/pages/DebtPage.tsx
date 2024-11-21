@@ -1,10 +1,14 @@
 import { Controller, useForm } from "react-hook-form";
 import { useState } from "react";
 import {
+  Autocomplete,
   Box,
   Button,
+  Checkbox,
+  Chip,
   Divider,
   FormControl,
+  FormControlLabel,
   Paper,
   TextField,
 } from "@mui/material";
@@ -15,7 +19,10 @@ import {
   OperationDataDebt,
   PatientsDebtKpiClient,
 } from "../services/KpisService";
-import useUserRoles from "../zustand/UseRoles";
+import { CACHE_KEY_Hospitals } from "../constants";
+import getGlobal from "../hooks/getGlobal";
+import { Hospital, hospitalApiClient } from "../services/HospitalService";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 interface SentDebtData {
   date: string;
@@ -24,7 +31,16 @@ interface SentDebtData {
 
 const DebtPage = () => {
   const [data, setData] = useState<OperationDataDebt[]>([]);
-
+  const {
+    data: hospitals,
+    refetch,
+    isLoading,
+  } = getGlobal(
+    {} as Hospital,
+    CACHE_KEY_Hospitals,
+    hospitalApiClient,
+    undefined
+  );
   const addMutation = addGlobal(
     {} as SentDebtData,
     PatientsDebtKpiClient,
@@ -37,30 +53,29 @@ const DebtPage = () => {
     getValues,
     formState: { errors },
   } = useForm();
-
+  const todayDate = new Date().toISOString().split("T")[0];
   const onSubmit = async (formData: SentDebtData) => {
     setData([]);
+    console.log(formData);
 
-    await addMutation.mutateAsync(
-      { date: formData.date, date2: formData.date2 },
-      {
-        onSuccess: (response: any) => {
-          console.log(response);
+    await addMutation.mutateAsync(formData, {
+      onSuccess: (response: any) => {
+        console.log(response);
 
-          const transformedData = response?.data?.map((item: any) => ({
-            name: item.name,
-            date: item.date,
-            operation_type: item.operation_type, // Already formatted as a string
-            total_cost: `${item.total_cost.toFixed(2)} MAD`,
-            total_amount_paid: `${item.total_amount_paid.toFixed(2)} MAD`,
-            amount_due: `${item.amount_due.toFixed(2)} MAD`,
-          }));
-          setData(transformedData);
-        },
-      }
-    );
+        const transformedData = response?.data?.map((item: any) => ({
+          name: item.name,
+          date: item.date,
+          operation_type: item.operation_type, // Already formatted as a string
+          total_cost: `${item.total_cost.toFixed(2)} MAD`,
+          total_amount_paid: `${item.total_amount_paid.toFixed(2)} MAD`,
+          amount_due: `${item.amount_due.toFixed(2)} MAD`,
+        }));
+        setData(transformedData);
+      },
+    });
   };
 
+  if (isLoading) return <LoadingSpinner />;
   return (
     <Paper className="p-4">
       <Box
@@ -79,13 +94,13 @@ const DebtPage = () => {
           variant="middle"
         />
 
-        <Box className="w-full flex flex-col md:flex-row gap-4 md:items-center">
-          <Box className="flex md:flex-row items-center gap-4">
-            <label htmlFor="date">Start date:</label>
+        <Box className="w-full flex flex-col md:flex-row gap-4 items-end flex-wrap">
+          <Box className="flex items-start gap-1 flex-1 flex-col">
+            <label htmlFor="date">Date de début:</label>
             <FormControl className="w-full md:flex-1">
               <Controller
                 name="date"
-                defaultValue=""
+                defaultValue={todayDate}
                 control={control}
                 render={({ field }) => (
                   <TextField required type="date" {...field} id="date" />
@@ -93,8 +108,8 @@ const DebtPage = () => {
               />
             </FormControl>
           </Box>
-          <Box className="flex flex-row items-center gap-4">
-            <label htmlFor="date2">End date:</label>
+          <Box className="flex  items-start gap-1 flex-1 flex-col">
+            <label htmlFor="date2">Date de fin :</label>
             <FormControl className="w-full md:flex-1">
               <Controller
                 name="date2"
@@ -127,6 +142,84 @@ const DebtPage = () => {
               />
             </FormControl>
           </Box>
+          <Box className="flex flex-row items-center flex-1 ">
+            <FormControl className="w-full md:flex-1">
+              <Controller
+                name="hospitals"
+                control={control}
+                render={({ field }) => (
+                  <Autocomplete
+                    className="bg-white"
+                    multiple
+                    id="tags-filled"
+                    options={[
+                      { id: "tout", name: "tout" }, // Add "tout" as a static option
+                      ...hospitals.map((option) => ({
+                        id: option.id,
+                        name: option.name,
+                      })), // Use ID and name for hospitals
+                    ]}
+                    getOptionLabel={(option) => option.name} // Display the hospital name
+                    defaultValue={[]}
+                    value={
+                      field.value === "tout"
+                        ? [{ id: "tout", name: "tout" }]
+                        : hospitals.filter((option) =>
+                            Array.isArray(field.value)
+                              ? field.value.includes(option.id)
+                              : false
+                          )
+                    }
+                    isOptionEqualToValue={(option, value) =>
+                      option.id === value.id
+                    } // Match by ID
+                    onChange={(event, newValue) => {
+                      // Handle the "tout" logic
+                      if (newValue.some((item) => item.id === "tout")) {
+                        field.onChange("tout"); // Set value to "tout"
+                      } else {
+                        field.onChange(newValue.map((item) => item.id)); // Send IDs only
+                      }
+                    }}
+                    freeSolo
+                    renderTags={(value: readonly any[], getTagProps) =>
+                      value.map((option: any, index: number) => {
+                        const { key, ...tagProps } = getTagProps({ index });
+                        return (
+                          <Chip
+                            variant="outlined"
+                            label={option.name}
+                            key={key}
+                            {...tagProps}
+                          />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="outlined"
+                        placeholder="Cliniques"
+                        sx={autocompleteStyles}
+                      />
+                    )}
+                  />
+                )}
+              />
+            </FormControl>
+          </Box>
+
+          {/*  <FormControlLabel
+            control={
+              <Controller
+                name="checkbox"
+                control={control}
+                render={({ field }) => <Checkbox {...field} />}
+              />
+            }
+            label="Tout"
+          /> */}
+
           <Box className="flex md:ml-auto">
             <Button
               size="small"
@@ -135,7 +228,7 @@ const DebtPage = () => {
               startIcon={<SearchOutlinedIcon />}
               className="w-full md:w-max !px-10 !py-3 rounded-lg !ml-auto"
             >
-              Search
+              Recherche
             </Button>
           </Box>
         </Box>
@@ -146,5 +239,19 @@ const DebtPage = () => {
     </Paper>
   );
 };
-
+const autocompleteStyles = {
+  "& .MuiOutlinedInput-root": {
+    backgroundColor: "white",
+    borderColor: "rgba(0, 0, 0, 0.23)",
+    "& fieldset": {
+      borderColor: "rgba(0, 0, 0, 0.23)",
+    },
+    "&:hover fieldset": {
+      borderColor: "dark",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "primary.main",
+    },
+  },
+};
 export default DebtPage;

@@ -64,8 +64,14 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
         (total: number, xray: any) => total + Number(xray.price),
         0
       );
+      //addded
+      const externalOperationsCost = data.externalOperation.reduce(
+        (total: number, external: any) => total + Number(external.total_price),
+        0
+      );
 
-      setTotalCost(operationDetailsCost + xraysCost);
+      // Set the total cost
+      setTotalCost(operationDetailsCost + xraysCost + externalOperationsCost);
     }
   }, [data]);
   //TODO: remove only operation with the specify id
@@ -201,6 +207,21 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                         </span>
                       </Box>
                     ))}
+                    {data?.externalOperation?.map(
+                      (external: any, i: number) => (
+                        <Box
+                          className="flex items-center justify-between"
+                          key={`xray-${i}`}
+                        >
+                          <span className="text-gray-500 text-base text-start">
+                            {external.operation_type || "No X-Ray Type"}
+                          </span>
+                          <span className="text-gray-500 text-sm text-end">
+                            {external.total_price} MAD
+                          </span>
+                        </Box>
+                      )
+                    )}
                   </Box>
                 </Box>
                 <Box className="flex flex-col gap-2">
@@ -231,7 +252,7 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                           <span className="text-gray-500 text-sm text-center w-1/3">
                             {payment.amount_paid === null
                               ? "0.00"
-                              : payment.amount_paid}
+                              : payment.amount_paid}{" "}
                             MAD
                           </span>
                           <span className="text-gray-500 text-sm text-end w-1/3">

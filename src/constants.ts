@@ -38,6 +38,7 @@ export const CACHE_KEY_ProductConsumed = ["ProductConsumed"];
 export const CACHE_KEY_MonthlyAppointments = ["MonthlyAppointments"];
 export const CACHE_KEY_Hospitals = ["Hospitals"];
 export const CACHE_KEY_Hospitaloperations = ["Hospitaloperations"];
+export const CACHE_KEY_SearchPatients = ["SearchPatients"];
 export const CACHE_KEY_CanceledMonthlyAppointments = [
   "CanceledMonthlyAppointments",
 ];

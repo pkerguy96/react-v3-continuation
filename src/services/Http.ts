@@ -94,6 +94,13 @@ export class APIClient<T> {
       .delete<T>(`${this.endpoint}/${id}`)
       .then((res) => res.data);
   };
+  getPaginated = async (
+    params: Record<string, any>
+  ): Promise<ApiResponse<T>> => {
+    return axiosInstance
+      .get<ApiResponse<T>>(this.endpoint, { params })
+      .then((res) => res.data);
+  };
 }
 
 export default axiosInstance;

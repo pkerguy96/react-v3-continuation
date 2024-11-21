@@ -14,7 +14,7 @@ import { Controller, useForm } from "react-hook-form";
 import addGlobal from "../../hooks/addGlobal";
 import { Supplier, SupplierApiClient } from "../../services/SupplierService";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import getGlobalById from "../../hooks/getGlobalById";
 import { CACHE_KEY_Suppliers } from "../../constants";
 import updateItem from "../../hooks/updateItem";
@@ -37,6 +37,7 @@ interface UpdateData {
   supplierId: string | undefined;
 }
 const AddSupplier = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const supplierId = params.get("supplierId");
@@ -82,6 +83,7 @@ const AddSupplier = () => {
       if (!supplierId) {
         await addMutation.mutateAsync(data, {
           onSuccess: () => {
+            navigate("/Supplier");
             showSnackbar("Fournisseur ajouté avec succès", "success");
           },
           onError: () => {
