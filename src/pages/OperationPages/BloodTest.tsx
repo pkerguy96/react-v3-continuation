@@ -78,7 +78,7 @@ const BloodTest = ({ onNext }) => {
 
     try {
       addMutation.mutateAsync(formatedData, {
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setRow(data.data);
           setCall(true);
         },

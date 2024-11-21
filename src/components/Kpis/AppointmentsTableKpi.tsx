@@ -362,12 +362,12 @@ const AppointmentsTableKpi = () => {
   return (
     <Box className="relative">
       <DataTable
-        title="Liste des ordonances"
-        noMatchMessage="Désolé, aucun ordonance n'est dans nos données"
+        title="Liste des rendez-vous"
+        noMatchMessage="Désolé, aucun rendez-vous n'est dans nos données"
         columns={columns}
         dataHook={dataHook}
         options={{
-          searchPlaceholder: "Rechercher une ordonance",
+          searchPlaceholder: "Rechercher une rendez-vous",
 
           selectableRowsHideCheckboxes: true,
           onRowClick: (rowData: any, _m: any, e: any) => {
