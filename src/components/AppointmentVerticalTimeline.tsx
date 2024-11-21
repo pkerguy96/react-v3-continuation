@@ -3,7 +3,7 @@ import {
   VerticalTimelineElement,
   //@ts-ignore
 } from "react-vertical-timeline-component";
-import HealthAndSafetyOutlinedIcon from "@mui/icons-material/HealthAndSafetyOutlined";
+import InsertInvitationOutlinedIcon from "@mui/icons-material/InsertInvitationOutlined";
 import LoadingSpinner from "./LoadingSpinner";
 import { useMemo } from "react";
 import { Box } from "@mui/material";
@@ -28,19 +28,22 @@ const AppointmentVerticalTimeline = ({
               className="vertical-timeline-element--work"
               date={appointment.date}
               contentStyle={{
-                borderTop: "3px solid rgb(33, 150, 243)",
+                borderTop: "3px solid #76c5bf",
               }}
               dateClassName="custom-date-color"
               contentArrowStyle={{
-                borderRight: "8px solid  rgb(33, 150, 243)",
+                borderRight: "8px solid  #76c5bf",
               }}
-              iconStyle={{ background: "rgb(33, 150, 243)", color: "#fff" }}
-              icon={<HealthAndSafetyOutlinedIcon />}
+              iconStyle={{ background: "#76c5bf", color: "#fff" }}
+              icon={<InsertInvitationOutlinedIcon />}
             >
               <h3 className="vertical-timeline-element-title uppercase">
-                {appointment.title}
+                {appointment.note ? (
+                  <p>{appointment.note}</p>
+                ) : (
+                  "Aucune remarque"
+                )}
               </h3>
-              {appointment.note ? <p>{appointment.note}</p> : null}
             </VerticalTimelineElement>
           ))}
         </VerticalTimeline>

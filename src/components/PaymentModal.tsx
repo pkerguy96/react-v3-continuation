@@ -69,7 +69,9 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
         (total: number, external: any) => total + Number(external.total_price),
         0
       );
-
+      console.log("====================================");
+      console.log(200, externalOperationsCost);
+      console.log("====================================");
       // Set the total cost
       setTotalCost(operationDetailsCost + xraysCost + externalOperationsCost);
     }
@@ -125,7 +127,9 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
   );
 
   const outstandingAmount = totalCost - totalpaid;
-
+  console.log("====================================");
+  console.log(totalCost, totalpaid);
+  console.log("====================================");
   const deletePayment = async (id: number) => {
     try {
       const deletionSuccessful = await deleteItem(
@@ -270,7 +274,7 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                     })}
                   </Box>
                 </Box>
-                {outstandingAmount && (
+                {outstandingAmount ? (
                   <Box className="flex items-center flex-wrap gap-2">
                     <Controller
                       //@ts-ignore
@@ -294,6 +298,8 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                       {addMutation.isLoading ? "..." : "Ajouter"}
                     </Button>
                   </Box>
+                ) : (
+                  ""
                 )}
                 <Box className="flex justify-between items-center">
                   <h2 className="font-semibold text-base text-start">

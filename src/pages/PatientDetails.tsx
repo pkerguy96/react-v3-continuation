@@ -16,7 +16,7 @@ const PatientDetails = React.memo(() => {
   const [activeBtn, setActiveBtn] = useState("three");
   //get id in the url
   const { id } = useParams();
-  /* 
+
   const { data, isLoading } = id
     ? getGlobalById(
         {} as Patientinfo,
@@ -28,30 +28,20 @@ const PatientDetails = React.memo(() => {
     : { data: null, isLoading: true };
   const handleBtnClick = (ButtonName: string) => {
     setActiveBtn(ButtonName);
-  }; */
-  /* 
+  };
+
   if (isLoading) {
     return <LoadingSpinner />;
-  } */
+  }
 
   if (!id) {
     return <div>No ID specified.</div>;
   }
-  /*   const { appointments, operations } = data; */
+  const { appointments, operations } = data;
 
   return (
     <>
-      <Box>
-        <Typography
-          variant="h4"
-          component="h1"
-          color="red"
-          className="flex text-center justify-center "
-        >
-          À venir dès que l'opération sera construite
-        </Typography>
-      </Box>
-      {/*  <Box className="parent w-full flex flex-col gap-4">
+      <Box className="parent w-full flex flex-col gap-4">
         <PatientsdetailsComponent info={data} isLoading={isLoading} />
         <Box className="w-full bg-white gap-4 flex flex-col rounded-lg p-4">
           <Box className="w-full rounded-md overflow-hidden flex">
@@ -60,8 +50,7 @@ const PatientDetails = React.memo(() => {
               className="px-4 py-2 flex-1 text-center cursor-pointer"
               sx={{
                 color: activeBtn === "one" ? "#fff" : "#9ea8b2",
-                backgroundColor:
-                  activeBtn === "one" ? "rgb(33, 150, 243)" : "#f5f5f5",
+                backgroundColor: activeBtn === "one" ? "#76c5bf" : "#f5f5f5",
               }}
               onClick={() => handleBtnClick("one")}
             >
@@ -72,8 +61,7 @@ const PatientDetails = React.memo(() => {
               className="px-4 py-2 flex-1 text-center cursor-pointer"
               sx={{
                 color: activeBtn === "three" ? "#fff" : "#9ea8b2",
-                backgroundColor:
-                  activeBtn === "three" ? "rgb(33, 150, 243)" : "#f5f5f5",
+                backgroundColor: activeBtn === "three" ? "#76c5bf" : "#f5f5f5",
               }}
               onClick={() => handleBtnClick("three")}
             >
@@ -106,7 +94,7 @@ const PatientDetails = React.memo(() => {
             />
           )}
         </Box>
-      </Box> */}
+      </Box>
     </>
   );
 });

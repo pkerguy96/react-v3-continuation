@@ -102,7 +102,6 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
   const operation_id = queryParams.get("operation_id");
   const direct = queryParams.get("direct");
   const navigate = useNavigate();
-  console.log("100", ordonanceID);
 
   const isAddMode = !id;
 
@@ -343,7 +342,7 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
               />
               <datalist id="browsers">
                 {items.map((e, i) => (
-                  <option key={i} value={e} />
+                  <option key={i} value={e.name} />
                 ))}
               </datalist>
             </Box>
@@ -358,9 +357,16 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
                     (e) => e.medicine_name.toUpperCase() === name.toUpperCase()
                   );
                 if (valid) {
+                  const found = items.find((e) => e.name === name);
                   setDrugs([
                     ...drugs,
-                    { medicine_name: name, note: "", id: drugs.length },
+                    {
+                      medicine_name: found.name,
+                      type: found.type,
+                      price: found.price,
+                      note: "",
+                      id: drugs.length,
+                    },
                   ]);
                 }
                 setName("");
@@ -384,6 +390,8 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Nom du médicament</TableCell>
+                    <TableCell>Type</TableCell>
+                    <TableCell>Prix</TableCell>
                     <TableCell>Note</TableCell>
                   </TableRow>
                 </TableHead>
@@ -396,6 +404,8 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
                       <TableCell component="th" scope="row">
                         {row.medicine_name}
                       </TableCell>
+                      <TableCell component="th">{row.type}</TableCell>
+                      <TableCell component="th">{row.price} MAD</TableCell>
                       <TableCell style={{ minWidth: 200 }}>
                         <TextField
                           fullWidth
