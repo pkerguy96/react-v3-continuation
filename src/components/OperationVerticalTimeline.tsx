@@ -20,9 +20,6 @@ const OperationVerticalTimeline = ({
   Operations,
   isLoading,
 }: OperationVerticalTimelineProps) => {
-  console.log("====================================");
-  console.log(Operations);
-  console.log("====================================");
   if (isLoading) return <LoadingSpinner />;
   const Operationtimeline = useMemo(
     () => (

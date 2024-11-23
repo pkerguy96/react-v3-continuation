@@ -73,6 +73,7 @@ export default function SignIn() {
     await addmutation.mutateAsync(userdata, {
       onSuccess: (data: any) => {
         setRoles(data.data.roles);
+
         localStorage.setItem("user_login", JSON.stringify(data.data));
 
         navigate("/dashboard");

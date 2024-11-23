@@ -24,7 +24,7 @@ export interface Nurse {
   recruitment_date: string;
   termination_date: string;
   prenom: string;
-  cin: string;
+  cin?: string;
   date: string;
   sex: string;
   address: string;
@@ -118,9 +118,17 @@ const AddNurseForm = () => {
     }
     const { agecalc, ...newData } = data;
     try {
-      await addPatientMutation.mutateAsync(newData);
-      showSnackbar("Infirmière ajoutée avec succès.", "success");
-      navigate("/Nurses");
+      await addPatientMutation.mutateAsync(newData, {
+        onSuccess: () => {
+          showSnackbar("Infirmière ajoutée avec succès.", "success");
+          navigate("/Nurses");
+        },
+        onError: (Error: any) => {
+          console.log(Error);
+
+          showSnackbar("Something went wrong.", "error");
+        },
+      });
     } catch (error: any) {
       const message =
         error instanceof AxiosError
@@ -254,7 +262,6 @@ const AddNurseForm = () => {
               <Controller
                 name="cin"
                 control={control}
-                rules={{ required: customErrorMessages.cin.required }}
                 render={({ field }) => (
                   <TextField
                     {...field}

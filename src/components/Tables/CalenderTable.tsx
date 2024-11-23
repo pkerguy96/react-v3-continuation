@@ -84,10 +84,7 @@ const CalenderTable = () => {
       rowsPerPage,
       searchQuery,
 
-      {
-        staleTime: 60000,
-        cacheTime: 300000,
-      }
+      undefined
     );
 
   return (

@@ -1,6 +1,6 @@
 //@ts-ignore
 import MUIDataTable from "mui-datatables-mara";
-import { Tooltip, IconButton, Box, Typography } from "@mui/material";
+import { Tooltip, IconButton, Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router";
 import DataTable from "../DataTable";

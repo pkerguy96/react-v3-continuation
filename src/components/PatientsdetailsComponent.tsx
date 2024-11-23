@@ -9,6 +9,7 @@ const PatientsdetailsComponent = ({
   isLoading: boolean;
 }) => {
   if (isLoading) return <LoadingSpinner />;
+  console.log(info);
 
   return (
     <Box className="flex flex-col gap-4">
@@ -25,17 +26,42 @@ const PatientsdetailsComponent = ({
             </Box>
             <Box className="w-full flex gap-4">
               <Box className="w-full flex flex-col">
-                <p className="text-xl font-mono font-bold text-center">15</p>
+                <p className="text-xl font-mono font-bold text-center">
+                  {info.pastAppointmentsCount}
+                </p>
                 <p className="text-md font-light tracking-wider text-center  text-[#b9bec5]">
-                  Past
+                  Passer
                 </p>
               </Box>
               <Divider orientation="vertical" flexItem />
               <Box className="w-full flex flex-col">
-                <p className="text-xl font-mono font-bold text-center">2</p>
-                <p className="text-md font-light tracking-wider text-center  text-[#b9bec5]">
-                  Upcoming
+                <p className="text-xl font-mono font-bold text-center">
+                  {info.upcomingAppointmentsCount}
                 </p>
+                <p className="text-md font-light tracking-wider text-center  text-[#b9bec5]">
+                  Prochain
+                </p>
+              </Box>
+            </Box>
+            <Box className="">
+              <Box className="w-full flex items-center justify-center">
+                <p className="text-md font-mono font-bold text-center">
+                  Référence
+                </p>
+              </Box>
+              <Box className="w-full flex flex-wrap gap-2">
+                {info.referral && info.referral.length > 0 ? (
+                  info.referral.map((item, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 rounded-full text-gray-700 bg-[#eff1f7] text-sm"
+                    >
+                      {item}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-gray-500">Aucune référence disponible.</p>
+                )}
               </Box>
             </Box>
           </Box>
@@ -98,9 +124,6 @@ const PatientsdetailsComponent = ({
         <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4">
           <Box className="w-full flex justify-between">
             <p className="text-md font-mono font-bold">Notes</p>
-            <p className="text-md font-mono font-bold text-[#1976d2] cursor-pointer">
-              Voir tout
-            </p>
           </Box>
           <Box className="w-full bg-[#eff1f7] p-4">
             <p
@@ -113,9 +136,47 @@ const PatientsdetailsComponent = ({
         </Box>
       </Box>
       <Box className="flex flex-col lg:flex-row gap-4">
-        <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4"></Box>
-        <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4"></Box>
-        <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4"></Box>
+        {/* Allergies Section */}
+        <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4">
+          <Box className="w-full flex  justify-center">
+            <p className="text-md font-mono font-bold">Allergies</p>
+          </Box>
+          <Box className="w-full flex flex-wrap gap-2">
+            {info.allergy && info.allergy.length > 0 ? (
+              info.allergy.map((item, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 rounded-full text-gray-700 bg-[#eff1f7] text-sm"
+                >
+                  {item}
+                </span>
+              ))
+            ) : (
+              <p className="text-gray-500">Aucune allergie disponible.</p>
+            )}
+          </Box>
+        </Box>
+
+        {/* Diseases Section */}
+        <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4">
+          <Box className="w-full flex  justify-center">
+            <p className="text-md font-mono font-bold ">Maladies</p>
+          </Box>
+          <Box className="w-full flex flex-wrap gap-2">
+            {info.disease && info.disease.length > 0 ? (
+              info.disease.map((item, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 rounded-full text-gray-700 bg-[#eff1f7] text-sm"
+                >
+                  {item}
+                </span>
+              ))
+            ) : (
+              <p className="text-gray-500">Aucune maladie disponible.</p>
+            )}
+          </Box>
+        </Box>
       </Box>
     </Box>
   );

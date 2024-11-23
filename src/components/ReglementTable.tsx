@@ -14,6 +14,7 @@ import { CACHE_KEY_Operation } from "../constants";
 import deleteItem from "../hooks/deleteItem";
 import DataTable from "./DataTable";
 import getGlobalv2 from "../hooks/getGlobalv2";
+import useUserRoles from "../zustand/UseRoles";
 
 interface CustomPaymentInfo {
   id: number;
@@ -32,6 +33,8 @@ interface Payment {
   total_cost: string;
 }
 const ReglementTable = () => {
+  const { can } = useUserRoles();
+
   const [openModal, setOpenModal] = useState(false);
   const [modalOperationId, setModalOperationId] = useState<number | null>(null);
   const { showSnackbar } = useSnackbarStore();
@@ -108,51 +111,58 @@ const ReglementTable = () => {
       options: {
         filter: false,
         sort: false,
-        customBodyRender: (value: any, tableMeta: any) => (
-          <button
-            className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-            title="Supprimer"
-            onClick={() => {
-              const id = tableMeta.rowData[0]; // "id" is the first column
-              confirmDialog(
-                "Voulez-vous vraiment supprimer le paiement ?",
-                async () => {
-                  try {
-                    const deletionSuccessful = await deleteItem(
-                      id,
-                      operationApiClient
-                    );
-                    if (deletionSuccessful) {
-                      queryClient.invalidateQueries({
-                        queryKey: ["operation"],
-                      });
-                      showSnackbar(
-                        "La suppression du paiement a réussi",
-                        "success"
-                      );
-                    } else {
-                      showSnackbar(
-                        "La suppression du paiement a échoué",
-                        "error"
-                      );
+        customBodyRender: (value: any, tableMeta: any) => {
+          if (can(["delete_debt", "doctor"])) {
+            // Check permissions before rendering the delete button
+            return (
+              <button
+                className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
+                title="Supprimer"
+                onClick={() => {
+                  const id = tableMeta.rowData[0]; // "id" is the first column
+                  confirmDialog(
+                    "Voulez-vous vraiment supprimer le paiement ?",
+                    async () => {
+                      try {
+                        const deletionSuccessful = await deleteItem(
+                          id,
+                          operationApiClient
+                        );
+                        if (deletionSuccessful) {
+                          queryClient.invalidateQueries({
+                            queryKey: ["operation"],
+                          });
+                          showSnackbar(
+                            "La suppression du paiement a réussi",
+                            "success"
+                          );
+                        } else {
+                          showSnackbar(
+                            "La suppression du paiement a échoué",
+                            "error"
+                          );
+                        }
+                      } catch (error) {
+                        showSnackbar(
+                          `Une erreur s'est produite lors de la suppression du paiement: ${error}`,
+                          "error"
+                        );
+                      }
                     }
-                  } catch (error) {
-                    showSnackbar(
-                      `Une erreur s'est produite lors de la suppression du paiement: ${error}`,
-                      "error"
-                    );
-                  }
-                }
-              );
-            }}
-          >
-            <DeleteOutlineIcon
-              color="error"
-              className="pointer-events-none"
-              fill="currentColor"
-            />
-          </button>
-        ),
+                  );
+                }}
+              >
+                <DeleteOutlineIcon
+                  color="error"
+                  className="pointer-events-none"
+                  fill="currentColor"
+                />
+              </button>
+            );
+          } else {
+            return null; // Do not render the button if the user lacks permissions
+          }
+        },
       },
     },
   ];
@@ -166,76 +176,91 @@ const ReglementTable = () => {
       rowsPerPage,
       searchQuery,
 
-      {
-        staleTime: 60000,
-        cacheTime: 300000,
-      }
+      undefined
     );
   return (
     <>
-      <Box className="relative">
-        <DataTable
-          title="Liste des paiements des opérations"
-          noMatchMessage="Désolé, aucune opération n'est présente dans nos données"
-          columns={columns}
-          dataHook={dataHook}
-          options={{
-            searchPlaceholder: "Rechercher une opération",
-            selectableRowsHideCheckboxes: true,
-            onRowClick: (s: any, _m: any, e: any) => {
-              console.log(s);
+      {can(["access_debt", "doctor", "delete_debt", "insert_debt"]) ? ( // Check permissions for DataTable
+        <Box className="relative">
+          <DataTable
+            title="Liste des paiements des opérations"
+            noMatchMessage="Désolé, aucune opération n'est présente dans nos données"
+            columns={columns}
+            dataHook={dataHook}
+            options={{
+              searchPlaceholder: "Rechercher une opération",
+              selectableRowsHideCheckboxes: true,
+              onRowClick: (s: any, _m: any, e: any) => {
+                console.log(s);
 
-              if (
-                e.target.querySelector(".btn-ordonance-delete") ||
-                e.target.classList.contains("btn-ordonance-delete")
-              ) {
-                confirmDialog(
-                  "Voulez-vous vraiment supprimer le paiement ?",
-                  async () => {
-                    try {
-                      const deletionSuccessful = await deleteItem(
-                        s[0],
-                        operationApiClient
-                      );
+                if (
+                  e.target.querySelector(".btn-ordonance-delete") ||
+                  e.target.classList.contains("btn-ordonance-delete")
+                ) {
+                  if (!can(["delete_debt", "doctor"])) {
+                    showSnackbar(
+                      "Vous n'avez pas la permission de supprimer.",
+                      "error"
+                    );
+                    return;
+                  }
 
-                      if (deletionSuccessful) {
-                        queryClient.invalidateQueries({
-                          queryKey: ["operation"],
-                        });
-                        showSnackbar(
-                          "La suppression du paiement a réussi",
-                          "success"
+                  confirmDialog(
+                    "Voulez-vous vraiment supprimer le paiement ?",
+                    async () => {
+                      try {
+                        const deletionSuccessful = await deleteItem(
+                          s[0],
+                          operationApiClient
                         );
-                      } else {
+
+                        if (deletionSuccessful) {
+                          queryClient.invalidateQueries({
+                            queryKey: ["operation"],
+                          });
+                          showSnackbar(
+                            "La suppression du paiement a réussi",
+                            "success"
+                          );
+                        } else {
+                          showSnackbar(
+                            "La suppression du paiement a échoué",
+                            "error"
+                          );
+                        }
+                      } catch (error) {
                         showSnackbar(
-                          "La suppression du paiement a échoué",
+                          `Une erreur s'est produite lors de la suppression du paiement :${error}`,
                           "error"
                         );
                       }
-                    } catch (error) {
-                      showSnackbar(
-                        `Une erreur s'est produite lors de la suppression du paiement :${error}`,
-                        "error"
-                      );
                     }
-                  }
-                );
-              } else {
-                setModalOperationId(s[0]);
-                setOpenModal(true);
-              }
-            },
-          }}
-        />
-      </Box>
+                  );
+                } else {
+                  setModalOperationId(s[0]);
+                  setOpenModal(true);
+                }
+              },
+            }}
+          />
+        </Box>
+      ) : (
+        <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+          Vous n'avez pas la permission de consulter cette page.
+        </div>
+      )}
 
-      {openModal && (
+      {openModal && can(["insert_debt", "doctor"]) ? ( // Check permissions for PaymentModal
         <PaymentModal
           open={openModal}
           onClose={handleCloseModal}
           operationID={modalOperationId}
         />
-      )}
+      ) : openModal ? (
+        <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+          Vous n'avez pas la permission d'insérer un paiement.
+        </div>
+      ) : null}
     </>
   );
 };

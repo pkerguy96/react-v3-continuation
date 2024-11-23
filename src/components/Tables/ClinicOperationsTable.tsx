@@ -12,9 +12,12 @@ import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import deleteItem from "../../hooks/deleteItem";
 import PaymentModal from "../PaymentModal";
 import { useState } from "react";
+import useUserRoles from "../../zustand/UseRoles";
 
 const ClinicOperationsTable = () => {
   const [openModal, setOpenModal] = useState(false);
+  const { can } = useUserRoles();
+
   const [modalOperationId, setModalOperationId] = useState<number | null>(null);
   const queryClient = useQueryClient();
   const { showSnackbar } = useSnackbarStore();
@@ -22,7 +25,7 @@ const ClinicOperationsTable = () => {
   const handleCloseModal = () => {
     setOpenModal(false);
   };
-
+  //TODO ADD STATUS PAYMENT HERE ALSO
   const handleStockDelete = async (id: any) => {
     confirmDialog("Voulez-vous vraiment supprimer le patient ?", async () => {
       try {
@@ -49,7 +52,7 @@ const ClinicOperationsTable = () => {
     { name: "operation_id", label: "OPID", options: { display: false } },
     {
       name: "hospital",
-      label: "Nom de l'hôpital",
+      label: "Nom de la clinique",
       options: { filter: true, sort: true },
     },
     {
@@ -99,18 +102,24 @@ const ClinicOperationsTable = () => {
         customBodyRender: (value: any, tableMeta: any) => {
           const StockID = tableMeta.rowData[0]; // id
 
-          return (
-            <Box style={{ width: "90px" }}>
-              <Tooltip title="Supprimer le produit" arrow>
-                <button
-                  className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-                  onClick={() => handleStockDelete(StockID)}
-                >
-                  <DeleteOutlineIcon color="error" />
-                </button>
-              </Tooltip>
-            </Box>
-          );
+          // Check permissions for deleting stock
+          if (can(["delete_external_debt", "doctor"])) {
+            return (
+              <Box style={{ width: "90px" }}>
+                <Tooltip title="Supprimer le produit" arrow>
+                  <button
+                    className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
+                    onClick={() => handleStockDelete(StockID)}
+                  >
+                    <DeleteOutlineIcon color="error" />
+                  </button>
+                </Tooltip>
+              </Box>
+            );
+          } else {
+            // Return null if the user lacks the required permissions
+            return null;
+          }
         },
       },
     },
@@ -129,39 +138,61 @@ const ClinicOperationsTable = () => {
 
   return (
     <Box className="relative">
-      <DataTable
-        title="Liste des opérations externes"
-        noMatchMessage="Désolé, aucune opération n'est dans nos données."
-        columns={columns}
-        dataHook={dataHook}
-        options={{
-          searchPlaceholder: "Rechercher une opération",
-          customToolbar: () => (
-            <Tooltip title="Nouvelle opération">
-              <IconButton onClick={() => navigate("/External/ajouter")}>
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          ),
+      {can([
+        "access_external_debt",
+        "doctor",
+        "insert_external_debt",
+        "delete_external_debt",
+      ]) ? (
+        <>
+          <DataTable
+            title="Liste des opérations externes"
+            noMatchMessage="Désolé, aucune opération n'est dans nos données."
+            columns={columns}
+            dataHook={dataHook}
+            options={{
+              searchPlaceholder: "Rechercher une opération",
+              customToolbar: () =>
+                can(["insert_external_debt", "doctor"]) ? ( // Check permissions for "insert"
+                  <Tooltip title="Nouvelle opération">
+                    <IconButton onClick={() => navigate("/External/ajouter")}>
+                      <AddIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : null, // Render nothing if the user doesn't have "insert" permission
+              selectableRowsHideCheckboxes: true,
+              onRowClick: (s: any, _m: any, e: any) => {
+                if (
+                  !e.target.querySelector(".btn-patient-delete") &&
+                  !e.target.classList.contains("btn-patient-delete")
+                ) {
+                  setModalOperationId(s[1]);
+                  setOpenModal(true);
+                }
+              },
+            }}
+          />
 
-          selectableRowsHideCheckboxes: true,
-          onRowClick: (s: any, _m: any, e: any) => {
-            if (
-              !e.target.querySelector(".btn-patient-delete") ||
-              !e.target.classList.contains("btn-patient-delete")
-            ) {
-              setModalOperationId(s[1]);
-              setOpenModal(true);
-            }
-          },
-        }}
-      />
-      {openModal && (
-        <PaymentModal
-          open={openModal}
-          onClose={handleCloseModal}
-          operationID={modalOperationId}
-        />
+          {/* Modal with Permission Check */}
+          {openModal && can(["insert_external_debt", "doctor"]) ? ( // Check permissions for "insert"
+            <PaymentModal
+              open={openModal}
+              onClose={handleCloseModal}
+              operationID={modalOperationId}
+            />
+          ) : openModal ? (
+            <div
+              style={{ textAlign: "center", color: "red", marginTop: "20px" }}
+            >
+              Vous n'avez pas la permission d'insérer un paiement.
+            </div>
+          ) : null}
+        </>
+      ) : (
+        // If the user lacks "access_external_debt" or "doctor" permissions
+        <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+          Vous n'avez pas la permission de consulter cette page.
+        </div>
       )}
     </Box>
   );

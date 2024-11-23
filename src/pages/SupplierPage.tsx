@@ -1,7 +1,5 @@
-import React from "react";
 import { Outlet, useLocation } from "react-router";
 import SupplierTable from "../components/Tables/SupplierTable";
-import AddSupplier from "./AddForms/AddSupplier";
 
 const SupplierPage = () => {
   const location = useLocation();

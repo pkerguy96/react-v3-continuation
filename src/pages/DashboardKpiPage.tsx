@@ -81,9 +81,7 @@ const DashboardKpiPage = () => {
       </div>
       <Box className="Flex w-full ">
         <Box className="w-full shadow-md bg-[#eff0f1] text-gray-950 flex flex-col">
-          <h1 className="text-xl font-semibold p-6">
-            Dernière activité en salle d'attente
-          </h1>
+          <h1 className="text-xl font-semibold p-6">Salle d'attente</h1>
           <AppointmentsTableKpi />
         </Box>
       </Box>

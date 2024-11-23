@@ -1,4 +1,4 @@
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Box, Chip, IconButton, Tooltip } from "@mui/material";
 import React from "react";
 import DataTable from "../DataTable";
 import AddIcon from "@mui/icons-material/Add";
@@ -12,16 +12,24 @@ import { confirmDialog } from "../ConfirmDialog";
 import deleteItem from "../../hooks/deleteItem";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
+import useUserRoles from "../../zustand/UseRoles";
 
 const SupplierTable = () => {
+  const { can } = useUserRoles();
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { showSnackbar } = useSnackbarStore();
   const columns = [
     { name: "id", label: "Id", options: { display: false } },
     {
-      name: "name",
-      label: "Nom",
+      name: "company_name",
+      label: "Nom de l'entreprise",
+      options: { filter: true, sort: true },
+    },
+    {
+      name: "contact_person",
+      label: "Personne de contact",
       options: { filter: true, sort: true },
     },
     {
@@ -39,16 +47,7 @@ const SupplierTable = () => {
       label: "Email",
       options: { filter: true, sort: true },
     },
-    {
-      name: "contact_person",
-      label: "Personne de contact",
-      options: { filter: true, sort: true },
-    },
-    {
-      name: "company_name",
-      label: "Nom de l'entreprise",
-      options: { filter: true, sort: true },
-    },
+
     {
       name: "supply_type",
       label: "Type de fourniture",
@@ -62,7 +61,21 @@ const SupplierTable = () => {
     {
       name: "status",
       label: "Statut",
-      options: { filter: true, sort: true },
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value: string) => {
+          const isActive = value.toLowerCase() === "active"; // Check if the value is "active"
+          const color = isActive ? "success" : "error"; // Green for active, red for inactive
+          return (
+            <Chip
+              label={isActive ? "Actif" : "Inactif"} // Show "Actif" for active and "Inactif" for inactive
+              color={color}
+              variant="outlined"
+            />
+          );
+        },
+      },
     },
 
     {
@@ -76,21 +89,27 @@ const SupplierTable = () => {
 
           return (
             <Box style={{ width: "90px" }}>
-              <button
-                className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
-                onClick={() =>
-                  navigate(`/Supplier/ajouter?supplierId=${SupplierId}`)
-                }
-              >
-                <EditOutlinedIcon />
-              </button>
+              {/* Edit Button - Requires modify_supplier or doctor */}
+              {can(["modify_supplier", "doctor"]) && (
+                <button
+                  className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
+                  onClick={() =>
+                    navigate(`/Supplier/ajouter?supplierId=${SupplierId}`)
+                  }
+                >
+                  <EditOutlinedIcon />
+                </button>
+              )}
 
-              <button className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer">
-                <DeleteOutlineIcon
-                  color="error"
+              {/* Delete Button - Requires delete_supplier or doctor */}
+              {can(["delete_supplier", "doctor"]) && (
+                <button
+                  className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
                   onClick={() => handleDeleteSupplier(SupplierId)}
-                />
-              </button>
+                >
+                  <DeleteOutlineIcon color="error" />
+                </button>
+              )}
             </Box>
           );
         },
@@ -105,7 +124,11 @@ const SupplierTable = () => {
         try {
           const deletionSuccessful = await deleteItem(id, SupplierApiClient);
           if (deletionSuccessful) {
-            queryClient.invalidateQueries(CACHE_KEY_Suppliers);
+            queryClient.invalidateQueries({
+              queryKey: CACHE_KEY_Suppliers,
+              exact: false,
+            });
+
             showSnackbar("La suppression du fournisseur a réussi", "success");
           } else {
             showSnackbar("La suppression du fournisseur a échoué", "error");
@@ -135,27 +158,47 @@ const SupplierTable = () => {
       }
     );
   return (
-    <Box>
-      <DataTable
-        title="Liste des fournisseurs"
-        noMatchMessage="Désolé, aucun fournisseur n'est dans nos données."
-        columns={columns}
-        dataHook={dataHook}
-        options={{
-          searchPlaceholder: "Rechercher un fournisseur",
-          customToolbar: () => (
-            <Tooltip title="Nouveau patient">
-              <IconButton onClick={() => navigate("/Supplier/ajouter")}>
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          ),
+    <>
+      {can([
+        "access_supplier",
+        "add_supplier",
+        "delete_supplier",
+        "modify_supplier",
+        "doctor",
+      ]) ? (
+        <Box>
+          <DataTable
+            title="Liste des fournisseurs"
+            noMatchMessage="Désolé, aucun fournisseur n'est dans nos données."
+            columns={columns}
+            dataHook={dataHook}
+            options={{
+              searchPlaceholder: "Rechercher un fournisseur",
 
-          selectableRowsHideCheckboxes: true,
-          onRowClick: (s: any, _m: any, e: any) => {},
-        }}
-      />
-    </Box>
+              // Add Button restricted to "add_supplier" or "doctor"
+              customToolbar: () =>
+                can(["add_supplier", "doctor"]) ? (
+                  <Tooltip title="Ajouter un fournisseur">
+                    <IconButton onClick={() => navigate("/Supplier/ajouter")}>
+                      <AddIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : null, // Render nothing if the user lacks "add_supplier" permission
+
+              selectableRowsHideCheckboxes: true,
+              onRowClick: (s: any, _m: any, e: any) => {
+                // Future row click actions can go here
+              },
+            }}
+          />
+        </Box>
+      ) : (
+        // Display a denial message if the user lacks permissions
+        <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+          Vous n'avez pas la permission de consulter cette page.
+        </div>
+      )}
+    </>
   );
 };
 

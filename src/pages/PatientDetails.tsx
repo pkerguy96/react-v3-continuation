@@ -37,7 +37,12 @@ const PatientDetails = React.memo(() => {
   if (!id) {
     return <div>No ID specified.</div>;
   }
-  const { appointments, operations } = data;
+  const {
+    appointments,
+    operations,
+    upcomingAppointmentsCount,
+    pastAppointmentsCount,
+  } = data;
 
   return (
     <>

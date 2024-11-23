@@ -102,19 +102,15 @@ const XrayDemand = ({ onNext }) => {
       },
     });
   };
-  //TODO price filtrating in tables is fucked
+
   const addRow = () => {
     const { body_side, view_type, xray_type } = getValues();
-    if (
-      !body_side ||
-      !view_type ||
-      !xray_type ||
-      !body_side.length ||
-      !view_type.length ||
-      !xray_type.length
-    ) {
-      //TODO rewrite the error msgs
-      showSnackbar("please fill details", "error");
+    if (!xray_type || !xray_type.length) {
+      showSnackbar("Choisissez au moins une radiographie", "error");
+      return;
+    }
+    if (!view_type || !view_type.length) {
+      showSnackbar("Choisissez au moins un Type de vue", "error");
       return;
     }
     setXrays([...xrays, { body_side, view_type, xray_type, id: xrays.length }]);
@@ -299,8 +295,8 @@ const XrayDemand = ({ onNext }) => {
                   <TableCell component="th" scope="row">
                     {row.xray_type.join(", ")}
                   </TableCell>
-                  <TableCell>{row.view_type.join(", ")}</TableCell>
-                  <TableCell>{row.body_side.join(", ")}</TableCell>
+                  <TableCell>{row.view_type?.join(", ")}</TableCell>
+                  <TableCell>{row.body_side?.join(", ") ?? ""}</TableCell>
                   <TableCell>
                     <Button onClick={() => removeXRay(row.id)}>
                       <DeleteOutlineIcon

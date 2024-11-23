@@ -176,13 +176,13 @@ const AddOutsourceOperation = () => {
           {/* Hospital Search */}
           <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
             <label htmlFor="hospital" className="w-full md:w-[160px]">
-              Hôpital
+              Clinique
             </label>
             <FormControl className="w-full md:flex-1">
               <Controller
                 name="hospital"
                 control={control}
-                rules={{ required: "Veuillez sélectionner un hôpital." }}
+                rules={{ required: "Veuillez sélectionner un clinique." }}
                 render={({ field }) => (
                   <Autocomplete
                     options={hospitals}
@@ -196,7 +196,7 @@ const AddOutsourceOperation = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Rechercher un hôpital"
+                        label="Rechercher un clinique"
                         error={!!errors.hospital}
                         helperText={errors.hospital?.message}
                         InputProps={{

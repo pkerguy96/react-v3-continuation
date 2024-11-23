@@ -28,8 +28,13 @@ import {
   PermissionListcreance,
   PermissionListdebt,
   PermissionListdocument,
+  PermissionListHistoriqueEnter,
+  PermissionListHistoriqueSortie,
   PermissionListordonance,
   PermissionListpatient,
+  PermissionListProduct,
+  PermissionListStock,
+  PermissionListSupplier,
 } from "../../constants";
 import LoadingSpinner from "../LoadingSpinner";
 import addGlobal from "../../hooks/addGlobal";
@@ -45,7 +50,7 @@ const PermissionsSettings = () => {
     watch,
     setValue,
   } = useForm();
-  /*   const { data, isLoading } = getGlobal(
+  const { data, isLoading } = getGlobal(
     {} as RoleResponse,
     CACHE_KEY_Role,
     RoleApiClient,
@@ -56,7 +61,7 @@ const PermissionsSettings = () => {
     CACHE_KEY_NurseRole,
     RoleNursesClient,
     undefined
-  ); */
+  );
   const addMutation = addGlobal({} as AddRoles, AddRolesApiClient);
   const getPermissionsMutation = addGlobal(
     {} as any,
@@ -77,6 +82,11 @@ const PermissionsSettings = () => {
             PermissionListcreance,
             PermissionListdebt,
             PermissionListdocument,
+            PermissionListSupplier,
+            PermissionListStock,
+            PermissionListProduct,
+            PermissionListHistoriqueEnter,
+            PermissionListHistoriqueSortie,
           ].forEach((permissionArray) => {
             permissionArray.forEach((permission) => {
               setValue(permission.name, false);
@@ -100,9 +110,7 @@ const PermissionsSettings = () => {
   }, [roleName]);
 
   const { showSnackbar } = useSnackbarStore();
-  /*   if (isLoading || isLoading2) return <LoadingSpinner />; */
-  const data = [];
-  const data2 = [];
+  if (isLoading || isLoading2) return <LoadingSpinner />;
 
   const onSubmit = async (data: any) => {
     const { nurseid, rolename, ...permissions } = data;
@@ -277,6 +285,91 @@ const PermissionsSettings = () => {
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">Créance:</label>
             {PermissionListcreance.map((item, index) => (
+              <Controller
+                key={index}
+                name={item.name}
+                control={control}
+                defaultValue={false}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={<Checkbox {...field} checked={field.value} />}
+                    label={item.display}
+                  />
+                )}
+              />
+            ))}
+          </Box>
+          <Box className="flex flex-col flex-wrap">
+            <label htmlFor="nom">Fournisseur:</label>
+            {PermissionListSupplier.map((item, index) => (
+              <Controller
+                key={index}
+                name={item.name}
+                control={control}
+                defaultValue={false}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={<Checkbox {...field} checked={field.value} />}
+                    label={item.display}
+                  />
+                )}
+              />
+            ))}
+          </Box>
+          <Box className="flex flex-col flex-wrap">
+            <label htmlFor="nom">Produit:</label>
+            {PermissionListProduct.map((item, index) => (
+              <Controller
+                key={index}
+                name={item.name}
+                control={control}
+                defaultValue={false}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={<Checkbox {...field} checked={field.value} />}
+                    label={item.display}
+                  />
+                )}
+              />
+            ))}
+          </Box>
+          <Box className="flex flex-col flex-wrap">
+            <label htmlFor="nom">Stock général:</label>
+            {PermissionListStock.map((item, index) => (
+              <Controller
+                key={index}
+                name={item.name}
+                control={control}
+                defaultValue={false}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={<Checkbox {...field} checked={field.value} />}
+                    label={item.display}
+                  />
+                )}
+              />
+            ))}
+          </Box>
+          <Box className="flex flex-col flex-wrap">
+            <label htmlFor="nom">historique d'entrée:</label>
+            {PermissionListHistoriqueEnter.map((item, index) => (
+              <Controller
+                key={index}
+                name={item.name}
+                control={control}
+                defaultValue={false}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={<Checkbox {...field} checked={field.value} />}
+                    label={item.display}
+                  />
+                )}
+              />
+            ))}
+          </Box>
+          <Box className="flex flex-col flex-wrap">
+            <label htmlFor="nom">historique d'sortie:</label>
+            {PermissionListHistoriqueSortie.map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}

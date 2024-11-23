@@ -13,10 +13,11 @@ import getGlobalv2 from "../../hooks/getGlobalv2";
 import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import useUserRoles from "../../zustand/UseRoles";
 
 const PatientsTable = () => {
   const { showSnackbar } = useSnackbarStore();
-
+  const { can } = useUserRoles();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -53,26 +54,30 @@ const PatientsTable = () => {
 
           return (
             <Box style={{ width: "90px" }}>
-              <button
-                className="btn-patient-info text-gray-950 hover:text-blue-700 cursor-pointer"
-                onClick={() => navigate(`/Patients/Details/${patientId}`)}
-              >
-                <FolderCopyOutlinedIcon />
-              </button>
-
-              <button
-                className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
-                onClick={() => navigate(`/AddPatient/${patientId}`)}
-              >
-                <EditOutlinedIcon />
-              </button>
-
-              <button
-                className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-                onClick={() => handleDeletePatient(patientId)}
-              >
-                <DeleteOutlineIcon color="error" />
-              </button>
+              {can(["detail_patient", "doctor"]) && (
+                <button
+                  className="btn-patient-info text-gray-950 hover:text-blue-700 cursor-pointer"
+                  onClick={() => navigate(`/Patients/Details/${patientId}`)}
+                >
+                  <FolderCopyOutlinedIcon />
+                </button>
+              )}
+              {can(["update_patient", "doctor"]) && (
+                <button
+                  className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
+                  onClick={() => navigate(`/AddPatient/${patientId}`)}
+                >
+                  <EditOutlinedIcon />
+                </button>
+              )}
+              {can(["delete_patient", "doctor"]) && (
+                <button
+                  className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
+                  onClick={() => handleDeletePatient(patientId)}
+                >
+                  <DeleteOutlineIcon color="error" />
+                </button>
+              )}
             </Box>
           );
         },
@@ -109,55 +114,66 @@ const PatientsTable = () => {
       rowsPerPage, // Number of rows per page
       searchQuery,
 
-      {
-        staleTime: 60000,
-        cacheTime: 300000,
-      }
+      undefined
     );
 
   return (
-    <DataTable
-      title="Liste des patients"
-      noMatchMessage="Désolé, aucun patient n'est dans nos données."
-      columns={columns}
-      dataHook={dataHook}
-      options={{
-        searchPlaceholder: "Rechercher un patient",
-        customToolbar: () => (
-          <Tooltip title="Nouveau patient">
-            <IconButton onClick={() => navigate("/AddPatient")}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
-        ),
+    <>
+      {can([
+        "access_patient",
+        "doctor",
+        "insert_patient",
+        "update_patient",
+        "delete_patient",
+        "detail_patient",
+      ]) ? (
+        <DataTable
+          title="Liste des patients"
+          noMatchMessage="Désolé, aucun patient n'est dans nos données."
+          columns={columns}
+          dataHook={dataHook}
+          options={{
+            searchPlaceholder: "Rechercher un patient",
+            customToolbar: () => {
+              return can(["delete_patient", "doctor"]) ? (
+                <Tooltip title="Nouveau patient">
+                  <IconButton onClick={() => navigate("/AddPatient")}>
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              ) : null;
+            },
+            selectableRowsHideCheckboxes: true,
+            onRowClick: (s: any, _m: any, e: any) => {
+              const patientId = s[0];
+              // Check if the click was on the "Patient Info" button
+              if (e.target.closest(".btn-patient-info")) {
+                navigate(`/Patients/Details/${patientId}`);
+                return;
+              }
 
-        selectableRowsHideCheckboxes: true,
-        onRowClick: (s: any, _m: any, e: any) => {
-          const patientId = s[0];
-          // Check if the click was on the "Patient Info" button
-          if (e.target.closest(".btn-patient-info")) {
-            navigate(`/Patients/Details/${patientId}`);
-            return;
-          }
+              // Check if the click was on the "Edit" button
+              if (e.target.closest(".btn-patient-edit")) {
+                navigate(`/AddPatient/${patientId}`);
+                return;
+              }
 
-          // Check if the click was on the "Edit" button
-          if (e.target.closest(".btn-patient-edit")) {
-            navigate(`/AddPatient/${patientId}`);
-            return;
-          }
-
-          // Check if the click was on the "Delete" button
-          if (e.target.closest(".btn-patient-delete")) {
-            handleDeletePatient(patientId);
-            return;
-          }
-          const formatedDate = s[3].split("-");
-          /* 
-          navigate(`Operate/${s[0]}/${formatedDate[0]}`); */
-          navigate(`Xray?id=${s[0]}`);
-        },
-      }}
-    />
+              // Check if the click was on the "Delete" button
+              if (e.target.closest(".btn-patient-delete")) {
+                handleDeletePatient(patientId);
+                return;
+              }
+              const formatedDate = s[3].split("-");
+              navigate(`Xray?id=${s[0]}`);
+            },
+          }}
+        />
+      ) : (
+        <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+          Vous n'avez pas la permission de consulter cette page.
+        </div>
+      )}
+    </>
   );
 };
 

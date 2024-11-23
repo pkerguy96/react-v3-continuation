@@ -306,68 +306,15 @@ const AppointmentsTableKpi = () => {
     },
   ];
 
-  const options = {
-    searchOpen: true,
-    filterType: "dropdown",
-    searchPlaceholder: "Rechercher un rendez-vous",
-    textLabels: {
-      body: {
-        noMatch: "Désolé, aucun rendez-vous n'est dans nos données",
-      },
-    },
-    selectableRowsHideCheckboxes: true,
-    onRowClick: (rowData: any, _m: any, e: any) => {
-      if (
-        e.target.querySelector(".btn-ordonance-delete") ||
-        e.target.classList.contains("btn-ordonance-delete")
-      ) {
-        confirmDialog(
-          "Voulez-vous vraiment supprimer le rendez-vous ?",
-          async () => {
-            try {
-              console.log(rowData[0]);
-
-              const deletionSuccessful = await deleteItem(
-                rowData[0],
-                decrementPatientApiClient
-              );
-              if (deletionSuccessful) {
-                queryClient.invalidateQueries(CACHE_KEY_WAITINGLIST);
-
-                showSnackbar(
-                  "La suppression du rendez-vous a réussi",
-                  "success"
-                );
-              } else {
-                showSnackbar("La suppression du rendez-vous a échoué", "error");
-              }
-            } catch (error) {
-              showSnackbar(
-                `Une erreur s'est produite lors de la suppression du rendez-vous ${error}`,
-                "error"
-              );
-            }
-          }
-        );
-      } else {
-        navigate(`/Patients/Xray?id=${rowData[1]}`);
-      }
-    },
-  };
-
-  /*   const deletezaba = async ($id) => {
-    await deleteItem($id, decrementPatientApiClient);
-  }; */
-
   return (
     <Box className="relative">
       <DataTable
-        title="Liste des rendez-vous"
-        noMatchMessage="Désolé, aucun rendez-vous n'est dans nos données"
+        title="Liste des patients dans la salle d'attente"
+        noMatchMessage="Désolé, aucun patient n'est enregistré"
         columns={columns}
         dataHook={dataHook}
         options={{
-          searchPlaceholder: "Rechercher une rendez-vous",
+          searchPlaceholder: "Rechercher un patient",
 
           selectableRowsHideCheckboxes: true,
           onRowClick: (rowData: any, _m: any, e: any) => {
@@ -376,29 +323,32 @@ const AppointmentsTableKpi = () => {
               e.target.classList.contains("btn-ordonance-delete")
             ) {
               confirmDialog(
-                "Voulez-vous vraiment supprimer le rendez-vous ?",
+                "Voulez-vous supprimer le patient de la salle d'attente ?",
                 async () => {
                   try {
-                    console.log(rowData[0]);
-
                     const deletionSuccessful = await deleteItem(
                       rowData[0],
                       decrementPatientApiClient
                     );
                     if (deletionSuccessful) {
+                      queryClient.removeQueries(CACHE_KEY_WAITINGLIST, {
+                        exact: false,
+                      });
+
                       showSnackbar(
-                        "La suppression du rendez-vous a réussi",
+                        "La suppression du patient de la salle d'attente a été effectuée avec succès.",
+
                         "success"
                       );
                     } else {
                       showSnackbar(
-                        "La suppression du rendez-vous a échoué",
+                        "La suppressiondu patient de la salle d'attente a échoué",
                         "error"
                       );
                     }
                   } catch (error) {
                     showSnackbar(
-                      `Une erreur s'est produite lors de la suppression du rendez-vous ${error}`,
+                      `Une erreur s'est produite lors de la suppression du patient de la salle d'attente ${error}`,
                       "error"
                     );
                   }

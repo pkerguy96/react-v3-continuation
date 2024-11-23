@@ -23,7 +23,7 @@ interface ModalComponentProps {
   onClose: () => void;
 }
 const ModalComponent = ({ open, onClose }: ModalComponentProps) => {
-  const { setRoles } = useUserRoles();
+  const { setRoles, clearRoles } = useUserRoles();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const logOut = async () => {
@@ -32,7 +32,7 @@ const ModalComponent = ({ open, onClose }: ModalComponentProps) => {
       if (response.status === 200) {
         localStorage.clear();
         queryClient.clear();
-        setRoles([]);
+        clearRoles();
         navigate("/");
       }
     } catch (error) {

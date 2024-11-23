@@ -40,6 +40,7 @@ export const MainListItems = () => {
           <ListItemText primary="Accueille" />
         </ListItemButton>
       </Link>
+
       <Link to="/Appointments" className="no-underline">
         <ListItemButton>
           <ListItemIcon>
@@ -48,53 +49,75 @@ export const MainListItems = () => {
           <ListItemText primary="Rendez-vous" />
         </ListItemButton>
       </Link>
-      <Link to="/Patients" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <PeopleIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Patients" />
-        </ListItemButton>
-      </Link>
-
-      <Link to="/Opérations-inachevées" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <AutorenewOutlinedIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Opérations inachevées" />
-        </ListItemButton>
-      </Link>
-      <Link to="/Ordonnance" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <MedicationLiquidOutlinedIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Ordonnance" />
-        </ListItemButton>
-      </Link>
-      <Link to="/Creance" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <AccountBalanceOutlinedIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Créance" />
-        </ListItemButton>
-      </Link>
-      <Link to="/Reglement" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <RequestQuoteOutlinedIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Règlement" />
-        </ListItemButton>
-      </Link>
+      {can([
+        "insert_patient",
+        "access_patient",
+        "update_patient",
+        "delete_patient",
+        "detail_patient",
+        "doctor",
+      ]) && (
+        <Link to="/Patients" className="no-underline">
+          <ListItemButton>
+            <ListItemIcon>
+              <PeopleIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Patients" />
+          </ListItemButton>
+        </Link>
+      )}
+      {can(["access_debt", "doctor"]) && (
+        <Link to="/Opérations-inachevées" className="no-underline">
+          <ListItemButton>
+            <ListItemIcon>
+              <AutorenewOutlinedIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Opérations inachevées" />
+          </ListItemButton>
+        </Link>
+      )}
+      {can([
+        "access_ordonance",
+        "insert_ordonance",
+        "update_ordonance",
+        "delete_ordonance",
+        "doctor",
+      ]) && (
+        <Link to="/Ordonnance" className="no-underline">
+          <ListItemButton>
+            <ListItemIcon>
+              <MedicationLiquidOutlinedIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Ordonnance" />
+          </ListItemButton>
+        </Link>
+      )}
+      {can(["access_creance", "search_creance", "doctor"]) && (
+        <Link to="/Creance" className="no-underline">
+          <ListItemButton>
+            <ListItemIcon>
+              <AccountBalanceOutlinedIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Créance" />
+          </ListItemButton>
+        </Link>
+      )}
+      {can(["access_debt", "insert_debt", "delete_debt", "doctor"]) && (
+        <Link to="/Reglement" className="no-underline">
+          <ListItemButton>
+            <ListItemIcon>
+              <RequestQuoteOutlinedIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Règlement" />
+          </ListItemButton>
+        </Link>
+      )}
       <Link to="/External" className="no-underline">
         <ListItemButton>
           <ListItemIcon>
             <AddBusinessOutlinedIcon color="primary" />
           </ListItemIcon>
-          <ListItemText primary="Règlement extérieur" />
+          <ListItemText primary="Règlement extern" />
         </ListItemButton>
       </Link>
     </React.Fragment>
@@ -106,6 +129,8 @@ interface Props {
   handleClick: () => void;
 }
 export function SecondaryListItems({}: Props) {
+  const { can } = useUserRoles();
+
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {
@@ -113,38 +138,68 @@ export function SecondaryListItems({}: Props) {
   };
   return (
     <React.Fragment>
-      <Link to="/Nurses" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <BadgeIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Gestion du personnel" />
-        </ListItemButton>
-      </Link>
-
+      {can(["doctor"]) && (
+        <Link to="/Nurses" className="no-underline">
+          <ListItemButton>
+            <ListItemIcon>
+              <BadgeIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Gestion du personnel" />
+          </ListItemButton>
+        </Link>
+      )}
       <Divider />
-
-      <Link to="/Files" className="no-underline">
-        <ListItemButton>
+      {can([
+        "access_document",
+        "insert_document",
+        "delete_document",
+        "download_document",
+        "detail_document",
+        "doctor",
+      ]) && (
+        <Link to="/Files" className="no-underline">
+          <ListItemButton>
+            <ListItemIcon>
+              <ContentPasteSearchOutlinedIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="imagerie" />
+          </ListItemButton>
+        </Link>
+      )}
+      {can([
+        "access_supplier",
+        "add_supplier",
+        "delete_supplier",
+        "modify_supplier",
+        "access_stock",
+        "add_stock",
+        "delete_stock",
+        "modify_stock",
+        "access_product",
+        "add_product",
+        "delete_product",
+        "modify_product",
+        "access_historique_enter",
+        "add_historique_enter",
+        "delete_historique_enter",
+        "modify_historique_enter",
+        "access_historique_sortie",
+        "doctor",
+      ]) && (
+        <ListItemButton
+          onClick={handleClick}
+          style={{
+            flexGrow: "0",
+            WebkitFlexGrow: "0",
+          }}
+        >
           <ListItemIcon>
-            <ContentPasteSearchOutlinedIcon color="primary" />
+            <Inventory2OutlinedIcon color="primary" />
           </ListItemIcon>
-          <ListItemText primary="imagerie" />
+          <ListItemText primary="Gestion des stocks" />
+          {open ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-      </Link>
-      <ListItemButton
-        onClick={handleClick}
-        style={{
-          flexGrow: "0",
-          WebkitFlexGrow: "0",
-        }}
-      >
-        <ListItemIcon>
-          <Inventory2OutlinedIcon color="primary" />
-        </ListItemIcon>
-        <ListItemText primary="Gestion des stocks" />
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton>
+      )}
       <Collapse
         in={open}
         timeout="auto"
@@ -154,38 +209,64 @@ export function SecondaryListItems({}: Props) {
         }}
       >
         <List component="div" disablePadding>
-          <Link to="/Supplier" className="no-underline">
-            <ListItemButton>
-              <ListItemIcon>
-                <PersonAddAlt1OutlinedIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText primary="Fournisseur" />
-            </ListItemButton>
-          </Link>
-          <Link to="/Stock" className="no-underline">
-            <ListItemButton>
-              <ListItemIcon>
-                <InventoryOutlinedIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText primary="Stock" />
-            </ListItemButton>
-          </Link>
-          <Link to="/Stock/entry" className="no-underline">
-            <ListItemButton>
-              <ListItemIcon>
-                <InputOutlinedIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText primary="Historique des entrées" />
-            </ListItemButton>
-          </Link>
-          <Link to="/Stock/exit" className="no-underline">
-            <ListItemButton>
-              <ListItemIcon>
-                <OutputOutlinedIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText primary="Historique des sorties" />
-            </ListItemButton>
-          </Link>
+          {can([
+            "access_supplier",
+            "add_supplier",
+            "delete_supplier",
+            "modify_supplier",
+            "doctor",
+          ]) && (
+            <Link to="/Supplier" className="no-underline">
+              <ListItemButton>
+                <ListItemIcon>
+                  <PersonAddAlt1OutlinedIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="Fournisseur" />
+              </ListItemButton>
+            </Link>
+          )}
+          {can([
+            "access_product",
+            "add_product",
+            "delete_product",
+            "modify_product",
+            "doctor",
+          ]) && (
+            <Link to="/Stock" className="no-underline">
+              <ListItemButton>
+                <ListItemIcon>
+                  <InventoryOutlinedIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="Stock" />
+              </ListItemButton>
+            </Link>
+          )}
+          {can([
+            "access_historique_enter",
+            "add_historique_enter",
+            "delete_historique_enter",
+            "modify_historique_enter",
+            "doctor",
+          ]) && (
+            <Link to="/Stock/entry" className="no-underline">
+              <ListItemButton>
+                <ListItemIcon>
+                  <InputOutlinedIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="Historique des entrées" />
+              </ListItemButton>
+            </Link>
+          )}
+          {can(["access_historique_sortie", "doctor"]) && (
+            <Link to="/Stock/exit" className="no-underline">
+              <ListItemButton>
+                <ListItemIcon>
+                  <OutputOutlinedIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="Historique des sorties" />
+              </ListItemButton>
+            </Link>
+          )}
         </List>
       </Collapse>
 

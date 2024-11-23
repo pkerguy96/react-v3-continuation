@@ -23,6 +23,7 @@ import { CACHE_KEY_Hospitals } from "../constants";
 import getGlobal from "../hooks/getGlobal";
 import { Hospital, hospitalApiClient } from "../services/HospitalService";
 import LoadingSpinner from "../components/LoadingSpinner";
+import useUserRoles from "../zustand/UseRoles";
 
 interface SentDebtData {
   date: string;
@@ -30,6 +31,8 @@ interface SentDebtData {
 }
 
 const DebtPage = () => {
+  const { can } = useUserRoles();
+
   const [data, setData] = useState<OperationDataDebt[]>([]);
   const {
     data: hospitals,
@@ -46,7 +49,15 @@ const DebtPage = () => {
     PatientsDebtKpiClient,
     undefined
   );
+  const hasAccess = can(["access_debt", "doctor"]);
 
+  if (!hasAccess) {
+    return (
+      <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+        Vous n'avez pas la permission de consulter cette page.
+      </div>
+    );
+  }
   const {
     handleSubmit,
     control,

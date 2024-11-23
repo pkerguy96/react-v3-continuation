@@ -1,4 +1,3 @@
-//@ts-ignore
 import MUIDataTable from "mui-datatables-mara";
 import { Tooltip, IconButton, Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -23,6 +22,7 @@ import useUserRoles from "../zustand/UseRoles";
 
 const Uploadstable = () => {
   const queryClient = useQueryClient();
+
   const { showSnackbar } = useSnackbarStore();
   const { can } = useUserRoles();
   const navigate = useNavigate();
@@ -108,7 +108,8 @@ const Uploadstable = () => {
         customBodyRender: (data: any) => {
           return (
             <>
-              {data.mime === "application/dicom" ? (
+              {can(["detail_document", "doctor"]) &&
+              data.mime === "application/dicom" ? (
                 <button
                   className="btn-ordonance-see text-gray-950 hover:text-blue-700 cursor-pointer"
                   title="Voir"
@@ -120,27 +121,32 @@ const Uploadstable = () => {
                 </button>
               ) : null}
 
-              <button
-                onClick={() => download(data.urls)}
-                className="btn-ordonance-download text-gray-950 hover:text-blue-700 cursor-pointer"
-                title="Télécharger"
-              >
-                <DownloadForOfflineOutlinedIcon
-                  className="pointer-events-none"
-                  fill="currentColor"
-                />
-              </button>
+              {can(["download_document", "doctor"]) ? (
+                <button
+                  onClick={() => download(data.urls)}
+                  className="btn-ordonance-download text-gray-950 hover:text-blue-700 cursor-pointer"
+                  title="Télécharger"
+                >
+                  <DownloadForOfflineOutlinedIcon
+                    className="pointer-events-none"
+                    fill="currentColor"
+                  />
+                </button>
+              ) : null}
 
-              <button
-                className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-                title="Supprimer"
-              >
-                <DeleteOutlineIcon
-                  color="error"
-                  className="pointer-events-none"
-                  fill="currentColor"
-                />
-              </button>
+              {can(["delete_document", "doctor"]) ? (
+                <button
+                  className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
+                  title="Supprimer"
+                  /*  onClick={() => handleDelete(data)} */
+                >
+                  <DeleteOutlineIcon
+                    color="error"
+                    className="pointer-events-none"
+                    fill="currentColor"
+                  />
+                </button>
+              ) : null}
             </>
           );
         },
@@ -156,17 +162,19 @@ const Uploadstable = () => {
         noMatch: "Désolé, aucun fichier n'est dans nos données",
       },
     },
-    customToolbar: () => (
-      <Tooltip title="Nouveau fichier">
-        <IconButton
-          onClick={() => {
-            navigate(`/Addfile`);
-          }}
-        >
-          <AddIcon />
-        </IconButton>
-      </Tooltip>
-    ),
+    customToolbar: () => {
+      return can(["insert_document", "doctor"]) ? (
+        <Tooltip title="Nouveau fichier">
+          <IconButton
+            onClick={() => {
+              navigate(`/Addfile`);
+            }}
+          >
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
+      ) : null;
+    },
     onRowClick: async (s: any, _m: any, e: any) => {
       if (
         e.target.querySelector(".btn-ordonance-see") ||
@@ -204,14 +212,30 @@ const Uploadstable = () => {
   };
 
   return (
-    <Box className="relative">
-      <MUIDataTable
-        title={"Gestion de fichiers"}
-        data={transformedData}
-        columns={columns}
-        options={options}
-      />
-    </Box>
+    <>
+      {can([
+        "access_document",
+        "doctor",
+        "insert_document",
+        "delete_document",
+        "download_document",
+        "detail_document",
+      ]) ? ( // Check if the user has access_document or doctor role
+        <Box className="relative">
+          <MUIDataTable
+            title={"Gestion de fichiers"}
+            data={transformedData}
+            columns={columns}
+            options={options}
+          />
+        </Box>
+      ) : (
+        // Display a denial message if the user lacks permissions
+        <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+          Vous n'avez pas la permission de consulter cette page.
+        </div>
+      )}
+    </>
   );
 };
 

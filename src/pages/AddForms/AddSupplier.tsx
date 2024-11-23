@@ -9,7 +9,7 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import addGlobal from "../../hooks/addGlobal";
 import { Supplier, SupplierApiClient } from "../../services/SupplierService";
@@ -19,8 +19,8 @@ import getGlobalById from "../../hooks/getGlobalById";
 import { CACHE_KEY_Suppliers } from "../../constants";
 import updateItem from "../../hooks/updateItem";
 import { AxiosError } from "axios";
+import { useQueryClient } from "@tanstack/react-query";
 interface SupplierFormValues {
-  name: string;
   address?: string;
   phone?: string;
   email?: string;
@@ -37,6 +37,7 @@ interface UpdateData {
   supplierId: string | undefined;
 }
 const AddSupplier = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -66,7 +67,6 @@ const AddSupplier = () => {
     setValue,
   } = useForm<SupplierFormValues>({
     defaultValues: {
-      name: "",
       address: "",
       phone: "",
       email: "",
@@ -83,6 +83,10 @@ const AddSupplier = () => {
       if (!supplierId) {
         await addMutation.mutateAsync(data, {
           onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: CACHE_KEY_Suppliers,
+              exact: false,
+            });
             navigate("/Supplier");
             showSnackbar("Fournisseur ajouté avec succès", "success");
           },
@@ -108,6 +112,11 @@ const AddSupplier = () => {
       { data, id: parseInt(supplierId) }, // Ensure ID is included in the API call
       {
         onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: CACHE_KEY_Suppliers,
+            exact: false,
+          });
+          navigate("/Supplier");
           showSnackbar("Fournisseur modifié avec succès.", "success");
         },
         onError: (error: any) => {
@@ -150,19 +159,39 @@ const AddSupplier = () => {
         <Box className="w-full flex flex-col gap-4">
           <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
             <label htmlFor="nom" className="w-full md:w-[160px]">
-              Nom
+              Nom de l'entreprise
             </label>
             <FormControl className="w-full md:flex-1">
               <Controller
-                name="name"
+                name="company_name"
                 control={control}
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    id="name"
-                    label="Nom"
-                    error={!!errors.name}
-                    helperText={errors.name?.message}
+                    id="company_name"
+                    label="Nom de l'entreprise"
+                    error={!!errors.company_name}
+                    helperText={errors.company_name?.message}
+                  />
+                )}
+              />
+            </FormControl>
+          </Box>
+          <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
+            <label htmlFor="nom" className="w-full md:w-[160px]">
+              Personne de contact
+            </label>
+            <FormControl className="w-full md:flex-1">
+              <Controller
+                name="contact_person"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    id="contact_person"
+                    label="Personne de contact"
+                    error={!!errors.contact_person}
+                    helperText={errors.contact_person?.message}
                   />
                 )}
               />
@@ -229,46 +258,7 @@ const AddSupplier = () => {
               />
             </FormControl>
           </Box>
-          <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
-            <label htmlFor="nom" className="w-full md:w-[160px]">
-              Personne de contact
-            </label>
-            <FormControl className="w-full md:flex-1">
-              <Controller
-                name="contact_person"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    id="contact_person"
-                    label="Personne de contact"
-                    error={!!errors.contact_person}
-                    helperText={errors.contact_person?.message}
-                  />
-                )}
-              />
-            </FormControl>
-          </Box>
-          <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
-            <label htmlFor="nom" className="w-full md:w-[160px]">
-              Nom de l'entreprise
-            </label>
-            <FormControl className="w-full md:flex-1">
-              <Controller
-                name="company_name"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    id="company_name"
-                    label="Nom de l'entreprise"
-                    error={!!errors.company_name}
-                    helperText={errors.company_name?.message}
-                  />
-                )}
-              />
-            </FormControl>
-          </Box>
+
           <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
             <label htmlFor="nom" className="w-full md:w-[160px]">
               Type de fourniture

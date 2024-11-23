@@ -3,8 +3,11 @@ import { incompletedOperationsApiClient } from "../../services/OperationService"
 import { CACHE_KEY_RecurringOperations } from "../../constants";
 import DataTable from "../DataTable";
 import getGlobalv2 from "../../hooks/getGlobalv2";
+import useUserRoles from "../../zustand/UseRoles";
 
 const IncompletedOperations = () => {
+  const { can } = useUserRoles();
+
   const columns = [
     {
       name: "id",
@@ -71,25 +74,30 @@ const IncompletedOperations = () => {
       page, // Current page
       rowsPerPage, // Number of rows per page
       searchQuery,
-      {
-        staleTime: 60000,
-        cacheTime: 300000,
-      }
+      undefined
     );
   //TODO  invalidate cache once the operation completed and its reocuring
   return (
-    <Box className="relative">
-      <DataTable
-        title="Liste des opérations incomplètes"
-        noMatchMessage="Désolé, aucune opération incomplète n'est dans nos données."
-        columns={columns}
-        dataHook={dataHook}
-        options={{
-          searchPlaceholder: "Rechercher une opération ",
-          selectableRows: "none",
-        }}
-      />
-    </Box>
+    <>
+      {can(["access_debt", "doctor"]) ? (
+        <Box className="relative">
+          <DataTable
+            title="Liste des opérations incomplètes"
+            noMatchMessage="Désolé, aucune opération incomplète n'est dans nos données."
+            columns={columns}
+            dataHook={dataHook}
+            options={{
+              searchPlaceholder: "Rechercher une opération ",
+              selectableRows: "none",
+            }}
+          />
+        </Box>
+      ) : (
+        <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+          Vous n'avez pas la permission de consulter cette page.
+        </div>
+      )}
+    </>
   );
 };
 

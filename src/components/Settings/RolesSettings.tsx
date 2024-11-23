@@ -31,12 +31,12 @@ import deleteItem from "../../hooks/deleteItem";
 const RolesSettings = () => {
   const useref = useRef<HTMLInputElement>(null);
   const Addmutation = addGlobal({} as CreateRole, CreateRoleApiClient);
-  /*   const { data, isLoading, refetch } = getGlobal(
+  const { data, isLoading, refetch } = getGlobal(
     {} as UserRoleData,
     CACHE_KEY_UsersRolePermission,
     getUsersWithRolesClient,
     undefined
-  ); */
+  );
   const { showSnackbar } = useSnackbarStore();
 
   const onSubmit = async () => {
@@ -67,7 +67,7 @@ const RolesSettings = () => {
     const roledelte = await deleteItem($id, DeleteRoleApiClient);
     if (roledelte) {
       showSnackbar("Le rôle a été supprimé.", "info");
-      /*       refetch(); */
+      refetch();
     } else {
       showSnackbar(
         "Oups, quelque chose s'est mal passé.",
@@ -77,8 +77,8 @@ const RolesSettings = () => {
     }
   }, []);
 
-  /*   if (isLoading) return <LoadingSpinner />; */
-  const data = [];
+  if (isLoading) return <LoadingSpinner />;
+
   return (
     <Box className="flex flex-col w-full h-full p-4 gap-4" component="form">
       <p className="font-light text-gray-600 text-md md:text-xl text-center">
@@ -157,7 +157,7 @@ const RolesSettings = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <Box className="flex mt-4">
+      <Box className=" mt-4 hidden">
         <Button
           size="small"
           type="submit"

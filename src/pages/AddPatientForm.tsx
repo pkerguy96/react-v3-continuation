@@ -116,7 +116,7 @@ const AddPatient = () => {
         } else {
           await updateUser(data);
         }
-        queryClient.invalidateQueries({ queryKey: ["patient"], exact: false });
+        queryClient.invalidateQueries(CACHE_KEY_PATIENTS, { exact: false });
         navigate("/Patients");
       } catch (error: any) {
         const message =

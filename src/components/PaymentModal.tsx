@@ -12,7 +12,11 @@ import LoadingSpinner from "./LoadingSpinner";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
-import { CACHE_KEY_Operation, CACHE_KEY_OperationDetail } from "../constants";
+import {
+  CACHE_KEY_Hospitaloperations,
+  CACHE_KEY_Operation,
+  CACHE_KEY_OperationDetail,
+} from "../constants";
 import getGlobalById from "../hooks/getGlobalById";
 import operationDetailsApiClient, {
   OperationDetail,
@@ -69,9 +73,7 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
         (total: number, external: any) => total + Number(external.total_price),
         0
       );
-      console.log("====================================");
-      console.log(200, externalOperationsCost);
-      console.log("====================================");
+
       // Set the total cost
       setTotalCost(operationDetailsCost + xraysCost + externalOperationsCost);
     }
@@ -96,7 +98,12 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                 CACHE_KEY_OperationDetail,
                 operationID.toString(),
               ]);
-              queryClient.invalidateQueries(CACHE_KEY_Operation);
+              queryClient.invalidateQueries(CACHE_KEY_Operation, {
+                exact: false,
+              });
+              queryClient.invalidateQueries(CACHE_KEY_Hospitaloperations, {
+                exact: false,
+              });
 
               setFetchedOperations((prevData) => [
                 ...prevData,
