@@ -6,7 +6,7 @@ import axios, {
 } from "axios";
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "/api/v1",
+  baseURL: "http://127.0.0.1:8000/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
@@ -100,6 +100,28 @@ export class APIClient<T> {
     return axiosInstance
       .get<ApiResponse<T>>(this.endpoint, { params })
       .then((res) => res.data);
+  };
+  downloadFile = (id: string) => {
+    const endpointWithId = `${this.endpoint}/${id}`;
+    return axiosInstance
+      .get(endpointWithId, { responseType: "blob" }) // Fetch as binary
+      .then((response) => {
+        const blob = new Blob([response.data], {
+          type: response.headers["content-type"],
+        });
+        const url = window.URL.createObjectURL(blob);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = url;
+        downloadLink.setAttribute("download", `download_${id}.zip`); // Adjust the filename as needed
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+        throw error;
+      });
   };
 }
 

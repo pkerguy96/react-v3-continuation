@@ -79,7 +79,7 @@ const IncompletedOperations = () => {
   //TODO  invalidate cache once the operation completed and its reocuring
   return (
     <>
-      {can(["access_debt", "doctor"]) ? (
+      {can(["access_operation_recurring", "doctor"]) ? (
         <Box className="relative">
           <DataTable
             title="Liste des opérations incomplètes"

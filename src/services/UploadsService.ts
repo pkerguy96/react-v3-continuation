@@ -13,7 +13,13 @@ export interface ClusterData {
   dates: string[];
   totalSize: number;
 }
+export interface ClusterName {
+  clusterName: string;
+}
 export const UploadServiceApiClient = new APIClient<any>("/Filesupload");
 const ShowUploadsServiceApiClient = new APIClient<any>("/uploadsInfo");
 export const DeleteUploadServiceClient = new APIClient<any>("/Filesupload");
+export const DownloadClusterApiClient = new APIClient<ClusterName>(
+  "/downloadZip"
+);
 export default ShowUploadsServiceApiClient;

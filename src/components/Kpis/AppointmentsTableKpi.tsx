@@ -1,169 +1,12 @@
-//@ts-ignore
-/*import MUIDataTable from "mui-datatables-mara";
-import getGlobal from "../../hooks/getGlobal";
-import {
-  AppointmentKpiClient,
-  AppointmentKpiData,
-} from "../../services/KpisService";
-import { CACHE_KEY_AppointmentsKpi } from "../../constants";
-import LoadingSpinner from "../LoadingSpinner";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { useSnackbarStore } from "../../zustand/useSnackbarStore";
-import { confirmDialog } from "../ConfirmDialog";
-import { Box } from "@mui/material";
-import deleteItem from "../../hooks/deleteItem";
-import appointmentAPIClient from "../../services/AppointmentService";
-
-const AppointmentsTableKpi = () => {
-  const { showSnackbar } = useSnackbarStore();
-   const { data, isLoading } = getGlobal(
-    {} as AppointmentKpiData,
-    CACHE_KEY_AppointmentsKpi,
-    AppointmentKpiClient,
-    { staleTime: 300000 }
-  );
-  if (isLoading) return <LoadingSpinner />; 
-  const columns = [
-    {
-      name: "id",
-      label: "#",
-      options: {
-        display: false,
-      },
-    },
-
-    {
-      name: "patient_name",
-      label: "Nom",
-      options: {
-        filter: true,
-        sort: true,
-      },
-    },
-
-    {
-      name: "phone_number",
-      label: "Téléphone",
-      options: {
-        filter: true,
-        sort: true,
-      },
-    },
-    {
-      name: "entry_time",
-      label: "temps d'attente",
-      options: {
-        filter: true,
-        sort: true,
-      },
-    },
-    {
-      name: "Actions",
-      label: "Actions",
-
-      options: {
-        filter: true,
-        sort: true,
-
-        customBodyRender: () => (
-          <button
-            className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-            title="Modifier"
-          >
-            <DeleteOutlineIcon
-              color="error"
-              className="pointer-events-none"
-              fill="currentColor"
-            />
-          </button>
-        ),
-      },
-    },
-  ];
-
-  const options = {
-    searchOpen: true,
-    filterType: "dropdown",
-    searchPlaceholder: "Rechercher un rendez-vous",
-    textLabels: {
-      body: {
-        noMatch: "Désolé, aucun rendez-vous n'est dans nos données",
-      },
-    },
-
-    selectableRowsHideCheckboxes: true,
-    onRowClick: (s: any, _m: any, e: any) => {
-      console.log(s);
-
-      if (
-        e.target.querySelector(".btn-ordonance-delete") ||
-        e.target.classList.contains("btn-ordonance-delete")
-      ) {
-        // api
-        confirmDialog(
-          "Voulez-vous vraiment supprimer le rendez-vous ?",
-          async () => {
-            try {
-              const deletionSuccessful = await deleteItem(
-                s[0],
-                appointmentAPIClient
-              );
-              if (deletionSuccessful) {
-                // invalidate query
-
-                showSnackbar(
-                  "La suppression du rendez-vous a réussi",
-                  "success"
-                );
-              } else {
-                showSnackbar("La suppression du rendez-vous a échoué", "error");
-              }
-            } catch (error) {
-              showSnackbar(
-                `Une erreur s'est produite lors de la suppression du rendez-vous ${error}`,
-                "error"
-              );
-            }
-          }
-        );
-      }
-    },
-  };
-  const data = [];
-  return (
-    <Box className="relative">
-      <MUIDataTable
-        title={"Liste des rendez-vous"}
-        data={data}
-        columns={columns}
-        options={options}
-      />
-    </Box>
-  );
-};
-
-export default AppointmentsTableKpi;
- */
-//@ts-nocheck
 import * as React from "react";
-import MUIDataTable from "mui-datatables-mara";
-import {
-  AppointmentKpiClient,
-  AppointmentKpiData,
-} from "../../services/KpisService";
-import {
-  CACHE_KEY_AppointmentsKpi,
-  CACHE_KEY_WAITINGLIST,
-} from "../../constants";
+import { CACHE_KEY_WAITINGLIST } from "../../constants";
 import LoadingSpinner from "../LoadingSpinner";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import { confirmDialog } from "../ConfirmDialog";
 import { Box, Chip } from "@mui/material";
 import deleteItem from "../../hooks/deleteItem";
-import appointmentAPIClient from "../../services/AppointmentService";
-import moment from "moment"; // Import moment for time handling
-import getGlobal from "../../hooks/getGlobal";
+import moment from "moment";
 import {
   decrementPatientApiClient,
   FetchWaitingList,
@@ -172,17 +15,12 @@ import { useNavigate } from "react-router";
 import getGlobalv2 from "../../hooks/getGlobalv2";
 import DataTable from "../DataTable";
 import { useQueryClient } from "@tanstack/react-query";
-
+import useUserRoles from "../../zustand/UseRoles";
+import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
 const AppointmentsTableKpi = () => {
   const { showSnackbar } = useSnackbarStore();
   const queryClient = useQueryClient();
-
-  /*  const { data, isLoading, refetch } = getGlobal(
-    {},
-    CACHE_KEY_WAITINGLIST,
-    FetchWaitingList,
-    undefined
-  ); */
+  const { can } = useUserRoles();
 
   const dataHook = (page: number, searchQuery: string, rowsPerPage: number) =>
     getGlobalv2(
@@ -193,11 +31,7 @@ const AppointmentsTableKpi = () => {
       5,
       searchQuery,
 
-      {
-        staleTime: 60000, // Data stays fresh for 60 seconds
-        cacheTime: 300000, // Cache lasts for 300 seconds
-        refetchInterval: 10000, // Refetch every 10 seconds (in milliseconds)
-      }
+      undefined
     );
   const navigate = useNavigate();
   const [lastUpdateTime, setLastUpdateTime] = React.useState(Date.now()); // Store last update time
@@ -239,11 +73,24 @@ const AppointmentsTableKpi = () => {
         display: false,
       },
     },
+
     {
       name: "patient_id",
       label: "#d",
       options: {
         display: false,
+      },
+    },
+    {
+      name: "order",
+      label: "Ordre",
+      options: {
+        filter: false,
+        sort: false,
+        customBodyRender: (_value, tableMeta) => {
+          // Generate order based on row index
+          return tableMeta.rowIndex + 1;
+        },
       },
     },
     {
@@ -289,18 +136,26 @@ const AppointmentsTableKpi = () => {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: ($row, $d) => (
-          <button
-            className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-            title="Supprimer"
-            onClick={() => console.log($row, $d)}
-          >
-            <DeleteOutlineIcon
-              color="error"
-              className="pointer-events-none"
-              fill="currentColor"
-            />
-          </button>
+        customBodyRender: ($row, $metadata) => (
+          <Box className="flex gap-4 items-center">
+            {can(["detail_patient", "doctor"]) && (
+              <button className="text-3xl btn-patient-info text-gray-950 hover:text-blue-700 cursor-pointer">
+                <FolderSharedOutlinedIcon color="info" fontSize="inherit" />
+              </button>
+            )}
+            <button
+              className=" text-3xl btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
+              title="Supprimer"
+              onClick={() => console.log($metadata.rowData[0])}
+            >
+              <DeleteOutlineIcon
+                color="error"
+                className="pointer-events-none"
+                fill="currentColor"
+                fontSize="inherit"
+              />
+            </button>
+          </Box>
         ),
       },
     },
@@ -318,16 +173,17 @@ const AppointmentsTableKpi = () => {
 
           selectableRowsHideCheckboxes: true,
           onRowClick: (rowData: any, _m: any, e: any) => {
+            // Check if the delete button was clicked
             if (
-              e.target.querySelector(".btn-ordonance-delete") ||
-              e.target.classList.contains("btn-ordonance-delete")
+              e.target.classList.contains("btn-ordonance-delete") ||
+              e.target.closest(".btn-ordonance-delete")
             ) {
               confirmDialog(
                 "Voulez-vous supprimer le patient de la salle d'attente ?",
                 async () => {
                   try {
                     const deletionSuccessful = await deleteItem(
-                      rowData[0],
+                      rowData[0], // Assuming the ID is in rowData[0]
                       decrementPatientApiClient
                     );
                     if (deletionSuccessful) {
@@ -337,25 +193,31 @@ const AppointmentsTableKpi = () => {
 
                       showSnackbar(
                         "La suppression du patient de la salle d'attente a été effectuée avec succès.",
-
                         "success"
                       );
                     } else {
                       showSnackbar(
-                        "La suppressiondu patient de la salle d'attente a échoué",
+                        "La suppression du patient de la salle d'attente a échoué",
                         "error"
                       );
                     }
                   } catch (error) {
                     showSnackbar(
-                      `Une erreur s'est produite lors de la suppression du patient de la salle d'attente ${error}`,
+                      `Une erreur s'est produite lors de la suppression du patient de la salle d'attente: ${error}`,
                       "error"
                     );
                   }
                 }
               );
-            } else {
-              navigate(`/Patients/Xray?id=${rowData[1]}`);
+            } else if (
+              e.target.classList.contains("btn-patient-info") ||
+              e.target.closest(".btn-patient-info")
+            ) {
+              navigate(`/Patients/Details/${rowData[1]}`);
+            }
+            // If another clickable element triggers the row click
+            else {
+              navigate(`/Patients/Xray?id=${rowData[1]}`); // Assuming the second column has the patient ID
             }
           },
         }}

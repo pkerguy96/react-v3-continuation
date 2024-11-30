@@ -45,6 +45,7 @@ export const CACHE_KEY_CanceledMonthlyAppointments = [
 export const CACHE_KEY_Url = "urllist";
 export const CACHE_KEY_StockExit = ["StockExit"];
 export const CACHE_KEY_StockEntry = ["StockEntry"];
+
 export const CACHE_KEY_StockEntryUpdate = ["StockEntryUpdate"];
 
 export const PermissionListpatient = [
@@ -55,16 +56,20 @@ export const PermissionListpatient = [
   { name: "detail_patient", display: "Détails du patient" },
 ];
 
+export const reoccuringoperations = [
+  {
+    name: "access_operation_recurring",
+    display: "Accès Opérations inachevées",
+  },
+];
 export const PermissionListordonance = [
   { name: "access_ordonance", display: "Accès complet" },
   { name: "insert_ordonance", display: "Ajouter une ordonnance" },
   { name: "update_ordonance", display: "Modifier une ordonnance" },
   { name: "delete_ordonance", display: "Supprimer une ordonnance" },
 ];
-
 export const PermissionListcreance = [
   { name: "access_creance", display: "Accès complet" },
-  { name: "search_creance", display: "Rechercher" },
 ];
 
 export const PermissionListdebt = [
@@ -97,32 +102,29 @@ export const PermissionListSupplier = [
   { name: "delete_supplier", display: "Supprimer un fournisseur" },
   { name: "modify_supplier", display: "Modifier un fournisseur" },
 ];
-export const PermissionListStock = [
-  { name: "access_stock", display: "Accès complet" },
-  { name: "add_stock", display: "Ajouter au stock" },
-  { name: "delete_stock", display: "Supprimer du stock" },
-  { name: "modify_stock", display: "Modifier le stock" },
-];
 export const PermissionListProduct = [
   { name: "access_product", display: "Accès complet" },
   { name: "add_product", display: "Ajouter un produit" },
   { name: "delete_product", display: "Supprimer un produit" },
   { name: "modify_product", display: "Modifier un produit" },
+  { name: "add_stock", display: "Ajouter au stock" },
 ];
+
 export const PermissionListHistoriqueEnter = [
   { name: "access_historique_enter", display: "Accès complet" },
-  { name: "add_historique_enter", display: "Ajouter une entrée historique" },
+  { name: "modify_historique_enter", display: "Modifier historique enter" },
+
   {
     name: "delete_historique_enter",
     display: "Supprimer une entrée historique",
   },
-  {
-    name: "modify_historique_enter",
-    display: "Modifier une entrée historique",
-  },
 ];
 export const PermissionListHistoriqueSortie = [
   { name: "access_historique_sortie", display: "Accès complet" },
+  {
+    name: "delete_historique_sortie",
+    display: "Supprimer une sortie historique",
+  },
 ];
 
 export const referral = [

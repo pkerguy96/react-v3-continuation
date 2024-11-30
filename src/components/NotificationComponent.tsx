@@ -45,8 +45,10 @@ const NotificationComponent = () => {
     queryClient.invalidateQueries(CACHE_KEY_Notification);
     if (type === "payment") {
       navigate(`/InvoicePage?target_id=${target_id}`);
-    } else {
+    } else if (type === "xray") {
       navigate(`/Xraydemand?target_id=${target_id}`);
+    } else {
+      return;
     }
   };
   return (
@@ -102,10 +104,13 @@ const NotificationComponent = () => {
             data?.map((notification: NotificationProps, index: number) => {
               return (
                 <Box
-                  className="flex flex-wrap gap-2 items-center border-t border-gray-200 p-4 cursor-pointer"
+                  className={`flex flex-wrap gap-2 items-center border-t border-gray-200 p-4 ${
+                    notification.type === "stock"
+                      ? "cursor-default"
+                      : "cursor-pointer"
+                  }`}
                   key={index}
                   onClick={() => {
-                    console.log(notification.target_id);
                     markAsRead(
                       notification.id,
                       notification.target_id,
@@ -114,7 +119,18 @@ const NotificationComponent = () => {
                   }}
                 >
                   <Box className="w-0 flex-1">
-                    <Typography>{notification.title}</Typography>
+                    <Typography
+                      className={`${
+                        notification.type === "stock" ? "text-red-500" : ""
+                      }`}
+                    >
+                      {notification.title}
+                    </Typography>
+                    {notification.message && (
+                      <Typography className="text-xs text-gray-500">
+                        {notification.message}
+                      </Typography>
+                    )}
                     <Typography className="text-xs text-gray-500">
                       {notification.date}
                     </Typography>

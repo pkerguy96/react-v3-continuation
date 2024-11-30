@@ -92,7 +92,7 @@ export const MainListItems = () => {
           </ListItemButton>
         </Link>
       )}
-      {can(["access_creance", "search_creance", "doctor"]) && (
+      {can(["access_creance", "doctor"]) && (
         <Link to="/Creance" className="no-underline">
           <ListItemButton>
             <ListItemIcon>
@@ -112,14 +112,21 @@ export const MainListItems = () => {
           </ListItemButton>
         </Link>
       )}
-      <Link to="/External" className="no-underline">
-        <ListItemButton>
-          <ListItemIcon>
-            <AddBusinessOutlinedIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Règlement extern" />
-        </ListItemButton>
-      </Link>
+      {can([
+        "access_external_debt",
+        "insert_external_debt",
+        "delete_external_debt",
+        "doctor",
+      ]) && (
+        <Link to="/External" className="no-underline">
+          <ListItemButton>
+            <ListItemIcon>
+              <AddBusinessOutlinedIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Règlement extern" />
+          </ListItemButton>
+        </Link>
+      )}
     </React.Fragment>
   );
 };
@@ -230,6 +237,7 @@ export function SecondaryListItems({}: Props) {
             "add_product",
             "delete_product",
             "modify_product",
+            "add_stock",
             "doctor",
           ]) && (
             <Link to="/Stock" className="no-underline">
@@ -243,7 +251,6 @@ export function SecondaryListItems({}: Props) {
           )}
           {can([
             "access_historique_enter",
-            "add_historique_enter",
             "delete_historique_enter",
             "modify_historique_enter",
             "doctor",
@@ -257,7 +264,11 @@ export function SecondaryListItems({}: Props) {
               </ListItemButton>
             </Link>
           )}
-          {can(["access_historique_sortie", "doctor"]) && (
+          {can([
+            "access_historique_sortie",
+            "delete_historique_enter",
+            "doctor",
+          ]) && (
             <Link to="/Stock/exit" className="no-underline">
               <ListItemButton>
                 <ListItemIcon>

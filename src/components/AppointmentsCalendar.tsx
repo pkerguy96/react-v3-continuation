@@ -112,6 +112,9 @@ const AppointmentsCalendar = () => {
         slotMinTime="08:00:00"
         allDaySlot={false}
         locales={[frLocale]}
+        validRange={{
+          start: moment().format("YYYY-MM-DD"),
+        }}
       />
       <AppointmentConfirmation
         data={confirmationData}

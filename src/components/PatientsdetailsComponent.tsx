@@ -1,5 +1,16 @@
-import { Box, Divider } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import LoadingSpinner from "./LoadingSpinner";
+import { useNavigate } from "react-router";
 
 const PatientsdetailsComponent = ({
   info,
@@ -8,9 +19,12 @@ const PatientsdetailsComponent = ({
   info: any;
   isLoading: boolean;
 }) => {
+  const navigate = useNavigate();
   if (isLoading) return <LoadingSpinner />;
-  console.log(info);
 
+  const handleRowClick = (id: number) => {
+    navigate(`/OrdonanceDetails/${id}`);
+  };
   return (
     <Box className="flex flex-col gap-4">
       <Box className="w-full flex gap-4 flex-col lg:flex-row lg:items-start">
@@ -135,6 +149,53 @@ const PatientsdetailsComponent = ({
           </Box>
         </Box>
       </Box>
+
+      <div className=" gap-4 items-start">
+        <div className="   bg-[#f5f5f5] text-white text-center  rounded-lg ">
+          <h2 className="text-xl text-black font-mono font-bold">Ordonances</h2>
+          <Paper className="mt-4" elevation={3}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">#</TableCell>
+
+                    <TableCell align="center">Date</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {info.ordonances.length > 0 ? (
+                    info.ordonances.map((ordonance, index) => (
+                      <TableRow
+                        key={index}
+                        hover
+                        onClick={() => handleRowClick(ordonance.id)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <TableCell align="center">{index + 1}</TableCell>
+                        <TableCell align="center">{ordonance.date}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={2}
+                        align="center"
+                        className="text-gray-600 p-4"
+                      >
+                        <p className="text-lg ">
+                          Désolé, aucune ordonnance pour le moment.
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </div>
+      </div>
+
       <Box className="flex flex-col lg:flex-row gap-4">
         {/* Allergies Section */}
         <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4">

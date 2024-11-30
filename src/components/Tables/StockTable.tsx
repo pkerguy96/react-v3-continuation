@@ -1,5 +1,3 @@
-//@ts-ignore
-import MUIDataTable from "mui-datatables-mara";
 import { Tooltip, IconButton, Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router";
@@ -14,9 +12,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import deleteItem from "../../hooks/deleteItem";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
+import useUserRoles from "../../zustand/UseRoles";
 
 const stockTable = () => {
   const navigate = useNavigate();
+  const { can } = useUserRoles();
+
   const queryClient = useQueryClient();
   const { showSnackbar } = useSnackbarStore();
   const columns = [
@@ -58,30 +59,36 @@ const stockTable = () => {
 
           return (
             <Box style={{ width: "90px" }}>
-              <Tooltip title="Ajouter du stock" arrow>
-                <button
-                  className="btn-stock-add text-gray-950 hover:text-blue-700 cursor-pointer"
-                  onClick={() => navigate(`/Stock/product?id=${StockID}`)}
-                >
-                  <Inventory2OutlinedIcon />
-                </button>
-              </Tooltip>
-              <Tooltip title="Modifier le stock" arrow>
-                <button
-                  className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
-                  onClick={() => navigate(`/Stock/ajouter?id=${StockID}`)}
-                >
-                  <EditOutlinedIcon />
-                </button>
-              </Tooltip>
-              <Tooltip title="Supprimer le produit" arrow>
-                <button
-                  className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-                  onClick={() => handleStockDelete(StockID)}
-                >
-                  <DeleteOutlineIcon color="error" />
-                </button>
-              </Tooltip>
+              {can(["add_stock", "doctor"]) ? (
+                <Tooltip title="Ajouter du stock" arrow>
+                  <button
+                    className="btn-stock-add text-gray-950 hover:text-blue-700 cursor-pointer"
+                    onClick={() => navigate(`/Stock/product?id=${StockID}`)}
+                  >
+                    <Inventory2OutlinedIcon />
+                  </button>
+                </Tooltip>
+              ) : null}
+              {can(["modify_product", "doctor"]) ? (
+                <Tooltip title="Modifier le stock" arrow>
+                  <button
+                    className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
+                    onClick={() => navigate(`/Stock/ajouter?id=${StockID}`)}
+                  >
+                    <EditOutlinedIcon />
+                  </button>
+                </Tooltip>
+              ) : null}
+              {can(["delete_product", "doctor"]) ? (
+                <Tooltip title="Supprimer le produit" arrow>
+                  <button
+                    className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
+                    onClick={() => handleStockDelete(StockID)}
+                  >
+                    <DeleteOutlineIcon color="error" />
+                  </button>
+                </Tooltip>
+              ) : null}
             </Box>
           );
         },
@@ -119,27 +126,44 @@ const stockTable = () => {
     );
 
   return (
-    <Box className="relative">
-      <DataTable
-        title="Liste des produits"
-        noMatchMessage="Désolé, aucun produit n'est dans nos données."
-        columns={columns}
-        dataHook={dataHook}
-        options={{
-          searchPlaceholder: "Rechercher un produit",
-          customToolbar: () => (
-            <Tooltip title="Nouveau produit">
-              <IconButton onClick={() => navigate("/Stock/ajouter")}>
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          ),
+    <>
+      {can([
+        "access_product",
+        "doctor",
+        "add_product",
+        "delete_product",
+        "modify_product",
+      ]) ? (
+        <Box className="relative">
+          <DataTable
+            title="Liste des produits"
+            noMatchMessage="Désolé, aucun produit n'est dans nos données."
+            columns={columns}
+            dataHook={dataHook}
+            options={{
+              searchPlaceholder: "Rechercher un produit",
+              customToolbar: () => {
+                return can(["add_product", "doctor"]) ? (
+                  <Tooltip title="Nouveau produit">
+                    <IconButton onClick={() => navigate("/Stock/ajouter")}>
+                      <AddIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : null;
+              },
 
-          selectableRowsHideCheckboxes: true,
-          onRowClick: (s: any, _m: any, e: any) => {},
-        }}
-      />
-    </Box>
+              selectableRowsHideCheckboxes: true,
+              onRowClick: (s: any, _m: any, e: any) => {},
+            }}
+          />
+        </Box>
+      ) : (
+        // Display a denial message if the user lacks permissions
+        <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+          Vous n'avez pas la permission de consulter cette page.
+        </div>
+      )}
+    </>
   );
 };
 

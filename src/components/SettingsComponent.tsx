@@ -18,6 +18,7 @@ import LocalPoliceOutlinedIcon from "@mui/icons-material/LocalPoliceOutlined";
 import LocalHospitalOutlinedIcon from "@mui/icons-material/LocalHospitalOutlined";
 import HealingOutlinedIcon from "@mui/icons-material/HealingOutlined";
 import { useSnackbarStore } from "../zustand/useSnackbarStore";
+import useUserRoles from "../zustand/UseRoles";
 /*  */
 const SettingsComponent = () => {
   const location = useLocation();
@@ -26,7 +27,7 @@ const SettingsComponent = () => {
     location.pathname
   );
   const [isHovered, setIsHovered] = useState(false);
-
+  const { can } = useUserRoles();
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value.toLowerCase());
   };
@@ -36,31 +37,41 @@ const SettingsComponent = () => {
       name: "Paramètres des métriques",
       url: "/Settings/Kpis",
       icon: AnalyticsOutlinedIcon,
+      checkPermissions: false,
     },
     {
       name: "Paramètres d'opérations",
       url: "/Settings/Operations",
       icon: MedicationLiquidOutlinedIcon,
+      checkPermissions: false,
     },
     {
-      name: " Gestion des radiographie",
+      name: "Gestion des radiographie",
       url: "/Settings/Xrays",
       icon: LocalHospitalOutlinedIcon,
+      checkPermissions: true,
+      permissions: ["doctor"],
     },
     {
       name: "Gestion des rôles",
       url: "/Settings/Roles",
       icon: LocalPoliceOutlinedIcon,
+      checkPermissions: true,
+      permissions: ["doctor"],
     },
     {
       name: " Gestion des Autorisations",
       url: "/Settings/Autorisations",
       icon: AdminPanelSettingsOutlinedIcon,
+      checkPermissions: true,
+      permissions: ["doctor"],
     },
     {
       name: " Gestion des cliniques",
       url: "/Settings/Clinic",
       icon: HealingOutlinedIcon,
+      checkPermissions: true,
+      permissions: ["doctor"],
     },
   ];
 
@@ -127,11 +138,16 @@ const SettingsComponent = () => {
 
           <Box className="flex flex-col gap-6">
             {items
-              .filter((item) => item.name.toLowerCase().includes(searchQuery))
+              .filter(
+                (item) =>
+                  !item.checkPermissions ||
+                  (item.permissions && can(item.permissions))
+              ) // Only check permissions if required
+              .filter((item) => item.name.toLowerCase().includes(searchQuery)) // Search filter
               .map((item, index) => (
                 <Link
                   to={item.url}
-                  className={`no-underline `}
+                  className={`no-underline`}
                   key={index}
                   style={{
                     display: "block",
@@ -150,7 +166,7 @@ const SettingsComponent = () => {
                     <span
                       className={`${
                         activeItem === item.url
-                          ? " !text-blue-600"
+                          ? "!text-blue-600"
                           : "text-gray-500"
                       } font-light text-md md:hidden`}
                     >
@@ -159,7 +175,7 @@ const SettingsComponent = () => {
                     <div
                       className={`${
                         activeItem === item.url
-                          ? " !text-blue-600"
+                          ? "!text-blue-600"
                           : "text-gray-500"
                       } font-light text-md hidden md:flex items-center gap-4 overflow-hidden`}
                     >

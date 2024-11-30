@@ -25,6 +25,7 @@ import {
 import {
   CACHE_KEY_NurseRole,
   CACHE_KEY_Role,
+  PermissionExternalListExternalDebt,
   PermissionListcreance,
   PermissionListdebt,
   PermissionListdocument,
@@ -33,8 +34,8 @@ import {
   PermissionListordonance,
   PermissionListpatient,
   PermissionListProduct,
-  PermissionListStock,
   PermissionListSupplier,
+  reoccuringoperations,
 } from "../../constants";
 import LoadingSpinner from "../LoadingSpinner";
 import addGlobal from "../../hooks/addGlobal";
@@ -78,12 +79,13 @@ const PermissionsSettings = () => {
         onSuccess(data: any) {
           [
             PermissionListpatient,
+            reoccuringoperations,
             PermissionListordonance,
             PermissionListcreance,
             PermissionListdebt,
+            PermissionExternalListExternalDebt,
             PermissionListdocument,
             PermissionListSupplier,
-            PermissionListStock,
             PermissionListProduct,
             PermissionListHistoriqueEnter,
             PermissionListHistoriqueSortie,
@@ -283,6 +285,23 @@ const PermissionsSettings = () => {
             ))}
           </Box>
           <Box className="flex flex-col flex-wrap">
+            <label htmlFor="nom">Dette extérieure:</label>
+            {PermissionExternalListExternalDebt.map((item, index) => (
+              <Controller
+                key={index}
+                name={item.name}
+                control={control}
+                defaultValue={false}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={<Checkbox {...field} checked={field.value} />}
+                    label={item.display}
+                  />
+                )}
+              />
+            ))}
+          </Box>
+          <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">Créance:</label>
             {PermissionListcreance.map((item, index) => (
               <Controller
@@ -333,23 +352,7 @@ const PermissionsSettings = () => {
               />
             ))}
           </Box>
-          <Box className="flex flex-col flex-wrap">
-            <label htmlFor="nom">Stock général:</label>
-            {PermissionListStock.map((item, index) => (
-              <Controller
-                key={index}
-                name={item.name}
-                control={control}
-                defaultValue={false}
-                render={({ field }) => (
-                  <FormControlLabel
-                    control={<Checkbox {...field} checked={field.value} />}
-                    label={item.display}
-                  />
-                )}
-              />
-            ))}
-          </Box>
+
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">historique d'entrée:</label>
             {PermissionListHistoriqueEnter.map((item, index) => (
@@ -370,6 +373,23 @@ const PermissionsSettings = () => {
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">historique d'sortie:</label>
             {PermissionListHistoriqueSortie.map((item, index) => (
+              <Controller
+                key={index}
+                name={item.name}
+                control={control}
+                defaultValue={false}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={<Checkbox {...field} checked={field.value} />}
+                    label={item.display}
+                  />
+                )}
+              />
+            ))}
+          </Box>
+          <Box className="flex flex-col flex-wrap">
+            <label htmlFor="nom">historique d'sortie:</label>
+            {reoccuringoperations.map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}

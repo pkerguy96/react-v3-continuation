@@ -20,6 +20,8 @@ import { useSnackbarStore } from "../zustand/useSnackbarStore";
 import { useQueryClient } from "@tanstack/react-query";
 import useUserRoles from "../zustand/UseRoles";
 
+import { APIClient } from "../services/Http";
+
 const Uploadstable = () => {
   const queryClient = useQueryClient();
 
@@ -34,15 +36,14 @@ const Uploadstable = () => {
   );
 
   if (isLoading) return <LoadingSpinner />;
-  const download = (links: string) => {
-    const downloadLink = document.createElement("a");
-    downloadLink.setAttribute("download", "");
-    document.body.appendChild(downloadLink);
 
-    downloadLink.href = links;
-    downloadLink.click();
-
-    document.body.removeChild(downloadLink);
+  const download = async (clusterName: string) => {
+    const apiClient = new APIClient<ClusterData>("/downloadZip");
+    try {
+      await apiClient.downloadFile(clusterName);
+    } catch (error) {
+      console.error("Error downloading ZIP:", error);
+    }
   };
   const transformedData = Object.entries(data).map(
     ([cluster, clusterData]: any) => ({
@@ -51,7 +52,11 @@ const Uploadstable = () => {
       type: clusterData.type,
       date: clusterData.dates[0],
       size: `${clusterData.totalSize.toFixed(2)} Mb`,
-      action: { mime: clusterData.mimeType[0], urls: clusterData.links },
+      action: {
+        mime: clusterData.mimeType[0],
+        urls: clusterData.links,
+        clusterName: cluster,
+      },
     })
   );
 
@@ -106,6 +111,8 @@ const Uploadstable = () => {
         filter: true,
         sort: true,
         customBodyRender: (data: any) => {
+          console.log("1000", data);
+
           return (
             <>
               {can(["detail_document", "doctor"]) &&
@@ -123,7 +130,7 @@ const Uploadstable = () => {
 
               {can(["download_document", "doctor"]) ? (
                 <button
-                  onClick={() => download(data.urls)}
+                  onClick={() => download(data.clusterName)}
                   className="btn-ordonance-download text-gray-950 hover:text-blue-700 cursor-pointer"
                   title="Télécharger"
                 >
@@ -138,7 +145,6 @@ const Uploadstable = () => {
                 <button
                   className="btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
                   title="Supprimer"
-                  /*  onClick={() => handleDelete(data)} */
                 >
                   <DeleteOutlineIcon
                     color="error"

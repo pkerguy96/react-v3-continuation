@@ -10,7 +10,9 @@ import deleteItem from "../../hooks/deleteItem";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import useUserRoles from "../../zustand/UseRoles";
 const StockEntryTable = () => {
+  const { can } = useUserRoles();
   const { showSnackbar } = useSnackbarStore();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -47,6 +49,11 @@ const StockEntryTable = () => {
     {
       name: "supplier_name",
       label: "Nom fournisseur",
+      options: { filter: true, sort: true },
+    },
+    {
+      name: "contact_person",
+      label: "Personne de contact",
       options: { filter: true, sort: true },
     },
     {
@@ -90,24 +97,28 @@ const StockEntryTable = () => {
 
           return (
             <Box style={{ width: "90px" }}>
-              <Tooltip title="Modifier l'opération" arrow>
-                <button
-                  className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
-                  onClick={() =>
-                    navigate(`/Stock/product?stockoperation=${StockID}`)
-                  }
-                >
-                  <EditOutlinedIcon />
-                </button>
-              </Tooltip>
-              <Tooltip title="Supprimer l'opération" arrow disableInteractive>
-                <button
-                  className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-                  onClick={() => handleStockDelete(StockID)}
-                >
-                  <DeleteOutlineIcon color="error" />
-                </button>
-              </Tooltip>
+              {can(["modify_historique_enter", "doctor"]) ? (
+                <Tooltip title="Modifier l'opération" arrow>
+                  <button
+                    className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
+                    onClick={() =>
+                      navigate(`/Stock/product?stockoperation=${StockID}`)
+                    }
+                  >
+                    <EditOutlinedIcon />
+                  </button>
+                </Tooltip>
+              ) : null}
+              {can(["delete_historique_enter", "doctor"]) ? (
+                <Tooltip title="Supprimer l'opération" arrow disableInteractive>
+                  <button
+                    className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
+                    onClick={() => handleStockDelete(StockID)}
+                  >
+                    <DeleteOutlineIcon color="error" />
+                  </button>
+                </Tooltip>
+              ) : null}
             </Box>
           );
         },
@@ -125,19 +136,33 @@ const StockEntryTable = () => {
       undefined
     );
   return (
-    <Box className="relative">
-      <DataTable
-        title="Liste des entrée"
-        noMatchMessage="Désolé, aucun entrée n'est dans nos données."
-        columns={columns}
-        dataHook={dataHook}
-        options={{
-          searchPlaceholder: "Rechercher une entrée",
-          selectableRowsHideCheckboxes: true,
-          onRowClick: (s: any, _m: any, e: any) => {},
-        }}
-      />
-    </Box>
+    <>
+      {can([
+        "access_historique_enter",
+        "doctor",
+        "modify_historique_enter",
+        "delete_historique_enter",
+      ]) ? (
+        <Box className="relative">
+          <DataTable
+            title="Liste des entrée"
+            noMatchMessage="Désolé, aucun entrée n'est dans nos données."
+            columns={columns}
+            dataHook={dataHook}
+            options={{
+              searchPlaceholder: "Rechercher une entrée",
+              selectableRowsHideCheckboxes: true,
+              onRowClick: (s: any, _m: any, e: any) => {},
+            }}
+          />
+        </Box>
+      ) : (
+        // Display a denial message if the user lacks permissions
+        <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+          Vous n'avez pas la permission de consulter cette page.
+        </div>
+      )}
+    </>
   );
 };
 

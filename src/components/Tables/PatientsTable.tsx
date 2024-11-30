@@ -14,7 +14,7 @@ import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import useUserRoles from "../../zustand/UseRoles";
-
+import HealthAndSafetyOutlinedIcon from "@mui/icons-material/HealthAndSafetyOutlined";
 const PatientsTable = () => {
   const { showSnackbar } = useSnackbarStore();
   const { can } = useUserRoles();
@@ -57,9 +57,13 @@ const PatientsTable = () => {
               {can(["detail_patient", "doctor"]) && (
                 <button
                   className="btn-patient-info text-gray-950 hover:text-blue-700 cursor-pointer"
-                  onClick={() => navigate(`/Patients/Details/${patientId}`)}
+                  onClick={() =>
+                    /* navigate(`/Patients/Details/${patientId}`) */ navigate(
+                      `Xray?id=${patientId}`
+                    )
+                  }
                 >
-                  <FolderCopyOutlinedIcon />
+                  <HealthAndSafetyOutlinedIcon />
                 </button>
               )}
               {can(["update_patient", "doctor"]) && (
@@ -148,7 +152,7 @@ const PatientsTable = () => {
               const patientId = s[0];
               // Check if the click was on the "Patient Info" button
               if (e.target.closest(".btn-patient-info")) {
-                navigate(`/Patients/Details/${patientId}`);
+                navigate(`Xray?id=${patientId}`);
                 return;
               }
 
@@ -164,7 +168,8 @@ const PatientsTable = () => {
                 return;
               }
               const formatedDate = s[3].split("-");
-              navigate(`Xray?id=${s[0]}`);
+              /* navigate(`Xray?id=${s[0]}`); */
+              navigate(`/Patients/Details/${s[0]}`);
             },
           }}
         />

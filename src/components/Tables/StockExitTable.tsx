@@ -1,25 +1,20 @@
 import { Box, Tooltip } from "@mui/material";
-import React from "react";
 import DataTable from "../DataTable";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
-import {
-  CACHE_KEY_ProductConsumed,
-  CACHE_KEY_StockEntry,
-} from "../../constants";
+import { CACHE_KEY_ProductConsumed } from "../../constants";
 import deleteItem from "../../hooks/deleteItem";
 import getGlobalv2 from "../../hooks/getGlobalv2";
-import { SupplierProductApiClient } from "../../services/SupplierService";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import { confirmDialog } from "../ConfirmDialog";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { productconsumedApiClient } from "../../services/StockService";
+import useUserRoles from "../../zustand/UseRoles";
 
 const StockExitTable = () => {
+  const { can } = useUserRoles();
+
   const { showSnackbar } = useSnackbarStore();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   const handleStockDelete = async (id: any) => {
     confirmDialog("Voulez-vous vraiment supprimer l'opération?", async () => {
@@ -106,19 +101,32 @@ const StockExitTable = () => {
       undefined
     );
   return (
-    <Box className="relative">
-      <DataTable
-        title="Liste des sorties"
-        noMatchMessage="Désolé, aucun sorties n'est dans nos données."
-        columns={columns}
-        dataHook={dataHook}
-        options={{
-          searchPlaceholder: "Rechercher une sorties",
-          selectableRowsHideCheckboxes: true,
-          onRowClick: (s: any, _m: any, e: any) => {},
-        }}
-      />
-    </Box>
+    <>
+      {can([
+        "access_historique_sortie",
+        "doctor",
+        "delete_historique_enter",
+      ]) ? (
+        <Box className="relative">
+          <DataTable
+            title="Liste des sorties"
+            noMatchMessage="Désolé, aucun sorties n'est dans nos données."
+            columns={columns}
+            dataHook={dataHook}
+            options={{
+              searchPlaceholder: "Rechercher une sorties",
+              selectableRowsHideCheckboxes: true,
+              onRowClick: (s: any, _m: any, e: any) => {},
+            }}
+          />
+        </Box>
+      ) : (
+        // Display a denial message if the user lacks permissions
+        <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
+          Vous n'avez pas la permission de consulter cette page.
+        </div>
+      )}
+    </>
   );
 };
 
