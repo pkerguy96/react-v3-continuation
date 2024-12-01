@@ -50,6 +50,11 @@ import HospitalsSettings from "./components/Settings/HospitalsSettings";
 import ClinicOperationsTable from "./components/Tables/ClinicOperationsTable";
 import AddOutsourceOperation from "./pages/AddForms/AddOutsourceOperation";
 import OutsourceOperation from "./pages/OutsourceOperation";
+import BloodtestTable from "./components/Tables/BloodtestTable";
+import BloodTestAdd from "./pages/AddForms/BloodTestAdd";
+import BloodTestPage from "./pages/BloodTestPage";
+import BloodTestPrintableComponent from "./components/BloodTestPrintableComponent";
+import Lobby from "./components/Lobby";
 
 const router = createBrowserRouter([
   {
@@ -68,6 +73,10 @@ const router = createBrowserRouter([
       {
         path: "reset/:token?/:email?",
         element: <ChangePassword />,
+      },
+      {
+        path: "lobby",
+        element: <Lobby />,
       },
     ],
   },
@@ -106,6 +115,16 @@ const router = createBrowserRouter([
         element: <OrdonnancePage />,
       },
       {
+        path: "bloodtest",
+        element: <BloodTestPage />,
+        children: [
+          {
+            path: "add",
+            element: <BloodTestAdd />,
+          },
+        ],
+      },
+      {
         path: "Opérations-inachevées",
         element: <IncompletedOperations />,
       },
@@ -124,6 +143,10 @@ const router = createBrowserRouter([
       {
         path: "OrdonanceDetails/:id",
         element: <PrintableComponant />,
+      },
+      {
+        path: "bloodtestdetails/:id",
+        element: <BloodTestPrintableComponent />,
       },
       {
         path: "AddPatient/:id?",

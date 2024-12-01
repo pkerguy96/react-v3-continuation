@@ -22,6 +22,7 @@ import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 import PersonAddAlt1OutlinedIcon from "@mui/icons-material/PersonAddAlt1Outlined";
 import InputOutlinedIcon from "@mui/icons-material/InputOutlined";
 import OutputOutlinedIcon from "@mui/icons-material/OutputOutlined";
+import BloodtypeOutlinedIcon from "@mui/icons-material/BloodtypeOutlined";
 import { useState } from "react";
 
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
@@ -89,6 +90,16 @@ export const MainListItems = () => {
               <MedicationLiquidOutlinedIcon color="primary" />
             </ListItemIcon>
             <ListItemText primary="Ordonnance" />
+          </ListItemButton>
+        </Link>
+      )}
+      {can(["access_blood", "insert_blood", "delete_blood", "doctor"]) && (
+        <Link to="/bloodtest" className="no-underline">
+          <ListItemButton>
+            <ListItemIcon>
+              <BloodtypeOutlinedIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Analyse de sang" />
           </ListItemButton>
         </Link>
       )}

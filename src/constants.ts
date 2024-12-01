@@ -42,6 +42,8 @@ export const CACHE_KEY_SearchPatients = ["SearchPatients"];
 export const CACHE_KEY_CanceledMonthlyAppointments = [
   "CanceledMonthlyAppointments",
 ];
+export const CACHE_KEY_TvWaitingRoom = ["TvWaitingRoom"];
+
 export const CACHE_KEY_Url = "urllist";
 export const CACHE_KEY_StockExit = ["StockExit"];
 export const CACHE_KEY_StockEntry = ["StockEntry"];

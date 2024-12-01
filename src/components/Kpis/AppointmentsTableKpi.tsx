@@ -126,6 +126,7 @@ const AppointmentsTableKpi = () => {
             pending: "warning",
             current: "success",
           }[value];
+          //@ts-ignore
           return <Chip label={value} color={color} variant="outlined" />;
         },
       },

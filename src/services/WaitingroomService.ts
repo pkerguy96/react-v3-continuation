@@ -40,5 +40,8 @@ export const FetchPatientsWaitingRoom = new APIClient<patientCounteractions>(
 export const FetchWaitingList = new APIClient<PatientResponse>(
   "GetWaitingList"
 );
+export const tvWaitingListApiClient = new APIClient<PatientResponse>(
+  "tvwaitinglist"
+);
 export const clearPatientCounterApiClient =
   new APIClient<patientCounteractions>("resetPatientCounter");

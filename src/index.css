@@ -644,4 +644,59 @@ video {
   }
 }
 
+.bg {
+  animation: slide 3s ease-in-out infinite alternate;
+  background-image: linear-gradient(-60deg, #16ae9f 50%, #32aee4 50%);
+  bottom: 0;
+  left: -50%;
+  opacity: 0.5;
+  position: fixed;
+  right: -50%;
+  top: 0;
+  z-index: -1;
+}
 
+.bg2 {
+  animation-direction: alternate-reverse;
+  animation-duration: 4s;
+}
+
+.bg3 {
+  animation-duration: 5s;
+}
+
+.ui-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(1, 1fr);
+  scroll-snap-type: y mandatory;
+  grid-auto-rows: calc(20% - (40px / 5));
+  grid-auto-flow: row;
+  overflow-y: auto;
+}
+
+.ui-grid > * {
+  scroll-snap-align: center;
+}
+
+.ui-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.ui-grid-cursor {
+  height: calc((20% - (40px / 5)) + 10px);
+  width: calc(100% + 10px);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(-25%);
+  }
+  100% {
+    transform: translateX(25%);
+  }
+}
