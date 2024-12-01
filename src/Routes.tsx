@@ -55,6 +55,7 @@ import BloodTestAdd from "./pages/AddForms/BloodTestAdd";
 import BloodTestPage from "./pages/BloodTestPage";
 import BloodTestPrintableComponent from "./components/BloodTestPrintableComponent";
 import Lobby from "./components/Lobby";
+import Lobby2new from "./components/Lobby2new";
 
 const router = createBrowserRouter([
   {
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
       {
         path: "lobby",
         element: <Lobby />,
+      },
+      {
+        path: "newlobby",
+        element: <Lobby2new />,
       },
     ],
   },

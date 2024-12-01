@@ -7,6 +7,17 @@ import {
   Button,
   Autocomplete,
   Chip,
+  InputLabel,
+  ListSubheader,
+  MenuItem,
+  Select,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -17,7 +28,7 @@ import {
   FetchPatientsWaitingRoom,
   PatientNameWaitingRoom,
 } from "../../services/WaitingroomService";
-import { BoneDoctorBloodTests } from "../../constants";
+import { Analyses, BoneDoctorBloodTests } from "../../constants";
 import { bloodTestApiClient, BloodTestProps } from "../../services/BloodTest";
 import { Navigate, useNavigate } from "react-router";
 function $tempkate(opts: any) {
@@ -63,6 +74,7 @@ const BloodTestAdd = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [row, setRow] = useState<any>();
   const [call, setCall] = useState<any>(false);
+  const [analyse, setAnalyse] = useState([]);
 
   const addMutation = addGlobal({} as BloodTestProps, bloodTestApiClient);
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -83,12 +95,11 @@ const BloodTestAdd = () => {
   }, []);
 
   const onSubmit = (data: any) => {
-    console.log(data);
     const formdata = {
       patient_id: data.patient.id,
-      blood_test: data.blood_test,
+      blood_test: [...analyse].map((carry) => carry.analyse),
     };
-    console.log(formdata);
+
     try {
       addMutation.mutateAsync(formdata, {
         onSuccess: (data: any) => {
@@ -132,8 +143,7 @@ const BloodTestAdd = () => {
   }, [debouncedSearchQuery]);
   useEffect(() => {
     if (!row || !call) return;
-    Print("#page");
-    navigate("/bloodtest");
+    Print("#page", () => navigate("/bloodtest"));
   }, [row, call]);
   return (
     <Paper className="p-4">
@@ -210,18 +220,40 @@ const BloodTestAdd = () => {
                     className="bg-white"
                     multiple
                     id="tags-filled"
-                    options={BoneDoctorBloodTests.map((option) => option.title)}
+                    options={Object.keys(Analyses)
+                      .flatMap(
+                        (category) => Analyses[category].map((option) => option) // Map to all options in all categories
+                      )
+                      .filter(
+                        (value, index, self) =>
+                          index ===
+                          self.findIndex(
+                            (t) => t.analyse === value.analyse // Assuming 'id' is the unique property
+                          )
+                      )}
                     defaultValue={[]}
                     value={field.value || []}
-                    onChange={(event, newValue) => field.onChange(newValue)}
+                    onChange={(event, newValue) => {
+                      const vals = newValue.map((ana) => {
+                        return typeof ana === "string"
+                          ? {
+                              analyse: ana,
+                              price: "",
+                            }
+                          : ana;
+                      });
+                      field.onChange(vals);
+                      setAnalyse(vals);
+                    }} // Handle the change correctly
                     freeSolo
-                    renderTags={(value: readonly string[], getTagProps) =>
-                      value.map((option: string, index: number) => {
+                    getOptionLabel={(option) => option.analyse} // Show the 'analyse' field as the label
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => {
                         const { key, ...tagProps } = getTagProps({ index });
                         return (
                           <Chip
                             variant="outlined"
-                            label={option}
+                            label={option.analyse}
                             key={key}
                             {...tagProps}
                           />
@@ -232,7 +264,7 @@ const BloodTestAdd = () => {
                       <TextField
                         {...params}
                         variant="outlined"
-                        placeholder="Analyses "
+                        placeholder="Select Analyses"
                         sx={autocompleteStyles}
                       />
                     )}
@@ -240,16 +272,108 @@ const BloodTestAdd = () => {
                 )}
               />
             </FormControl>
+
+            {/*    <FormControl className="w-full md:flex-1">
+              <InputLabel id="demo-simple-analyse-helper-label">
+                Analyses
+              </InputLabel>
+              <Select
+                className="w-full"
+                multiple
+                id="tags-filled"
+                label="Analyses"
+                labelId="demo-simple-analyse-helper-label"
+                value={analyse}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setAnalyse(value);
+                }}
+                renderValue={(selected) => {
+                  return (
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip key={value.analyse} label={value.analyse} />
+                      ))}
+                    </Box>
+                  );
+                }}
+              >
+                {Object.keys(Analyses).reduce((acc, header) => {
+                  acc.push(
+                    <ListSubheader key={`header_${header}`}>
+                      {header}
+                    </ListSubheader>
+                  );
+                  acc.push(
+                    ...Analyses[header].map((print, index) => {
+                      return (
+                        <MenuItem
+                          key={`print_${header}_${index}`}
+                          value={print}
+                        >
+                          {print.analyse}
+                        </MenuItem>
+                      );
+                    })
+                  );
+                  return acc;
+                }, [])}
+              </Select>
+            </FormControl> */}
           </Box>
-          <Box className="flex mt-4">
-            <Button
-              type="submit"
-              variant="contained"
-              className="w-full md:w-max !px-10 !py-3 rounded-lg !ms-auto"
+          <Box className="w-full flex flex-col gap-2">
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              className="border border-gray-300"
             >
-              Enregistrer
-            </Button>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead className="bg-gray-200">
+                  <TableRow>
+                    <TableCell className="min-w-[400px]">Analyse</TableCell>
+                    <TableCell width="160px">Prix</TableCell>
+                    {/* <TableCell align="center" width="120px">
+                      Action
+                    </TableCell> */}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {analyse.map((carry, index) => (
+                    <TableRow key={index} className="border-t border-gray-300">
+                      <TableCell className="min-w-[400px]">
+                        <FormControl className="w-full" size="medium">
+                          {carry.analyse}
+                        </FormControl>
+                      </TableCell>
+                      <TableCell width="160px">
+                        <FormControl className="w-full md:flex-1" size="medium">
+                          {carry.prix} {carry.prix ? "MAD" : ""}
+                        </FormControl>
+                      </TableCell>
+                      {/* <TableCell align="center" width="120px">
+                        <IconButton
+                          variant="contained"
+                          color="error"
+                          onClick={() => handleRemoveRow(index)}
+                        >
+                          <DeleteOutlineOutlinedIcon />
+                        </IconButton>
+                      </TableCell> */}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
+        </Box>
+        <Box className="flex mt-4">
+          <Button
+            type="submit"
+            variant="contained"
+            className="w-full md:w-max !px-10 !py-3 rounded-lg !ms-auto"
+          >
+            Enregistrer
+          </Button>
         </Box>
       </Box>
       <div
@@ -268,10 +392,10 @@ const BloodTestAdd = () => {
           </div>
           <div className="w-full flex flex-col gap-4">
             <div className="w-full flex flex-col gap-2">
-              {rows.map((details: any, index: number) => (
+              {analyse.map((carry: any, index: number) => (
                 <div key={index}>
                   <h3 className="font-bold">
-                    {index + 1}- {details}
+                    {index + 1}- {carry.analyse}
                   </h3>
                 </div>
               ))}
