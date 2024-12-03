@@ -28,7 +28,9 @@ const ModalComponent = ({ open, onClose }: ModalComponentProps) => {
   const navigate = useNavigate();
   const logOut = async () => {
     try {
-      const response = await axiosInstance.get("/api/v1/Admin/logout");
+      const response = await axiosInstance.get(
+        "http://127.0.0.1:8000/Admin/logout"
+      );
       if (response.status === 200) {
         localStorage.clear();
         queryClient.clear();

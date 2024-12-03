@@ -349,7 +349,7 @@ const AhmedPageOptimized = ({ onNext }) => {
         <Box className="flex gap-4 flex-col">
           <Box className="flex justify-between">
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              Validation payment
+              Validation des consommables
             </Typography>
             <Button
               sx={{ borderRadius: 16 }}

@@ -157,15 +157,6 @@ const AppointmentConfirmation = ({
           <Box className=" mx-4 w-full flex gap-4 justify-center	 ">
             <Button
               variant="contained"
-              color="info"
-              size="small"
-              startIcon={<CheckCircleIcon />}
-            >
-              Approuver
-            </Button>
-
-            <Button
-              variant="contained"
               color="error"
               size="small"
               startIcon={<DeleteIcon />}

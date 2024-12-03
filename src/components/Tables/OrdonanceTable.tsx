@@ -51,15 +51,25 @@ const OrdonanceTable = () => {
       },
     },
     {
+      name: "patient_deleted_at",
+      label: "#",
+      options: {
+        display: false,
+      },
+    },
+    {
       name: "Actions",
       label: "Actions",
       options: {
         filter: true,
         sort: true,
-        customBodyRender: () => {
+        customBodyRender: (value, tableMeta) => {
+          const patientDeletedAt = tableMeta.rowData[4];
+          console.log(patientDeletedAt);
+
           return (
             <>
-              {can(["update_ordonance", "doctor"]) && (
+              {can(["update_ordonance", "doctor"]) && !patientDeletedAt && (
                 <button
                   className="btn-ordonance-edit text-gray-950 hover:text-blue-700 cursor-pointer"
                   title="Modifier"
