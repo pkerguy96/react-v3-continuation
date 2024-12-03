@@ -10,6 +10,7 @@ import BloodTest from "./BloodTest";
 
 import VisiteValidation from "./VisiteValidation";
 import NursePatientXrays from "../NursePatientXrays";
+import AhmedPageOptimized from "./AhmedPageOptimized";
 
 const OperationParentPage = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -49,7 +50,7 @@ const OperationParentPage = () => {
         <AppointmentStepPage onNext={() => handleStepChange(5)} />
       )}
       {activeStep === 5 && (
-        <VisiteValidation
+        <AhmedPageOptimized
           onNext={() => {
             handleStepChange(6);
           }}

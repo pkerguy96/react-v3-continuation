@@ -58,6 +58,8 @@ const RevenueKpi = () => {
       },
     ],
   };
+  console.log("revenue kpi");
+
   return <Bar options={options} data={data} />;
 };
 

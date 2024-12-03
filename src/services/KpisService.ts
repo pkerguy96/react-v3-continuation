@@ -74,6 +74,9 @@ export const TotalPatientKpiClient = new APIClient<TotalPatients>(
 export const PatientsAgeGroupKpiClient = new APIClient<AgeData>(
   "/calculateAgePercentage"
 );
+export const PatientsReferralClient = new APIClient<AgeData>(
+  "/countPatientsByReferral"
+);
 export const TotalcachierAmount = new APIClient<any>("/retrieveFromCashier");
 export const CanceledAppointmentsKpiClient =
   new APIClient<CanceledappointmentsCount>("/getCanceledAppointments");

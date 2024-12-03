@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Divider,
   Paper,
   Table,
@@ -8,9 +9,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
 } from "@mui/material";
 import LoadingSpinner from "./LoadingSpinner";
 import { useNavigate } from "react-router";
+import HealthAndSafetyOutlinedIcon from "@mui/icons-material/HealthAndSafetyOutlined";
 
 const PatientsdetailsComponent = ({
   info,
@@ -21,6 +24,7 @@ const PatientsdetailsComponent = ({
 }) => {
   const navigate = useNavigate();
   if (isLoading) return <LoadingSpinner />;
+  console.log(info);
 
   const handleRowClick = (id: number) => {
     navigate(`/OrdonanceDetails/${id}`);
@@ -74,8 +78,20 @@ const PatientsdetailsComponent = ({
                     </span>
                   ))
                 ) : (
-                  <p className="text-gray-500">Aucune référence disponible.</p>
+                  <p className="text-gray-500 text-center mx-auto">
+                    Aucune référence disponible.
+                  </p>
                 )}
+              </Box>
+              <Box className="flex justify-center items-center mt-4 ">
+                <Tooltip title="Opérer" arrow>
+                  <Button
+                    className="text-4xl"
+                    onClick={() => navigate(`/Patients/Xray?id=${info?.id}`)}
+                  >
+                    <HealthAndSafetyOutlinedIcon fontSize="large" />
+                  </Button>
+                </Tooltip>
               </Box>
             </Box>
           </Box>
@@ -149,7 +165,53 @@ const PatientsdetailsComponent = ({
           </Box>
         </Box>
       </Box>
+      <Box className="flex flex-col lg:flex-row gap-4">
+        {/* Allergies Section */}
+        <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4">
+          <Box className="w-full flex  justify-center">
+            <p className="text-md font-mono font-bold">Allergies</p>
+          </Box>
+          <Box className="w-full flex flex-wrap gap-2">
+            {info.allergy && info.allergy.length > 0 ? (
+              info.allergy.map((item, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 rounded-full text-gray-700 bg-[#eff1f7] text-sm"
+                >
+                  {item}
+                </span>
+              ))
+            ) : (
+              <p className="text-gray-500 text-center mx-auto">
+                Aucune allergie disponible.
+              </p>
+            )}
+          </Box>
+        </Box>
 
+        {/* Diseases Section */}
+        <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4">
+          <Box className="w-full flex  justify-center">
+            <p className="text-md font-mono font-bold ">Maladies</p>
+          </Box>
+          <Box className="w-full flex flex-wrap gap-2">
+            {info.disease && info.disease.length > 0 ? (
+              info.disease.map((item, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 rounded-full text-gray-700 bg-[#eff1f7] text-sm"
+                >
+                  {item}
+                </span>
+              ))
+            ) : (
+              <p className="text-gray-500 text-center mx-auto">
+                Aucune maladie disponible.
+              </p>
+            )}
+          </Box>
+        </Box>
+      </Box>
       <div className=" gap-4 items-start">
         <div className="   bg-[#f5f5f5] text-white text-center  rounded-lg ">
           <h2 className="text-xl text-black font-mono font-bold">Ordonances</h2>
@@ -195,50 +257,6 @@ const PatientsdetailsComponent = ({
           </Paper>
         </div>
       </div>
-
-      <Box className="flex flex-col lg:flex-row gap-4">
-        {/* Allergies Section */}
-        <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4">
-          <Box className="w-full flex  justify-center">
-            <p className="text-md font-mono font-bold">Allergies</p>
-          </Box>
-          <Box className="w-full flex flex-wrap gap-2">
-            {info.allergy && info.allergy.length > 0 ? (
-              info.allergy.map((item, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 rounded-full text-gray-700 bg-[#eff1f7] text-sm"
-                >
-                  {item}
-                </span>
-              ))
-            ) : (
-              <p className="text-gray-500">Aucune allergie disponible.</p>
-            )}
-          </Box>
-        </Box>
-
-        {/* Diseases Section */}
-        <Box className="w-full lg:flex-1 p-4 rounded-lg bg-[#fff] flex flex-col gap-4">
-          <Box className="w-full flex  justify-center">
-            <p className="text-md font-mono font-bold ">Maladies</p>
-          </Box>
-          <Box className="w-full flex flex-wrap gap-2">
-            {info.disease && info.disease.length > 0 ? (
-              info.disease.map((item, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 rounded-full text-gray-700 bg-[#eff1f7] text-sm"
-                >
-                  {item}
-                </span>
-              ))
-            ) : (
-              <p className="text-gray-500">Aucune maladie disponible.</p>
-            )}
-          </Box>
-        </Box>
-      </Box>
     </Box>
   );
 };

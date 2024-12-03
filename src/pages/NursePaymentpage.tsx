@@ -158,9 +158,15 @@ const NursePaymentpage = () => {
           className="w-full"
         >
           <Box className="flex flex-col gap-6 p-6">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight text-red-500">
-              Détails du paiement des patients
-            </h3>
+            <Box className="flex flex-col gap-6 md:justify-between md:flex-row">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight text-red-500">
+                Détails du paiement des patients
+              </h3>
+              <h3 className="text-2xl font-semibold leading-none tracking-tight text-gray-500">
+                {data?.patient_name}
+              </h3>
+            </Box>
+
             <Box className="flex flex-col gap-10">
               <Box className="flex flex-col gap-2">
                 <Box className="flex items-center justify-between">

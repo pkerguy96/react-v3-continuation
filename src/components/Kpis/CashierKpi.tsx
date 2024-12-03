@@ -37,6 +37,8 @@ const CashierKpi = () => {
       },
     ],
   };
+  console.log("chashier kpi");
+
   return (
     <Box className="flex flex-col !w-full h-full">
       <Box className="!w-full flex flex-row justify-between p-6">

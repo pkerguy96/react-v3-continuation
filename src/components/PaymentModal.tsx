@@ -288,7 +288,12 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                       defaultValue=""
                       name="amount_paid"
                       control={control}
-                      render={({ field }) => (
+                      rules={{
+                        required: "Le montant est requis",
+                        validate: (value) =>
+                          value > 0 || "Le montant doit être un nombre positif",
+                      }}
+                      render={({ field, fieldState: { error } }) => (
                         <TextField
                           className="flex-1"
                           id="amount_paid"
@@ -296,7 +301,9 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                           variant="outlined"
                           size="small"
                           type="number"
-                          placeholder="Enter Montant" // Add a placeholder
+                          placeholder="Enter Montant"
+                          error={!!error}
+                          helperText={error ? error.message : ""}
                           {...field}
                         />
                       )}

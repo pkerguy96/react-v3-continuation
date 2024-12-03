@@ -82,7 +82,7 @@ const AppointmentsCalendar = () => {
 
     openAppointmentConfirmationModal(data);
   };
-
+  /* 
   const handleDateClick = (info: DateClickArg) => {
     const dateTimeRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
 
@@ -91,6 +91,27 @@ const AppointmentsCalendar = () => {
     const formattedDateStr = dateTimeRegex.test(info.dateStr)
       ? moment(selecteddate).format("YYYY-MM-DD HH:mm:ss")
       : moment(selecteddate).format("YYYY-MM-DDTHH:mm:ss");
+    setSelectedDateStr(formattedDateStr);
+  }; */
+  const handleDateClick = (info: DateClickArg) => {
+    const dateTimeRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+
+    setOpenModal(true);
+
+    const selectedDate = moment(info.dateStr); // Use moment for parsing and manipulation
+    const currentHour = selectedDate.hour(); // Get the current hour
+
+    // Adjust the hour if it's outside the range 8 AM to 6 PM
+    if (currentHour < 8) {
+      selectedDate.hour(8).minute(0).second(0); // Set to 8 AM
+    } else if (currentHour > 18) {
+      selectedDate.hour(18).minute(0).second(0); // Set to 6 PM
+    }
+
+    const formattedDateStr = dateTimeRegex.test(info.dateStr)
+      ? selectedDate.format("YYYY-MM-DD HH:mm:ss")
+      : selectedDate.format("YYYY-MM-DDTHH:mm:ss");
+
     setSelectedDateStr(formattedDateStr);
   };
 
@@ -108,8 +129,9 @@ const AppointmentsCalendar = () => {
         events={formattedEvents} // Use formatted events with start and end time
         eventClick={handleEventClick}
         dateClick={handleDateClick}
-        slotDuration="00:30:00"
-        slotMinTime="08:00:00"
+        slotDuration="00:01:00"
+        slotMinTime="08:00:00" // Start time is 8:00 AM
+        slotMaxTime="19:00:00"
         allDaySlot={false}
         locales={[frLocale]}
         validRange={{
@@ -121,11 +143,15 @@ const AppointmentsCalendar = () => {
         open={openModalConfirmation}
         onClose={handleCloseModal}
       />
-      <AppointmentModal
-        dateTime={selectedDateStr}
-        open={openModal}
-        onClose={handleCloseModal}
-      />
+      {openModal ? (
+        <AppointmentModal
+          dateTime={selectedDateStr}
+          open={openModal}
+          onClose={handleCloseModal}
+        />
+      ) : (
+        ""
+      )}
     </Paper>
   );
 };

@@ -43,8 +43,8 @@ const Lobby2new = () => {
       <div className="bg bg2"></div>
       <div className="bg bg3"></div>
       <main className="flex items-center justify-center w-full h-[100dvh] p-4">
-        {data && data.length ? (
-          <section className="h-[90dvh] w-full max-w-[200px] relative">
+        {data && data.length && data.some((p) => p.status !== "completed") ? (
+          <section className="h-[90dvh] w-full max-w-[300px] relative">
             <div className="ui-grid-cursor rounded-2xl bg-green-500 bg-opacity-30"></div>
             <ul
               ref={waiting}
@@ -60,7 +60,7 @@ const Lobby2new = () => {
                     key={index}
                     className="flex flex-wrap bg-white justify-center rounded-2xl shadow-xl items-center p-4 px-10 gap-8"
                   >
-                    <h1 className="text-gray-900 font-black text-5xl w-max">
+                    <h1 className="text-gray-900 font-black text-[8rem] w-max leading-[0]">
                       {index + 1}
                     </h1>
                   </li>

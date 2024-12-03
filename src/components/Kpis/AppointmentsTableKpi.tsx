@@ -1,4 +1,3 @@
-import * as React from "react";
 import { CACHE_KEY_WAITINGLIST } from "../../constants";
 import LoadingSpinner from "../LoadingSpinner";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -17,11 +16,12 @@ import DataTable from "../DataTable";
 import { useQueryClient } from "@tanstack/react-query";
 import useUserRoles from "../../zustand/UseRoles";
 import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
+import { useEffect, useState } from "react";
 const AppointmentsTableKpi = () => {
   const { showSnackbar } = useSnackbarStore();
   const queryClient = useQueryClient();
   const { can } = useUserRoles();
-
+  const [waiting, setWaiting] = useState([]);
   const dataHook = (page: number, searchQuery: string, rowsPerPage: number) =>
     getGlobalv2(
       {},
@@ -31,39 +31,11 @@ const AppointmentsTableKpi = () => {
       5,
       searchQuery,
 
-      undefined
+      {
+        refetchInterval: 5000, // Fetch data every 5 seconds
+      }
     );
   const navigate = useNavigate();
-  const [lastUpdateTime, setLastUpdateTime] = React.useState(Date.now()); // Store last update time
-
-  // Function to calculate waiting time
-  const calculateWaitingTime = (entryTime: string) => {
-    const now = moment(); // Current time
-    const entry = moment(entryTime); // Entry time
-
-    const duration = moment.duration(now.diff(entry));
-
-    // Format the duration
-    const hours = Math.floor(duration.asHours());
-    const minutes = Math.floor(duration.minutes());
-    return `${hours}h ${minutes}min`;
-  };
-
-  // Function to update the waiting times using requestAnimationFrame
-  const updateWaitingTimes = React.useCallback(() => {
-    setLastUpdateTime(Date.now()); // Trigger re-render with the new time
-
-    // Call requestAnimationFrame again to continue the loop
-    requestAnimationFrame(updateWaitingTimes);
-  }, []);
-
-  // Start the requestAnimationFrame loop when the component mounts
-  React.useEffect(() => {
-    const animationId = requestAnimationFrame(updateWaitingTimes);
-
-    // Cleanup function to stop the loop when the component unmounts
-    return () => cancelAnimationFrame(animationId);
-  }, [updateWaitingTimes]);
 
   const columns = [
     {
@@ -82,6 +54,13 @@ const AppointmentsTableKpi = () => {
       },
     },
     {
+      name: "count",
+      label: "#d",
+      options: {
+        display: false,
+      },
+    },
+    {
       name: "order",
       label: "Ordre",
       options: {
@@ -89,7 +68,7 @@ const AppointmentsTableKpi = () => {
         sort: false,
         customBodyRender: (_value, tableMeta) => {
           // Generate order based on row index
-          return tableMeta.rowIndex + 1;
+          return tableMeta.rowData[2] + tableMeta.rowIndex + 1;
         },
       },
     },
@@ -103,15 +82,11 @@ const AppointmentsTableKpi = () => {
     },
 
     {
-      name: "entry_time",
+      name: "waiting_time",
       label: "Temps d'attente",
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value) => {
-          // Calculate and display waiting time based on current time
-          return calculateWaitingTime(value);
-        },
       },
     },
     {

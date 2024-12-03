@@ -99,7 +99,7 @@ export const MainListItems = () => {
             <ListItemIcon>
               <BloodtypeOutlinedIcon color="primary" />
             </ListItemIcon>
-            <ListItemText primary="Analyse de sang" />
+            <ListItemText primary="Analyse" />
           </ListItemButton>
         </Link>
       )}

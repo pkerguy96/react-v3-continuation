@@ -14,6 +14,8 @@ const TotalAppointmentsKpi = ({ className }: { className?: string }) => {
     AppointmentsKpiClient,
     undefined
   );
+  console.log("total appointments");
+
   if (isLoading) return <LoadingSpinner />;
   return (
     <div className={`p-6  flex flex-col flex-1 gap-1 ${className}`}>

@@ -122,11 +122,6 @@ export default function Dashboard(Props: React.PropsWithChildren) {
           </Typography>
           <WaitingRoomMenu />
 
-          {/*   <IconButton color="inherit">
-            <Badge badgeContent={0} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton> */}
           <NotificationComponent />
 
           <DashboardMenu />
@@ -140,7 +135,7 @@ export default function Dashboard(Props: React.PropsWithChildren) {
       >
         <Toolbar className="relative flex items-center justify-end px-1">
           {/* Logo - Only visible when the drawer is open */}
-          {open && (
+          {/*  {open && (
             <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden w-28 h-14">
               <img
                 src="/centre-jadid.jpeg"
@@ -148,7 +143,7 @@ export default function Dashboard(Props: React.PropsWithChildren) {
                 className="w-full h-full object-cover"
               />
             </Box>
-          )}
+          )} */}
 
           {/* IconButton - Aligned to the right */}
           <IconButton className="z-10" onClick={() => setOpen((prev) => !prev)}>

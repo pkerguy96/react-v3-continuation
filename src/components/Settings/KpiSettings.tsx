@@ -74,6 +74,7 @@ const KpiSettings = () => {
           <MenuItem value={"year"}>Année</MenuItem>
           <MenuItem value={"month"}>Mois</MenuItem>
           <MenuItem value={"week"}>Semaine</MenuItem>
+          <MenuItem value={"day"}>Jour</MenuItem>
         </Select>
       </FormControl>
       <Box className="flex mt-4">

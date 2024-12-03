@@ -2,11 +2,6 @@ import {
   Paper,
   Box,
   Divider,
-  IconButton,
-  TextField,
-  Button,
-  Typography,
-  FormControl,
   Table,
   TableBody,
   TableCell,
@@ -14,9 +9,6 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import React from "react";
-import { Controller } from "react-hook-form";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { useSearchParams } from "react-router-dom";
 import getGlobalById from "../hooks/getGlobalById";
 import {
@@ -37,9 +29,7 @@ const NursePatientXrays = () => {
     parseInt(targetId)
   );
   if (isLoading) return <LoadingSpinner />;
-  console.log("====================================");
-  console.log(data);
-  console.log("====================================");
+
   return (
     <Paper className="p-4">
       <Box className="w-full flex flex-col gap-2">
@@ -57,7 +47,7 @@ const NursePatientXrays = () => {
           <Box className="flex flex-col gap-6 p-6">
             <h3 className=" flex justify-between text-2xl font-semibold leading-none tracking-tight text-blue-500 gap-2 items-center">
               Radiographie demandée :
-              <span className="text-gray-500 ">Aymen elkor</span>
+              <span className="text-gray-500 ">{data[0].patient_name}</span>
             </h3>
 
             <TableContainer>
@@ -90,7 +80,7 @@ const NursePatientXrays = () => {
                 <TableBody>
                   {data.map((field, index) => (
                     <TableRow
-                      key={field.id}
+                      key={index}
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
                       <TableCell component="th" scope="row">

@@ -2,25 +2,50 @@ import DataTable from "../DataTable";
 import { useNavigate } from "react-router";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { CACHE_KEY_PATIENTS } from "../../constants";
+import { CACHE_KEY_PATIENTS, CACHE_KEY_WAITINGLIST } from "../../constants";
 import patientAPIClient from "../../services/PatientService";
 import { useQueryClient } from "@tanstack/react-query";
 import { confirmDialog } from "../ConfirmDialog";
 import deleteItem from "../../hooks/deleteItem";
 import { useSnackbarStore } from "../../zustand/useSnackbarStore";
-
+import AccessAlarmOutlinedIcon from "@mui/icons-material/AccessAlarmOutlined";
 import getGlobalv2 from "../../hooks/getGlobalv2";
-import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
+
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import useUserRoles from "../../zustand/UseRoles";
 import HealthAndSafetyOutlinedIcon from "@mui/icons-material/HealthAndSafetyOutlined";
+import addGlobal from "../../hooks/addGlobal";
+import {
+  incrementbyone,
+  incrementPatientApiClient,
+} from "../../services/WaitingroomService";
+import { AxiosError } from "axios";
 const PatientsTable = () => {
   const { showSnackbar } = useSnackbarStore();
   const { can } = useUserRoles();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const AddPatient = addGlobal({} as incrementbyone, incrementPatientApiClient);
 
+  const addWaitingRoom = async (id) => {
+    await AddPatient.mutateAsync(
+      { patient_id: id },
+      {
+        onSuccess(data: any) {
+          showSnackbar(data?.message, "success");
+          queryClient.invalidateQueries(CACHE_KEY_WAITINGLIST);
+        },
+        onError(error: any) {
+          const message =
+            error instanceof AxiosError
+              ? error.response?.data?.message
+              : error.message;
+          showSnackbar(message, "error");
+        },
+      }
+    );
+  };
   const columns = [
     { name: "id", label: "Id", options: { display: false } },
     { name: "nom", label: "Nom", options: { filter: true, sort: true } },
@@ -53,32 +78,22 @@ const PatientsTable = () => {
           const patientId = tableMeta.rowData[0]; // Assuming the first column is the ID
 
           return (
-            <Box style={{ width: "90px" }}>
-              {can(["detail_patient", "doctor"]) && (
-                <button
-                  className="btn-patient-info text-gray-950 hover:text-blue-700 cursor-pointer"
-                  onClick={() =>
-                    /* navigate(`/Patients/Details/${patientId}`) */ navigate(
-                      `Xray?id=${patientId}`
-                    )
-                  }
-                >
+            <Box style={{ width: "120px" }}>
+              <button className="btn-patient-waiting text-gray-950 hover:text-blue-700 cursor-pointer">
+                <AccessAlarmOutlinedIcon color="primary" />
+              </button>
+              {can(["doctor"]) && (
+                <button className="btn-patient-info text-gray-950 hover:text-blue-700 cursor-pointer">
                   <HealthAndSafetyOutlinedIcon />
                 </button>
               )}
               {can(["update_patient", "doctor"]) && (
-                <button
-                  className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer"
-                  onClick={() => navigate(`/AddPatient/${patientId}`)}
-                >
+                <button className="btn-patient-edit text-gray-950 hover:text-blue-700 cursor-pointer">
                   <EditOutlinedIcon />
                 </button>
               )}
               {can(["delete_patient", "doctor"]) && (
-                <button
-                  className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer"
-                  onClick={() => handleDeletePatient(patientId)}
-                >
+                <button className="btn-patient-delete text-gray-950 hover:text-blue-700 cursor-pointer">
                   <DeleteOutlineIcon color="error" />
                 </button>
               )}
@@ -139,7 +154,7 @@ const PatientsTable = () => {
           options={{
             searchPlaceholder: "Rechercher un patient",
             customToolbar: () => {
-              return can(["delete_patient", "doctor"]) ? (
+              return can(["insert_patient", "doctor"]) ? (
                 <Tooltip title="Nouveau patient">
                   <IconButton onClick={() => navigate("/AddPatient")}>
                     <AddIcon />
@@ -165,6 +180,10 @@ const PatientsTable = () => {
               // Check if the click was on the "Delete" button
               if (e.target.closest(".btn-patient-delete")) {
                 handleDeletePatient(patientId);
+                return;
+              }
+              if (e.target.closest(".btn-patient-waiting")) {
+                addWaitingRoom(patientId);
                 return;
               }
               const formatedDate = s[3].split("-");

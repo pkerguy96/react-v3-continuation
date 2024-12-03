@@ -17,6 +17,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import { Patient } from "./AddPatientForm";
 import { redirect, useLocation, useNavigate, useParams } from "react-router";
 import { AxiosError } from "axios";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -268,6 +269,9 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
     setSelectedPatient(newValue);
   }, []);
   const FormattedDate = new Date().toISOString().split("T")[0].split("-");
+  const removeOrdonance = (id: any) => {
+    setDrugs((old) => old.filter((e) => e.id !== id));
+  };
   useEffect(() => {
     const fetchPatients = async () => {
       if (!debouncedSearchQuery) {
@@ -493,26 +497,28 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
             </Typography>
           )}
           <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
-            <label htmlFor="nom" className="w-full md:w-[160px]">
+            {/*     <label htmlFor="nom" className="w-full md:w-[160px]">
               Sélectionné:
-            </label>
+            </label> */}
 
-            <TableContainer className="w-full md:flex-1 flex-wrap">
-              <Table sx={{ minWidth: 480 }} aria-label="simple table">
-                <TableHead>
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              className="border border-gray-300"
+            >
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead className="bg-gray-200">
                   <TableRow>
                     <TableCell>Nom du médicament</TableCell>
                     <TableCell>Type</TableCell>
                     <TableCell>Prix</TableCell>
                     <TableCell>Note</TableCell>
+                    <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {drugs.map((row, index) => (
-                    <TableRow
-                      key={index}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
+                    <TableRow key={index} className="border-t border-gray-300">
                       <TableCell component="th" scope="row">
                         {row.medicine_name}
                       </TableCell>
@@ -530,6 +536,15 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
                           label="Note"
                         />
                       </TableCell>
+                      <TableCell>
+                        <Button onClick={() => removeOrdonance(row.id)}>
+                          <DeleteOutlineIcon
+                            color="error"
+                            className="pointer-events-none"
+                            fill="currentColor"
+                          />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -541,6 +556,7 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
               <Button
                 className="w-full md:w-max !px-10 !py-3 rounded-lg "
                 variant="outlined"
+                type="button"
                 onClick={() => {
                   onNext();
                 }}

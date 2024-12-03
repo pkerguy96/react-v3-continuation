@@ -36,6 +36,7 @@ import {
   PermissionListProduct,
   PermissionListSupplier,
   reoccuringoperations,
+  settingsPermissions,
 } from "../../constants";
 import LoadingSpinner from "../LoadingSpinner";
 import addGlobal from "../../hooks/addGlobal";
@@ -89,6 +90,7 @@ const PermissionsSettings = () => {
             PermissionListProduct,
             PermissionListHistoriqueEnter,
             PermissionListHistoriqueSortie,
+            settingsPermissions,
           ].forEach((permissionArray) => {
             permissionArray.forEach((permission) => {
               setValue(permission.name, false);
@@ -113,7 +115,11 @@ const PermissionsSettings = () => {
 
   const { showSnackbar } = useSnackbarStore();
   if (isLoading || isLoading2) return <LoadingSpinner />;
-
+  const handleGroupToggle = (permissions, isChecked) => {
+    permissions.forEach((permission) => {
+      setValue(permission.name, isChecked);
+    });
+  };
   const onSubmit = async (data: any) => {
     const { nurseid, rolename, ...permissions } = data;
     const form: any = {
@@ -218,7 +224,19 @@ const PermissionsSettings = () => {
         <Box className="w-full grid grid-rows-1 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">Patient:</label>
-            {PermissionListpatient.map((item, index) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(PermissionListpatient, e.target.checked)
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {PermissionListpatient.filter(
+              (permi) => !permi.display.startsWith("Accès complet")
+            ).map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}
@@ -235,7 +253,19 @@ const PermissionsSettings = () => {
           </Box>
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">Document:</label>
-            {PermissionListdocument.map((item, index) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(PermissionListdocument, e.target.checked)
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {PermissionListdocument.filter(
+              (permi) => !permi.display.startsWith("Accès complet")
+            ).map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}
@@ -252,7 +282,19 @@ const PermissionsSettings = () => {
           </Box>
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">Ordonnance:</label>
-            {PermissionListordonance.map((item, index) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(PermissionListordonance, e.target.checked)
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {PermissionListordonance.filter(
+              (permi) => !permi.display.startsWith("Accès complet")
+            ).map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}
@@ -269,7 +311,19 @@ const PermissionsSettings = () => {
           </Box>
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">Dette:</label>
-            {PermissionListdebt.map((item, index) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(PermissionListdebt, e.target.checked)
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {PermissionListdebt.filter(
+              (permi) => !permi.display.startsWith("Accès complet")
+            ).map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}
@@ -286,7 +340,22 @@ const PermissionsSettings = () => {
           </Box>
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">Dette extérieure:</label>
-            {PermissionExternalListExternalDebt.map((item, index) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(
+                      PermissionExternalListExternalDebt,
+                      e.target.checked
+                    )
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {PermissionExternalListExternalDebt.filter(
+              (permi) => !permi.display.startsWith("Accès complet")
+            ).map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}
@@ -303,7 +372,19 @@ const PermissionsSettings = () => {
           </Box>
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">Créance:</label>
-            {PermissionListcreance.map((item, index) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(PermissionListcreance, e.target.checked)
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {PermissionListcreance.filter(
+              (permi) => !permi.display.startsWith("Accès complet")
+            ).map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}
@@ -320,7 +401,19 @@ const PermissionsSettings = () => {
           </Box>
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">Fournisseur:</label>
-            {PermissionListSupplier.map((item, index) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(PermissionListSupplier, e.target.checked)
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {PermissionListSupplier.filter(
+              (permi) => !permi.display.startsWith("Accès complet")
+            ).map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}
@@ -337,7 +430,19 @@ const PermissionsSettings = () => {
           </Box>
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">Produit:</label>
-            {PermissionListProduct.map((item, index) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(PermissionListProduct, e.target.checked)
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {PermissionListProduct.filter(
+              (permi) => !permi.display.startsWith("Accès complet")
+            ).map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}
@@ -355,7 +460,22 @@ const PermissionsSettings = () => {
 
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">historique d'entrée:</label>
-            {PermissionListHistoriqueEnter.map((item, index) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(
+                      PermissionListHistoriqueEnter,
+                      e.target.checked
+                    )
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {PermissionListHistoriqueEnter.filter(
+              (permi) => !permi.display.startsWith("Accès complet")
+            ).map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}
@@ -372,7 +492,22 @@ const PermissionsSettings = () => {
           </Box>
           <Box className="flex flex-col flex-wrap">
             <label htmlFor="nom">historique d'sortie:</label>
-            {PermissionListHistoriqueSortie.map((item, index) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(
+                      PermissionListHistoriqueSortie,
+                      e.target.checked
+                    )
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {PermissionListHistoriqueSortie.filter(
+              (permi) => !permi.display.startsWith("Accès complet")
+            ).map((item, index) => (
               <Controller
                 key={index}
                 name={item.name}
@@ -388,21 +523,62 @@ const PermissionsSettings = () => {
             ))}
           </Box>
           <Box className="flex flex-col flex-wrap">
-            <label htmlFor="nom">historique d'sortie:</label>
-            {reoccuringoperations.map((item, index) => (
-              <Controller
-                key={index}
-                name={item.name}
-                control={control}
-                defaultValue={false}
-                render={({ field }) => (
-                  <FormControlLabel
-                    control={<Checkbox {...field} checked={field.value} />}
-                    label={item.display}
-                  />
-                )}
-              />
-            ))}
+            <label htmlFor="nom">Opérations inachevées:</label>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(reoccuringoperations, e.target.checked)
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {reoccuringoperations
+              .filter((permi) => !permi.display.startsWith("Accès complet"))
+              .map((item, index) => (
+                <Controller
+                  key={index}
+                  name={item.name}
+                  control={control}
+                  defaultValue={false}
+                  render={({ field }) => (
+                    <FormControlLabel
+                      control={<Checkbox {...field} checked={field.value} />}
+                      label={item.display}
+                    />
+                  )}
+                />
+              ))}
+          </Box>
+          <Box className="flex flex-col flex-wrap">
+            <label htmlFor="nom">paramètres:</label>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) =>
+                    handleGroupToggle(settingsPermissions, e.target.checked)
+                  }
+                />
+              }
+              label="Accès complet"
+            />
+            {settingsPermissions
+              .filter((permi) => !permi.display.startsWith("Accès complet"))
+              .map((item, index) => (
+                <Controller
+                  key={index}
+                  name={item.name}
+                  control={control}
+                  defaultValue={false}
+                  render={({ field }) => (
+                    <FormControlLabel
+                      control={<Checkbox {...field} checked={field.value} />}
+                      label={item.display}
+                    />
+                  )}
+                />
+              ))}
           </Box>
         </Box>
       </Box>

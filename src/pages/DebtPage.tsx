@@ -49,7 +49,7 @@ const DebtPage = () => {
     PatientsDebtKpiClient,
     undefined
   );
-  const hasAccess = can(["access_debt", "doctor"]);
+  const hasAccess = can(["access_creance", "doctor"]);
 
   if (!hasAccess) {
     return (

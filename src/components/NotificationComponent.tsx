@@ -35,12 +35,13 @@ const NotificationComponent = () => {
       refetchInterval: 10000,
     }
   );
-  if (isLoading) return <NotificationsIcon />;
 
   const unreadCount =
     data?.filter((notification: NotificationProps) => !notification.is_read)
       .length || 0;
   const markAsRead = async (id: string, target_id: string, type: string) => {
+    console.log(id);
+
     await getUrls(id, markAsReadApiClient);
     queryClient.invalidateQueries(CACHE_KEY_Notification);
     if (type === "payment") {
@@ -51,6 +52,7 @@ const NotificationComponent = () => {
       return;
     }
   };
+  if (isLoading) return <NotificationsIcon />;
   return (
     <>
       <IconButton
@@ -142,15 +144,6 @@ const NotificationComponent = () => {
               );
             })
           )}
-          {/*   <Box className="flex flex-wrap gap-2 items-center border-t border-gray-200 p-4">
-            <Box className="w-0 flex-1">
-              <Typography>Some Notification</Typography>
-              <Typography className="text-xs text-gray-500">
-                time here
-              </Typography>
-            </Box>
-            <span className="block w-2 h-2 rounded-full bg-blue-500"></span>
-          </Box> */}
         </Box>
       </Menu>
     </>

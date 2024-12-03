@@ -20,6 +20,7 @@ import {
   CanceledAppointments,
   CanceledMonthlyAppointmentsKpiClient,
 } from "../services/KpisService";
+import ReferralPatient from "../components/Kpis/ReferralPatient";
 
 const DashboardKpiPage = () => {
   const navigate = useNavigate();
@@ -61,6 +62,8 @@ const DashboardKpiPage = () => {
       },
     ],
   };
+  console.log("hi");
+
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-rows-1 grid-cols-1 lg:grid-cols-12 gap-6">
@@ -86,23 +89,18 @@ const DashboardKpiPage = () => {
         </Box>
       </Box>
       <div className="grid grid-rows-1 grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="flex flex-col gap-6 lg:col-span-9">
-          <Box className="!w-full shadow-md bg-[#eff0f1] text-gray-950 flex flex-col">
-            <h1 className="text-xl font-semibold p-6">Graphique des revenus</h1>
-            <RevenueKpi />
-          </Box>
-        </div>
-        <div className="flex flex-col gap-6 lg:col-span-3">
-          <Box className="!w-full shadow-md bg-[#eff0f1] text-gray-950 flex flex-col">
-            <h1 className="text-xl font-semibold p-6">
-              Groupe d’âge des patients
-            </h1>
-            <PatientAgeGroupKpi />
-          </Box>
-          <Box className="w-full shadow-md bg-[#eff0f1] text-gray-950 flex flex-col">
-            <TotalpatientsKpi />
-          </Box>
-        </div>
+        <Box className="!w-full shadow-md bg-[#eff0f1] lg:col-span-12 text-gray-950 flex flex-col p-6 gap-3">
+          <h1 className="text-xl font-semibold">Graphique des revenus</h1>
+          <RevenueKpi />
+        </Box>
+        <Box className="!w-full shadow-md bg-[#eff0f1] lg:col-span-4 text-gray-950 flex flex-col p-6 gap-3">
+          <h1 className="text-xl font-semibold">Groupe d’âge des patients</h1>
+          <PatientAgeGroupKpi />
+        </Box>
+        <Box className="w-full shadow-md bg-[#eff0f1] lg:col-span-4 text-gray-950 flex flex-col p-6 gap-3">
+          <TotalpatientsKpi />
+          <ReferralPatient />
+        </Box>
       </div>
 
       <Box className="flex w-full "></Box>

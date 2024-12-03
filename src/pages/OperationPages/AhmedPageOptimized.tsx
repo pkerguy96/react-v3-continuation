@@ -54,8 +54,13 @@ interface Consomables {
   consomable: string;
   qte: number;
 }
-const VisiteValidation = ({ onNext }) => {
-  const [isInitialized, setIsInitialized] = useState(false);
+
+const AhmedPageOptimized = ({ onNext }) => {
+  const [operations, setOperations] = useState([]);
+  const [consomables, setConsomables] = useState([]);
+
+  const navigate = useNavigate();
+  const { showSnackbar } = useSnackbarStore();
   const { clearPatientOperation } = useOperationStore();
   const queryClient = useQueryClient();
   const location = useLocation();
@@ -63,19 +68,24 @@ const VisiteValidation = ({ onNext }) => {
   const operation_id = queryParams.get("operation_id");
   const patient_id = queryParams.get("id");
   const isdone = queryParams.get("isdone");
-  const { data: ConsumablesPref, isLoading: isLoading3 } = getGlobal(
+
+  const addmutation = addGlobal({} as RowData, insertOpwithoutxray);
+  const updateMutation = updateItem({} as XrayData, xrayApiClient);
+
+  const { data: consomableArrayList, isLoading: isLoading1 } = getGlobal(
     {},
     CACHE_KEY_ProductOperation,
     productOperationApiClient,
     undefined
   );
+
   const {
-    data: Operationprefs,
+    data: extraData,
     refetch,
     isLoading: isloading2,
   } = getGlobal({}, CACHE_KEY_OperationPref, OperationPrefApiClient, undefined);
-  const [consomableTotal, setConsomableTotal] = useState(0);
-  const { data: xrayData, isLoading } = operation_id
+
+  const { data: xrayData, isLoading: isLoading3 } = operation_id
     ? getGlobalById(
         {} as XrayData,
         ["CACHE_KEY_Xray", operation_id.toString()],
@@ -84,66 +94,51 @@ const VisiteValidation = ({ onNext }) => {
         parseInt(operation_id)
       )
     : { data: [], isLoading: false };
-  const { handleSubmit, control, setValue, getValues } = useForm<{
-    rows: RowData[];
-    consomables: Consomables[];
-  }>();
-  const Zok = [
-    {
-      id: 1,
-      name: "tichkbila",
-    },
-    {
-      id: 2,
-      name: "zaba",
-    },
-    {
-      id: 3,
-      name: "zaka",
-    },
-  ];
-  const navigate = useNavigate();
-  const { showSnackbar } = useSnackbarStore();
 
-  const addmutation = addGlobal({} as RowData, insertOpwithoutxray);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const updateMutation = updateItem({} as XrayData, xrayApiClient);
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "rows",
-  });
-
-  const {
-    fields: consomableFields,
-    append: appendConsomable,
-    remove: removeConsomable,
-  } = useFieldArray({
-    control,
-    name: "consomables",
-  });
-
-  const rows = useWatch({ control, name: "rows" });
-  const consomables = useWatch({ control, name: "consomables" });
-
-  const handleAddRow = () => {
-    append({ xray_type: "", price: 0 });
-  };
-  const handleAddConsomable = () => {
-    appendConsomable({ consomable: "", qte: 0 });
+  const addNewOperation = () => {
+    setOperations((old) => [...old, { xray_type: "", price: 0 }]);
   };
 
-  const onSubmit = async (data: {
-    rows: RowData[];
-    consomables: RowData[];
-  }) => {
-    if (data.rows.length === 0) {
+  const addNewConomable = () => {
+    setConsomables((old) => [...old, { consomable: "", qte: 0 }]);
+  };
+
+  const patchOperation = (index, value, type) => {
+    setOperations((old) =>
+      old.map((op, idx) => {
+        if (idx === index) op[type] = value;
+        return op;
+      })
+    );
+  };
+
+  const patchConsomable = (index, value, type) => {
+    setConsomables((old) =>
+      old.map((op, idx) => {
+        if (idx === index) op[type] = value;
+        return op;
+      })
+    );
+  };
+
+  const removeOperation = (index) => {
+    setOperations((old) => old.filter((op, idx) => idx !== index));
+  };
+
+  const removeConsomable = (index) => {
+    setConsomables((old) => old.filter((op, idx) => idx !== index));
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (operations.length === 0) {
       showSnackbar(
         "Vous devez remplir au moins une opération avant de soumettre",
         "error"
       );
       return;
     }
-    const validRows = data.rows.filter((row) => row.xray_type.trim() !== "");
+    const validRows = operations.filter((row) => row.xray_type.trim() !== "");
 
     if (validRows.length === 0) {
       showSnackbar(
@@ -160,17 +155,17 @@ const VisiteValidation = ({ onNext }) => {
           operation_id: operation_id,
           patient_id: patient_id,
           treatment_isdone: isdone ?? 1,
-          ...data,
+          consomables: consomables,
+          rows: operations.map((e) => {
+            if (e.id)
+              if (String(e.id).startsWith("pref-")) {
+                delete e.id; // Remove the id property if it starts with "pref-"
+              } else {
+                e.id = String(e.id).replace(/^data-(\d+)$/, "$1"); // Keep only the number for "data-"
+              }
+            return e;
+          }),
         };
-        formData.rows = formData.rows.map((e) => {
-          if (e.id)
-            if (String(e.id).startsWith("pref-")) {
-              delete e.id; // Remove the id property if it starts with "pref-"
-            } else {
-              e.id = String(e.id).replace(/^data-(\d+)$/, "$1"); // Keep only the number for "data-"
-            }
-          return e;
-        });
 
         // If operation_id exists, update the operation
         await updateMutation.mutateAsync(
@@ -202,9 +197,9 @@ const VisiteValidation = ({ onNext }) => {
         const formData = {
           patient_id: Number(patient_id),
           treatment_isdone: isdone ?? 1,
-          ...data,
+          consomables: consomables,
+          rows: operations,
         };
-        console.log(formData);
 
         await addmutation.mutateAsync(formData, {
           onSuccess: (data) => {
@@ -230,52 +225,29 @@ const VisiteValidation = ({ onNext }) => {
     }
   };
 
-  const combinedRows = useMemo(() => {
-    const xrayRows = (xrayData || []).map((item, index) => ({
-      id: `data-${item.id || index}`, // Ensure unique id
-      xray_type: item.xray_type || "", // Default to empty string
-      price: item.price || 0, // Default to 0
+  const xrayRows = useMemo(() => {
+    return [...(xrayData || [])].map((item, index) => ({
+      id: `data-${item.id || index}`,
+      xray_type: item.xray_type || "",
+      price: item.price || 0,
     }));
+  }, [xrayData]);
 
-    const prefRows = (Operationprefs || []).map((pref, index) => ({
-      id: `pref-${pref.id || index}`, // Ensure unique id
-      xray_type: pref.operation_type || "", // Default to empty string
-      price: parseFloat(pref.price || "0"), // Default to 0
+  const extraRows = useMemo(() => {
+    return [...(extraData || [])].map((pref, index) => ({
+      id: `pref-${pref.id || index}`,
+      xray_type: pref.operation_type || "",
+      price: parseFloat(pref.price || "0"),
     }));
+  }, [extraData]);
 
-    return [...xrayRows, ...prefRows];
-  }, [xrayData, Operationprefs]);
-  useEffect(() => {
-    if (!isInitialized && combinedRows.length > 0) {
-      setValue("rows", combinedRows);
-      setIsInitialized(true); // Mark as initialized
-    }
-  }, [combinedRows, setValue, isInitialized]);
-  useEffect(() => {
-    if (isInitialized && combinedRows.length > 0) {
-      const currentRows = getValues("rows");
-      const hasDifference =
-        JSON.stringify(currentRows) !== JSON.stringify(combinedRows);
-
-      if (hasDifference) {
-        setValue("rows", combinedRows); // Update rows if there's a difference
-      }
-    }
-  }, [combinedRows, setValue, getValues, isInitialized]);
+  const xrayString = JSON.stringify(xrayRows);
 
   useEffect(() => {
-    const total = rows?.reduce((sum, row) => sum + Number(row.price || 0), 0);
-    setTotalPrice(total);
-  }, [rows]);
+    setOperations([...xrayRows, ...extraRows]);
+  }, [extraRows, xrayString]);
 
-  useEffect(() => {
-    const total = consomables?.reduce(
-      (sum, row) => sum + Number(row.qte || 0),
-      0
-    );
-    setConsomableTotal(total);
-  }, [consomables]);
-  if (isLoading || isloading2 || isLoading3) return <LoadingSpinner />;
+  if (isLoading1 || isloading2 || isLoading3) return <LoadingSpinner />;
   return (
     <Paper className="!p-6 w-full flex flex-col gap-4">
       <Box
@@ -283,7 +255,7 @@ const VisiteValidation = ({ onNext }) => {
         noValidate
         autoComplete="off"
         className="flex gap-8 flex-col"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
       >
         <Box className="flex gap-4 flex-col">
           <Box className="flex justify-between">
@@ -293,71 +265,67 @@ const VisiteValidation = ({ onNext }) => {
             <Button
               sx={{ borderRadius: 16 }}
               variant="outlined"
-              onClick={handleAddRow}
+              onClick={addNewOperation}
             >
               <AddIcon />
             </Button>
           </Box>
-
           <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center">
-            <TableContainer component={Paper}>
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              className="border border-gray-300"
+            >
               <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                <TableHead>
+                <TableHead className="bg-gray-200">
                   <TableRow>
                     <TableCell>Operation name</TableCell>
-                    <TableCell width="250px" align="left">
-                      Price
-                    </TableCell>
+                    <TableCell>Price</TableCell>
                     <TableCell align="right">Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {fields.map((field, index) => (
+                  {operations.map((field, index) => (
                     <TableRow
-                      key={field.id}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      key={`operation.${index}`}
+                      className="border-t border-gray-300"
                     >
                       <TableCell component="th" scope="row">
                         <FormControl className="w-full md:flex-1">
-                          <Controller
-                            name={`rows.${index}.xray_type`}
-                            control={control}
-                            defaultValue={field.xray_type}
-                            render={({ field }) => (
-                              <TextField
-                                {...field}
-                                id={`xray_type_${field.id}`}
-                                size="small"
-                                type="text"
-                              />
-                            )}
+                          <TextField
+                            {...field}
+                            id={`xray_type_${field.id}`}
+                            size="small"
+                            type="text"
+                            value={field.xray_type}
+                            onChange={(event) =>
+                              patchOperation(
+                                index,
+                                event.target.value,
+                                "xray_type"
+                              )
+                            }
                           />
                         </FormControl>
                       </TableCell>
-
                       <TableCell align="right">
                         <FormControl className="w-full md:flex-1">
-                          <Controller
-                            name={`rows.${index}.price`}
-                            control={control}
-                            defaultValue={field.price}
-                            render={({ field }) => (
-                              <TextField
-                                {...field}
-                                id={`price_${field.id}`}
-                                size="small"
-                                type="number"
-                              />
-                            )}
+                          <TextField
+                            {...field}
+                            id={`price_${field.id}`}
+                            size="small"
+                            type="number"
+                            value={field.price}
+                            onChange={(event) =>
+                              patchOperation(index, event.target.value, "price")
+                            }
                           />
                         </FormControl>
                       </TableCell>
-
                       <TableCell align="right">
                         <IconButton
-                          variant="contained"
                           color="error"
-                          onClick={() => remove(index)}
+                          onClick={() => removeOperation(index)}
                         >
                           <DeleteOutlineOutlinedIcon />
                         </IconButton>
@@ -368,13 +336,13 @@ const VisiteValidation = ({ onNext }) => {
               </Table>
             </TableContainer>
           </Box>
-
           <Box className="flex justify-between items-center">
             <h2 className="font-semibold text-base text-start">
               Montant Total
             </h2>
             <span className="font-semibold text-sm text-end">
-              {totalPrice} MAD
+              {operations.reduce((carry, current) => carry + +current.price, 0)}{" "}
+              MAD
             </span>
           </Box>
         </Box>
@@ -386,87 +354,81 @@ const VisiteValidation = ({ onNext }) => {
             <Button
               sx={{ borderRadius: 16 }}
               variant="outlined"
-              onClick={handleAddConsomable}
+              onClick={addNewConomable}
             >
               <AddIcon />
             </Button>
           </Box>
-
           <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center">
-            <TableContainer component={Paper}>
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              className="border border-gray-300"
+            >
               <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                <TableHead>
+                <TableHead className="bg-gray-200">
                   <TableRow>
                     <TableCell>Consommable</TableCell>
-                    <TableCell width="250px" align="left">
-                      Quantité
-                    </TableCell>
+                    <TableCell>Quantité</TableCell>
                     <TableCell align="right">Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {consomableFields.map((carry, index) => (
+                  {consomables.map((field, index) => (
                     <TableRow
                       key={"consomable." + index}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      className="border-t border-gray-300"
                     >
                       <TableCell component="th" scope="consomables">
                         <FormControl className="w-full md:flex-1">
-                          <Controller
-                            name={`consomables.${index}.consomable`}
-                            control={control}
-                            defaultValue={carry.consomable}
-                            render={({ field }) => (
-                              <Select
-                                {...field}
-                                labelId="demo-select-small-label"
-                                id={`consomables.consomable_${index}`}
-                                size="small"
-                              >
-                                {ConsumablesPref &&
-                                ConsumablesPref.length > 0 ? (
-                                  ConsumablesPref.map(
-                                    (consumable: SupplierTinyData) => (
-                                      <MenuItem
-                                        key={consumable.id}
-                                        value={consumable.id}
-                                      >
-                                        {consumable.product_name}
-                                      </MenuItem>
-                                    )
-                                  )
-                                ) : (
-                                  <MenuItem value="none" disabled>
-                                    <em>Aucun consommable trouvé</em>
+                          <Select
+                            labelId="demo-select-small-label"
+                            id={`consomables.consomable_${index}`}
+                            size="small"
+                            value={field.consomable}
+                            onChange={(event) =>
+                              patchConsomable(
+                                index,
+                                event.target.value,
+                                "consomable"
+                              )
+                            }
+                          >
+                            {consomableArrayList &&
+                            consomableArrayList.length > 0 ? (
+                              consomableArrayList.map(
+                                (consumable: SupplierTinyData) => (
+                                  <MenuItem
+                                    key={consumable.id}
+                                    value={consumable.id}
+                                  >
+                                    {consumable.product_name}
                                   </MenuItem>
-                                )}
-                              </Select>
+                                )
+                              )
+                            ) : (
+                              <MenuItem value="none" disabled>
+                                <em>Aucun consommable trouvé</em>
+                              </MenuItem>
                             )}
-                          />
+                          </Select>
                         </FormControl>
                       </TableCell>
-
                       <TableCell align="right">
                         <FormControl className="w-full md:flex-1">
-                          <Controller
-                            name={`consomables.${index}.qte`}
-                            control={control}
-                            defaultValue={carry.qte}
-                            render={({ field }) => (
-                              <TextField
-                                {...field}
-                                id={`consomables.qte_${index}`}
-                                size="small"
-                                type="number"
-                              />
-                            )}
+                          <TextField
+                            id={`consomables.qte_${index}`}
+                            size="small"
+                            type="number"
+                            value={field.qte}
+                            onChange={(event) =>
+                              patchConsomable(index, event.target.value, "qte")
+                            }
                           />
                         </FormControl>
                       </TableCell>
-
                       <TableCell align="right">
                         <IconButton
-                          variant="contained"
                           color="error"
                           onClick={() => removeConsomable(index)}
                         >
@@ -485,7 +447,8 @@ const VisiteValidation = ({ onNext }) => {
               Quantité Total
             </h2>
             <span className="font-semibold text-sm text-end">
-              {consomableTotal} Pièces
+              {consomables.reduce((carry, current) => carry + +current.qte, 0)}{" "}
+              Pièces
             </span>
           </Box>
         </Box>
@@ -503,4 +466,4 @@ const VisiteValidation = ({ onNext }) => {
   );
 };
 
-export default VisiteValidation;
+export default AhmedPageOptimized;

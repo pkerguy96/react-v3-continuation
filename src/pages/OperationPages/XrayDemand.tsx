@@ -278,38 +278,44 @@ const XrayDemand = ({ onNext }) => {
           </Button>
         </Box>
         <Box>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Radiographie</TableCell>
-                <TableCell>Vue</TableCell>
-                <TableCell>Côté</TableCell>
-                <TableCell style={{ width: 100 }} align="center">
-                  Action
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {xrays.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell component="th" scope="row">
-                    {row.xray_type.join(", ")}
-                  </TableCell>
-                  <TableCell>{row.view_type?.join(", ")}</TableCell>
-                  <TableCell>{row.body_side?.join(", ") ?? ""}</TableCell>
-                  <TableCell>
-                    <Button onClick={() => removeXRay(row.id)}>
-                      <DeleteOutlineIcon
-                        color="error"
-                        className="pointer-events-none"
-                        fill="currentColor"
-                      />
-                    </Button>
+          <TableContainer
+            component={Paper}
+            elevation={0}
+            className="border border-gray-300"
+          >
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead className="bg-gray-200">
+                <TableRow>
+                  <TableCell>Radiographie</TableCell>
+                  <TableCell>Vue</TableCell>
+                  <TableCell>Côté</TableCell>
+                  <TableCell style={{ width: 100 }} align="center">
+                    Action
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {xrays.map((row) => (
+                  <TableRow key={row.id} className="border-t border-gray-300">
+                    <TableCell component="th" scope="row">
+                      {row.xray_type.join(", ")}
+                    </TableCell>
+                    <TableCell>{row.view_type?.join(", ")}</TableCell>
+                    <TableCell>{row.body_side?.join(", ") ?? ""}</TableCell>
+                    <TableCell>
+                      <Button onClick={() => removeXRay(row.id)}>
+                        <DeleteOutlineIcon
+                          color="error"
+                          className="pointer-events-none"
+                          fill="currentColor"
+                        />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
         <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center">
           <FormControl className="w-full md:flex-1">

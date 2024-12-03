@@ -1,4 +1,3 @@
-//@ts-nocheck
 import React, { useEffect, useState } from "react";
 import {
   Modal,
@@ -8,8 +7,7 @@ import {
   Button,
   Autocomplete,
 } from "@mui/material";
-import MuiAlert, { AlertColor } from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
+
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment"; // Import moment library
@@ -23,6 +21,10 @@ import { APIClient } from "../services/Http";
 import getGlobal from "../hooks/getGlobal";
 import { CACHE_KEY_PATIENTS } from "../constants";
 import patientAPIClient, { OnlyPatientData } from "../services/PatientService";
+import { useSnackbarStore } from "../zustand/useSnackbarStore";
+import addGlobal from "../hooks/addGlobal";
+import appointmentAPIClient from "../services/AppointmentService";
+import LoadingSpinner from "./LoadingSpinner";
 interface ModalComponentProps {
   open: boolean;
   onClose: () => void;
@@ -34,32 +36,24 @@ const AppointmentModal: React.FC<ModalComponentProps> = ({
   onClose,
   dateTime,
 }) => {
-  const [snackBar, setSnackBar] = useState({
-    isopen: false,
-    message: "",
-    severity: "info",
-  });
+  const { showSnackbar } = useSnackbarStore();
   const queryClient = useQueryClient();
+  console.log(dateTime);
+
   const dateTimeMoment = moment(dateTime);
-  const [patient, setPatient] = useState<Patient>();
+  const [patient, setPatient] = useState<Patient | null>(null);
   const [title, setTitle] = useState("");
   const [dateTimeValue, setDateTimeValue] = useState<string>();
   const [note, setNote] = useState("");
   const { data: patientsData, isLoading } = getGlobal(
     {} as OnlyPatientData, // Tname (you can use a placeholder object here)
-    [CACHE_KEY_PATIENTS[0]], // query
+    CACHE_KEY_PATIENTS, // query
     patientAPIClient, // service
     undefined // opts
   );
 
+  const addmutation = addGlobal({}, appointmentAPIClient);
   let dataArray = [];
-  if (patientsData && typeof patientsData === "object") {
-    dataArray = Object.values(patientsData);
-  }
-
-  if (open && !dateTimeValue) {
-    setDateTimeValue(dateTimeMoment.format("YYYY-MM-DDTHH:mm:ss"));
-  }
 
   const handlePatientChange = (_event: any, newValue: Patient) => {
     if (newValue) {
@@ -67,11 +61,8 @@ const AppointmentModal: React.FC<ModalComponentProps> = ({
       setPatient(newValue);
     } else {
       // Handle the case when nothing is selected
-      setPatient(undefined);
+      setPatient(null);
     }
-  };
-  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
   };
 
   const handleNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,71 +87,38 @@ const AppointmentModal: React.FC<ModalComponentProps> = ({
       note: note,
     };
     try {
-      //TODO: this;
-      const apiclient = new APIClient<Appointments>("/Appointment");
-      const response = await apiclient.Postall(formData);
-
-      setSnackBar({
-        isopen: true,
-        message: "Le rendez-vous a été créé",
-        severity: "success",
+      addmutation.mutateAsync(formData, {
+        onSuccess: () => {
+          showSnackbar("Le rendez-vous a été créé", "success");
+          queryClient.invalidateQueries(CACHE_KEY_APPOINTMENTS);
+          setPatient(null);
+          onClose();
+        },
+        onError: (error: any) => {
+          const message =
+            error instanceof AxiosError
+              ? error.response?.data?.message
+              : error.message;
+          showSnackbar(message, "warning");
+        },
       });
-      queryClient.invalidateQueries(CACHE_KEY_APPOINTMENTS);
     } catch (error: any) {
       const message =
         error instanceof AxiosError
           ? error.response?.data?.message
           : error.message;
-
-      setSnackBar({
-        isopen: true,
-        message: message,
-        severity: "error",
-      });
     }
   };
 
   useEffect(() => {
-    let intervalId: number;
-    if (snackBar.severity === "success") {
-      intervalId = setInterval(() => {
-        setSnackBar({
-          severity: "info",
-        });
-
-        onClose();
-      }, 1500);
+    if (open) {
+      setDateTimeValue(dateTimeMoment.format("YYYY-MM-DDTHH:mm:ss"));
     }
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [snackBar.severity]);
+  }, [open]);
+
+  if (isLoading) return <LoadingSpinner />;
   return (
     <>
-      <Snackbar
-        open={snackBar.isopen}
-        autoHideDuration={3000} // Adjust the duration for how long the snackbar should be displayed
-        onClose={() =>
-          setSnackBar((prevState) => ({ ...prevState, isopen: false }))
-        }
-        anchorOrigin={{
-          vertical: "top", // Set the vertical position to top
-          horizontal: "right", // Set the horizontal position to right
-        }}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
-          onClose={() =>
-            setSnackBar((prevState) => ({ ...prevState, isopen: false }))
-          }
-          severity={snackBar.severity as AlertColor}
-        >
-          {snackBar.message}
-        </MuiAlert>
-      </Snackbar>
       <Modal
         open={open}
         onClose={onClose}
@@ -179,18 +137,13 @@ const AppointmentModal: React.FC<ModalComponentProps> = ({
           <Autocomplete
             disablePortal
             id="combo-box-demo"
-            options={dataArray}
+            options={patientsData}
+            value={patient}
             getOptionLabel={(option) => `${option.nom} ${option.prenom}`}
             sx={{ width: " 100% " }}
             renderInput={(params) => <TextField {...params} label="Patient" />}
             onChange={handlePatientChange} // Handle changes
           />
-          {/*    <TextField
-            fullWidth
-            label="Titre"
-            id="title-text"
-            onChange={handleTitleChange}
-          /> */}
 
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <DateTimePicker

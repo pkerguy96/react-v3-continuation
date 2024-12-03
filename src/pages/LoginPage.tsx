@@ -90,75 +90,79 @@ export default function SignIn() {
 
   return (
     <Container component="main" maxWidth="xs">
+      <div className="bg"></div>
+      <div className="bg bg2"></div>
+      <div className="bg bg3"></div>
       <CssBaseline />
-      <Box className=" flex flex-col justify-center items-center">
-        <img src="/centre-jadid.jpeg" />
+      <Box className=" flex flex-col justify-center items-center min-h-[100dvh]">
+        {/*   <img src="/centre-jadid.jpeg" /> */}
+        <Box className="p-4 bg-white rounded-lg">
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            <TextField
+              error={errors.email}
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Address Email"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              onChange={handleChange}
+              value={userdata.email}
+            />
 
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            error={errors.email}
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Address Email"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            onChange={handleChange}
-            value={userdata.email}
-          />
-
-          {errors.email && (
-            <FormHelperText id="email-error-text" style={{ color: "red" }}>
-              Le champ adresse email est obligatoire.
-            </FormHelperText>
-          )}
-          <TextField
-            error={errors.password}
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Mot de passe"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            onChange={handleChange}
-            value={userdata.password}
-          />
-          {errors.password && (
-            <FormHelperText id="password-text" style={{ color: "red" }}>
-              Le champ mot de pass est obligatoire.
-            </FormHelperText>
-          )}
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{
-              mt: 3,
-              mb: 2,
-              backgroundColor: "#528F8A",
-              "&:hover": {
-                backgroundColor: "#3E7A75", // Darker shade for hover
-              },
-            }}
-          >
-            Sign In
-          </Button>
-          {error.isError && (
-            <Alert variant="filled" severity="error">
-              {error.message}
-            </Alert>
-          )}
-          <Grid container>
-            <Grid item xs>
-              <RouterLink to="réinitialisation-mot-de-passe">
-                Mot de passe oublié ?
-              </RouterLink>
+            {errors.email && (
+              <FormHelperText id="email-error-text" style={{ color: "red" }}>
+                Le champ adresse email est obligatoire.
+              </FormHelperText>
+            )}
+            <TextField
+              error={errors.password}
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Mot de passe"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              onChange={handleChange}
+              value={userdata.password}
+            />
+            {errors.password && (
+              <FormHelperText id="password-text" style={{ color: "red" }}>
+                Le champ mot de pass est obligatoire.
+              </FormHelperText>
+            )}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{
+                mt: 3,
+                mb: 2,
+                backgroundColor: "#528F8A",
+                "&:hover": {
+                  backgroundColor: "#3E7A75", // Darker shade for hover
+                },
+              }}
+            >
+              Sign In
+            </Button>
+            {error.isError && (
+              <Alert variant="filled" severity="error">
+                {error.message}
+              </Alert>
+            )}
+            <Grid container>
+              <Grid item xs>
+                <RouterLink to="réinitialisation-mot-de-passe">
+                  Mot de passe oublié ?
+                </RouterLink>
+              </Grid>
             </Grid>
-          </Grid>
+          </Box>
         </Box>
       </Box>
     </Container>
