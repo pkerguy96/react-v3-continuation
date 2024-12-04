@@ -104,7 +104,6 @@ const NursesTable = () => {
         sort: false,
         customBodyRender: (value: any, tableMeta: any) => {
           const patientId = tableMeta.rowData[0]; // Assuming the first column is the ID
-          console.log(patientId);
 
           return (
             <Box style={{ width: "90px" }}>

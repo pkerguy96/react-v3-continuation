@@ -128,13 +128,10 @@ const PatientOperation = ({ onNext }) => {
     try {
       await addMutation.mutateAsync(cleanedData, {
         onSuccess: () => {
-          console.log("ddaaaaaaaazt");
           onNext();
         },
       });
-    } catch (error) {
-      console.log("madaztch");
-    }
+    } catch (error) {}
   };
 
   function toggleStrokeColor(code) {

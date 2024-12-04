@@ -60,7 +60,7 @@ const PrintableComponant = () => {
   if (isLoading) {
     return <LoadingSpinner />;
   }
-  console.log(data);
+
   const FormattedDate = data?.date.split("-");
 
   return (

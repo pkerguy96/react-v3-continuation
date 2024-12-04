@@ -84,8 +84,6 @@ const XrayDemand = ({ onNext }) => {
       note: data.note, // Optional note
     };
 
-    console.log("Payload:", payload);
-
     await addMutation.mutateAsync(payload, {
       onSuccess: (data: any) => {
         const operationId = data.data;

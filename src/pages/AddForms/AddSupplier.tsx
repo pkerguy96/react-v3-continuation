@@ -106,7 +106,6 @@ const AddSupplier = () => {
       showSnackbar("L'identifiant du fournisseur est manquant.", "error");
       return;
     }
-    console.log("Update Payload:", { data, supplierId });
 
     await updateMutation.mutateAsync(
       { data, id: parseInt(supplierId) }, // Ensure ID is included in the API call

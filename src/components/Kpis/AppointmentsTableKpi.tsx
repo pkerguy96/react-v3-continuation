@@ -122,7 +122,6 @@ const AppointmentsTableKpi = () => {
             <button
               className=" text-3xl btn-ordonance-delete text-gray-950 hover:text-blue-700 cursor-pointer"
               title="Supprimer"
-              onClick={() => console.log($metadata.rowData[0])}
             >
               <DeleteOutlineIcon
                 color="error"

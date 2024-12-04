@@ -32,9 +32,6 @@ export const AddoperationPreference = (onAdd: () => void) => {
       return { previousData };
     },
     onSuccess: (apiOperation, FormOperation) => {
-      console.log("api", apiOperation);
-      console.log("form", FormOperation);
-
       queryClient.setQueryData<OperationPreference[]>(
         CACHE_KEY_OperationPref,
         (operations) =>

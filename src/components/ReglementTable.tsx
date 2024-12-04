@@ -191,8 +191,6 @@ const ReglementTable = () => {
               searchPlaceholder: "Rechercher une opération",
               selectableRowsHideCheckboxes: true,
               onRowClick: (s: any, _m: any, e: any) => {
-                console.log(s);
-
                 if (
                   e.target.querySelector(".btn-ordonance-delete") ||
                   e.target.classList.contains("btn-ordonance-delete")

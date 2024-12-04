@@ -57,7 +57,6 @@ const BloodTestPrintableComponent = () => {
   if (isLoading) {
     return <LoadingSpinner />;
   }
-  console.log(data);
 
   return (
     <>

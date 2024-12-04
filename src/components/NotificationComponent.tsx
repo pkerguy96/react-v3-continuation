@@ -40,8 +40,6 @@ const NotificationComponent = () => {
     data?.filter((notification: NotificationProps) => !notification.is_read)
       .length || 0;
   const markAsRead = async (id: string, target_id: string, type: string) => {
-    console.log(id);
-
     await getUrls(id, markAsReadApiClient);
     queryClient.invalidateQueries(CACHE_KEY_Notification);
     if (type === "payment") {

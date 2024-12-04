@@ -111,8 +111,6 @@ const Uploadstable = () => {
         filter: true,
         sort: true,
         customBodyRender: (data: any) => {
-          console.log("1000", data);
-
           return (
             <>
               {can(["detail_document", "doctor"]) &&

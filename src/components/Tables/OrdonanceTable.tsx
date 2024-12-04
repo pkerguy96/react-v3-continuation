@@ -65,7 +65,6 @@ const OrdonanceTable = () => {
         sort: true,
         customBodyRender: (value, tableMeta) => {
           const patientDeletedAt = tableMeta.rowData[4];
-          console.log(patientDeletedAt);
 
           return (
             <>

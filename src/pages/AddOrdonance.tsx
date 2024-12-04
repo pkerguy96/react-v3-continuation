@@ -188,8 +188,6 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
 
   const onSubmit = async (data: any) => {
     data.drugs = drugs;
-    /*     console.log("ddd", SpecifiedPatient, data);
-    return; */
 
     if (data.drugs && data.drugs.length === 0) {
       setIsError(true);
@@ -327,41 +325,6 @@ const AddOrdonanceUpdated = ({ onNext }: any) => {
               Patient:
             </label>
             <Box className={`w-full md:flex-1 `}>
-              {/*   <Controller
-                rules={{ required: "Veuillez sélectionner un patient" }} // Add required rule
-                control={control}
-                name="patient"
-                render={({ field, fieldState }) => (
-                  <Autocomplete
-                    {...field}
-                    id="combo-box-demo"
-                    value={optionsArray || field.value || null}
-                    options={dataArray}
-                    isOptionEqualToValue={(option, value) =>
-                      option.id === value.id
-                    }
-                    getOptionLabel={(option) =>
-                      `${option.nom} ${option.prenom}`
-                    }
-                    renderInput={(params) => {
-                      return (
-                        <TextField
-                          {...params}
-                          label="Patient"
-                          error={Boolean(fieldState?.error?.message)}
-                          helperText={fieldState?.error?.message || ""}
-                        />
-                      );
-                    }}
-                    onChange={(e, data) => {
-                      console.log(data);
-
-                      optionsArray && setOptionsArray(data);
-                      setValue("patient", data);
-                    }}
-                  />
-                )}
-              /> */}
               <Controller
                 name="patient"
                 control={control}

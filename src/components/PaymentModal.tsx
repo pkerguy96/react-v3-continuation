@@ -134,9 +134,7 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
   );
 
   const outstandingAmount = totalCost - totalpaid;
-  console.log("====================================");
-  console.log(totalCost, totalpaid);
-  console.log("====================================");
+
   const deletePayment = async (id: number) => {
     try {
       const deletionSuccessful = await deleteItem(

@@ -1,15 +1,10 @@
 import { useState } from "react";
 import StepperComponant from "../../components/StepperComponant";
-
 import AppointmentStepPage from "./AppointmentStepPage";
-
 import AddOrdonance from "../AddOrdonance";
 import XrayDemand from "./XrayDemand";
 import DocumentPage from "./DocumentPage";
 import BloodTest from "./BloodTest";
-
-import VisiteValidation from "./VisiteValidation";
-import NursePatientXrays from "../NursePatientXrays";
 import AhmedPageOptimized from "./AhmedPageOptimized";
 
 const OperationParentPage = () => {

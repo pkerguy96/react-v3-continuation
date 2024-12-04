@@ -38,7 +38,6 @@ const AppointmentModal: React.FC<ModalComponentProps> = ({
 }) => {
   const { showSnackbar } = useSnackbarStore();
   const queryClient = useQueryClient();
-  console.log(dateTime);
 
   const dateTimeMoment = moment(dateTime);
   const [patient, setPatient] = useState<Patient | null>(null);

@@ -62,7 +62,6 @@ const DashboardKpiPage = () => {
       },
     ],
   };
-  console.log("hi");
 
   return (
     <div className="flex flex-col gap-6">

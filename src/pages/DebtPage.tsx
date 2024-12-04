@@ -67,12 +67,9 @@ const DebtPage = () => {
   const todayDate = new Date().toISOString().split("T")[0];
   const onSubmit = async (formData: SentDebtData) => {
     setData([]);
-    console.log(formData);
 
     await addMutation.mutateAsync(formData, {
       onSuccess: (response: any) => {
-        console.log(response);
-
         const transformedData = response?.data?.map((item: any) => ({
           name: item.name,
           date: item.date,

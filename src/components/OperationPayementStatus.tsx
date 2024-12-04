@@ -40,7 +40,6 @@ const OperationPayementStatus = () => {
     undefined,
     parseInt(operationid)
   );
-  console.log(data);
 
   useEffect(() => {
     if (data && data.payments) {

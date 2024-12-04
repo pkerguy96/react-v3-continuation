@@ -106,28 +106,7 @@ const OperationsComponent = ({ operation_id }) => {
       }
     }
   }, [combinedRows, setValue, getValues, isInitialized]);
-  console.log("hello");
 
-  /*  useEffect(() => {
-    const combinedRows = [
-      ...(xrayData || []).map((item, index) => ({
-        id: `data-${item.id || index}`, // Ensure unique id
-        xray_type: item.xray_type || "", // Default to empty string
-        price: item.price || 0, // Default to 0
-      })),
-      ...(Operationprefs || []).map((pref, index) => ({
-        id: `pref-${pref.id || index}`, // Ensure unique id
-        xray_type: pref.operation_type || "", // Default to empty string
-        price: parseFloat(pref.price || "0"), // Default to 0
-      })),
-    ];
-
-    if (combinedRows.length > 0) {
-      setValue("rows", combinedRows);
-    }
-
-    console.log("Combined Rows After Transformation:", combinedRows);
-  }, []); */
   if (isLoading || isloading2) return <LoadingSpinner />;
 
   return (

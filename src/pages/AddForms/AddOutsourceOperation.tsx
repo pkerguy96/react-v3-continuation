@@ -90,7 +90,6 @@ const AddOutsourceOperation = () => {
       total_price: Number(data.total_price),
       amount_paid: Number(data.amount_paid),
     };
-    console.log(transformedData);
 
     try {
       await addmutation.mutateAsync(transformedData, {
