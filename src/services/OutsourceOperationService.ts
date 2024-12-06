@@ -15,6 +15,7 @@ export interface AddOutsourceOperationForm {
   operation_date: string; // Operation date (formatted as YYYY-MM-DD)
   total_price: number;
   amount_paid: number;
+  fee: number;
 }
 
 export const useSearchPatients = (search: string) =>

@@ -700,3 +700,11 @@ video {
     transform: translateX(25%);
   }
 }
+
+.MuiTableRow-root.row-yellow {
+  background-color: #fff3cd !important; /* Light yellow */
+}
+
+.MuiTableRow-root.row-red {
+  background-color: #f8d7da !important; /* Light red */
+}

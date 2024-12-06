@@ -60,7 +60,7 @@ export const MonthlyAppointmentsKpiClient = new APIClient<NewAppointments>(
 );
 export const TotalRevenueKpiClient = new APIClient<Revenue>("/getTotalRevenue");
 export const PatientsDebtKpiClient = new APIClient<OperationDataDebt>(
-  "/PatientsDebt"
+  "/fetchPayments"
 );
 export const CashierNumberKpiClient = new APIClient<CashierNumber>(
   "/OnlyCashierNumber"

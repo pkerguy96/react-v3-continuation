@@ -30,6 +30,7 @@ interface TransformedOutsourceOperation {
   operation_date: string;
   total_price: number;
   amount_paid: number;
+  fee: number;
   patient?: { id: number; name: string } | null; // Selected patient
   hospital?: { id: number; name: string } | null;
 }
@@ -48,6 +49,7 @@ const AddOutsourceOperation = () => {
     operation_date: new Date().toISOString().split("T")[0], // Default to today
     total_price: 0,
     amount_paid: 0,
+    fee: 0,
   };
   const addmutation = addGlobal(
     {} as AddOutsourceOperationForm,
@@ -89,6 +91,7 @@ const AddOutsourceOperation = () => {
       operation_date: data.operation_date,
       total_price: Number(data.total_price),
       amount_paid: Number(data.amount_paid),
+      fee: Number(data.amount_paid),
     };
 
     try {
@@ -304,6 +307,28 @@ const AddOutsourceOperation = () => {
                     type="number"
                     error={!!errors.total_price}
                     helperText={errors.total_price?.message}
+                  />
+                )}
+              />
+            </FormControl>
+          </Box>
+          <Box className="w-full flex flex-col gap-2 md:flex-row md:flex-wrap items-center mt-2">
+            <label htmlFor="total_price" className="w-full md:w-[160px]">
+              Les honoraires
+            </label>
+            <FormControl className="w-full md:flex-1">
+              <Controller
+                name="fee"
+                control={control}
+                rules={{ required: "Veuillez entrer le prix." }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    id="fee"
+                    label="honoraires"
+                    type="number"
+                    error={!!errors.fee}
+                    helperText={errors.fee?.message}
                   />
                 )}
               />

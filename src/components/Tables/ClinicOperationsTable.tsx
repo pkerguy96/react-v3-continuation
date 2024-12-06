@@ -1,4 +1,4 @@
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Box, Chip, IconButton, Tooltip } from "@mui/material";
 import DataTable from "../DataTable";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router";
@@ -25,7 +25,7 @@ const ClinicOperationsTable = () => {
   const handleCloseModal = () => {
     setOpenModal(false);
   };
-  //TODO ADD STATUS PAYMENT HERE ALSO
+
   const handleStockDelete = async (id: any) => {
     confirmDialog("Voulez-vous vraiment supprimer le patient ?", async () => {
       try {
@@ -91,6 +91,33 @@ const ClinicOperationsTable = () => {
         filter: true,
         sort: true,
         customBodyRender: (value: any) => `${value} MAD`, // Append "MAD" to amount paid
+      },
+    },
+    {
+      name: "fee",
+      label: "Les honoraires",
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value: any) => `${value} MAD`, // Append "MAD" to amount paid
+      },
+    },
+    {
+      name: "isPaid",
+      label: "Statut de Paiement",
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value: boolean) => {
+          const color = value ? "success" : "error";
+          return (
+            <Chip
+              label={value ? "Entièrement payé" : "Non payé"}
+              color={color}
+              variant="outlined"
+            />
+          );
+        },
       },
     },
     {

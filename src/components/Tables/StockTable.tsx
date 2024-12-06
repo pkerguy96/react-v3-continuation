@@ -14,12 +14,15 @@ import { useSnackbarStore } from "../../zustand/useSnackbarStore";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import useUserRoles from "../../zustand/UseRoles";
 
+import { useCallback } from "react";
+
 const stockTable = () => {
   const navigate = useNavigate();
   const { can } = useUserRoles();
 
   const queryClient = useQueryClient();
   const { showSnackbar } = useSnackbarStore();
+
   const columns = [
     { name: "id", label: "Id", options: { display: false } },
     {
@@ -95,6 +98,7 @@ const stockTable = () => {
       },
     },
   ];
+
   const handleStockDelete = async (id: any) => {
     confirmDialog("Voulez-vous vraiment supprimer le patient ?", async () => {
       try {
@@ -116,14 +120,25 @@ const stockTable = () => {
 
   const dataHook = (page: number, searchQuery: string, rowsPerPage: number) =>
     getGlobalv2(
-      {}, // _Tname (Type placeholder)
-      CACHE_KEY_Products, // Query key
-      StockApiClient, // Service function
-      page, // Current page
-      rowsPerPage, // Number of rows per  age
+      {},
+      CACHE_KEY_Products,
+      StockApiClient,
+      page,
+      rowsPerPage,
       searchQuery,
       undefined
     );
+  const rowClassGenerator = useCallback((row: any) => {
+    const qte = row[3];
+    const minStock = row[6];
+
+    if (qte <= minStock) {
+      return "row-red";
+    } else if (qte > minStock && qte <= minStock * 1.5) {
+      return "row-yellow";
+    }
+    return "";
+  }, []);
 
   return (
     <>
@@ -151,14 +166,17 @@ const stockTable = () => {
                   </Tooltip>
                 ) : null;
               },
-
               selectableRowsHideCheckboxes: true,
+              setRowProps: (row) => {
+                const className = rowClassGenerator(row);
+
+                return { className };
+              },
               onRowClick: (s: any, _m: any, e: any) => {},
             }}
           />
         </Box>
       ) : (
-        // Display a denial message if the user lacks permissions
         <div style={{ textAlign: "center", color: "red", marginTop: "20px" }}>
           Vous n'avez pas la permission de consulter cette page.
         </div>
