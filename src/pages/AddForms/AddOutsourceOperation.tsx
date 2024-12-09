@@ -91,7 +91,7 @@ const AddOutsourceOperation = () => {
       operation_date: data.operation_date,
       total_price: Number(data.total_price),
       amount_paid: Number(data.amount_paid),
-      fee: Number(data.amount_paid),
+      fee: Number(data.fee),
     };
 
     try {

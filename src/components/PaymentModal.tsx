@@ -40,6 +40,7 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
   const { handleSubmit, control, setValue } = useForm<FormData>();
   const [fetchedoperations, setFetchedOperations] = useState<any[]>([]);
   const [totalCost, setTotalCost] = useState<number>(0);
+  const [isOutsource, setIsOutsource] = useState<boolean>(false);
   const addMutation = updateItem<Operation>(
     {} as Operation,
     operationApiClient
@@ -57,25 +58,36 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
   );
 
   useEffect(() => {
-    if (data && data.payments) {
+    if (data) {
       setFetchedOperations(data.payments);
-      const operationDetailsCost = data.operation_details.reduce(
-        (total: number, detail: any) => total + Number(detail.price),
-        0
-      );
 
-      const xraysCost = data.xrays.reduce(
-        (total: number, xray: any) => total + Number(xray.price),
-        0
-      );
-      //addded
-      const externalOperationsCost = data.externalOperation.reduce(
-        (total: number, external: any) => total + Number(external.total_price),
-        0
-      );
+      // Check if this is an outsourced operation
+      setIsOutsource(data.outsource === 1);
+      console.log("outsource?", data.outsource === 1);
 
-      // Set the total cost
-      setTotalCost(operationDetailsCost + xraysCost + externalOperationsCost);
+      if (data.outsource === 1) {
+        // Use fee for external operations
+        const externalFee = data.externalOperation.reduce(
+          (total: number, external: any) => total + Number(external.fee),
+          0
+        );
+        console.log("externalFee?", externalFee);
+
+        setTotalCost(externalFee);
+      } else {
+        // Calculate total cost for regular operations
+        const operationDetailsCost = data.operation_details.reduce(
+          (total: number, detail: any) => total + Number(detail.price),
+          0
+        );
+
+        const xraysCost = data.xrays.reduce(
+          (total: number, xray: any) => total + Number(xray.price),
+          0
+        );
+
+        setTotalCost(operationDetailsCost + xraysCost);
+      }
     }
   }, [data]);
   //TODO: remove only operation with the specify id
@@ -220,13 +232,13 @@ const PaymentModal = ({ open, onClose, operationID }: ModalComponentProps) => {
                       (external: any, i: number) => (
                         <Box
                           className="flex items-center justify-between"
-                          key={`xray-${i}`}
+                          key={`outsource-${i}`}
                         >
                           <span className="text-gray-500 text-base text-start">
                             {external.operation_type || "No X-Ray Type"}
                           </span>
                           <span className="text-gray-500 text-sm text-end">
-                            {external.total_price} MAD
+                            {external.fee} MAD
                           </span>
                         </Box>
                       )
